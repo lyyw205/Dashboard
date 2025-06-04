@@ -1,4 +1,5 @@
 const express = require('express');
+const path = require('path');
 const { createClient } = require('@supabase/supabase-js');
 require('dotenv').config();
 
@@ -9,6 +10,7 @@ const PORT = 3000;
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
 
 // JSON 파싱, CORS 허용
+app.use(express.static(path.join(__dirname, '../01main')));
 app.use(express.json());
 app.use(require('cors')());
 
