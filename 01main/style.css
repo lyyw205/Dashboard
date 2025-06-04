@@ -1,0 +1,49 @@
+/* 전체 기본 스타일 */
+body {
+  margin: 0;
+  font-family: 'Noto Sans KR', sans-serif;
+  background-color: #f4f4f4;
+}
+
+/* 대시보드 전체 래퍼 */
+.dashboard {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* 메인 */
+.main{
+  flex: 1;
+  padding: 30px;
+  box-sizing: border-box;
+}
+
+/* 헤더 (나의 대시보드) */
+.main-header h1 {
+  margin: 0 0 20px;
+  font-size: 2rem;
+}
+
+/* 각 섹션 */
+.section {
+  margin-bottom: 40px;
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.section h2 {
+    margin-top: 20px;
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+  .dashboard-container {
+    flex-direction: column;
+  }
+
+  .main-content {
+    padding: 20px;
+  }
+}

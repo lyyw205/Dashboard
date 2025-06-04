@@ -1,0 +1,176 @@
+.dashboard {
+  display: flex;
+}
+.table {
+  display: flex;
+  flex-direction: column;
+  overflow-x: auto;
+  margin: 0 0 0 20px;
+  flex: 1; 
+}
+
+.table-table {
+  border-collapse: collapse;
+  width: 100%;             /* 내용물에 맞춰 너비 설정 */
+  white-space: nowrap;     /* 줄바꿈 방지 → 스크롤 유도 */
+  table-layout: fixed;
+}
+
+.table-table th {
+  background-color: #fafafa;
+  color: #8094ae;
+  padding: 10px;
+  font-size: 14px;
+}
+
+tr {
+  border: 1px solid #ddd;
+}
+
+body {
+  font-family: sans-serif;
+  padding: 0;
+  display: flex;
+  background-color: #F5F6FA;
+  margin: 0;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-top: 1rem;
+}
+
+td {
+  font-size: 13px;
+  padding: 2px;
+  text-align: center;
+  white-space: nowrap;       /* 줄바꿈 없이 한 줄로 유지 */
+  overflow: hidden;          /* 넘치는 내용 숨김 */
+  text-overflow: ellipsis;   /* 넘치면 ... 표시 */
+}
+
+/* 연한 회색 톤 (1, 3, 5, 7, 9, 11번째 열에 적용) */
+.table-table tbody tr:nth-child(odd) {
+  background-color: #fcfcfc; /* 연회색 */
+}
+
+.table-table tbody tr:nth-child(even) {
+  background-color: #f7f7f7; /* 흰색 */
+}
+
+
+th:nth-child(1) {
+  width: 100px;
+  text-align: center;
+}
+
+th:nth-child(2) {
+  width: 60px;
+  text-align: center;
+}
+
+th:nth-child(3) {
+  width: 60px;
+  text-align: center;
+}
+
+th:nth-child(4) {
+  width: 100px;
+  text-align: center;
+}
+
+th:nth-child(5) {
+  width: 60px;
+  text-align: center;
+}
+
+th:nth-child(6) {
+  width: 250px;
+  text-align: center;
+}
+
+th:nth-child(7) {
+  width: 100px;
+  text-align: center;
+}
+
+th:nth-child(8) {
+  width: 250px;
+  text-align: center;
+}
+
+th:nth-child(9) {
+  width: 100px;
+  text-align: center;
+}
+
+th:nth-child(10) {
+  width: 40px;
+  text-align: center;
+}
+
+th:nth-child(11) {
+  width: 100px;
+  text-align: center;
+}
+
+th:nth-child(12) {
+  width: 40px;
+  text-align: center;
+}
+
+th:nth-child(13) {
+  width: 300px;
+  text-align: center;
+}
+
+th {
+  background-color: #f2f2f2;
+}
+
+#filters {
+  margin-bottom: 1rem;
+}
+
+#search-name, #filter-gender, #filter-date {
+  padding: 6px;
+  margin-right: 10px;
+}
+
+.memo-input {
+  border: none;
+  outline: none;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  width: 100%;
+  text-align: center; /* 필요에 따라 left/right 조정 */
+}
+
+.memo-checkbox {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 1.5px solid #333;
+  border-radius: 4px;
+  background-color: white;
+  cursor: pointer;
+  margin: 6px 1px 1px 1px;
+}
+
+.memo-checkbox:checked {
+  background-color: #6366f1; /* 체크 상태일 때 배경 */
+  position: relative;
+}
+
+.memo-checkbox:checked::after {
+  content: '✔';
+  color: white;
+  position: absolute;
+  font-size: 13px;
+  left: 2px;
+  top: -1px;
+}

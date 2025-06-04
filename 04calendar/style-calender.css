@@ -1,0 +1,168 @@
+body {
+  font-family: 'Noto Sans KR', sans-serif;
+  background-color: #f9fafb;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.calendar-page {
+  display: flex;
+  flex-direction: row;
+  height: 100vh; /* ✅ 전체 화면을 채우도록 */
+}
+
+.fc .fc-scrollgrid {
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  background: none;
+  box-shadow: none;
+}
+
+.calendar-wrapper {
+  padding: 2rem;
+  height: 100%;
+  overflow-y: auto;
+  background-color: #ffffff;
+  border-left: 1px solid #e5e7eb;
+  flex-grow: 1;
+}
+
+.add-btn {
+  background-color: #4f46e5;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: bold;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.add-btn:hover {
+  background-color: #4338ca;
+}
+
+#calendar {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.10);
+  padding: 1rem;
+  height: 100%;
+}
+
+.fc .fc-scrollgrid {
+  border-collapse: separate;
+  border-spacing: 6px; /* 셀 간 간격 */
+}
+
+.fc .fc-scrollgrid td,
+.fc .fc-scrollgrid th {
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.fc .fc-col-header-cell-cushion {
+  padding: 5px 0; /* 상하 여백 */
+  font-size: 14px;
+}
+
+/* FullCalendar overrides */
+.fc .fc-toolbar-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.fc .fc-button {
+  background-color: #e5e7eb;
+  border: none;
+  color: #111827;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+}
+.fc .fc-button:hover {
+  background-color: #d1d5db;
+}
+
+.fc .fc-button-primary {
+  background-color: #6366f1;
+  color: white;
+}
+.fc .fc-button-primary:hover {
+  background-color: #4f46e5;
+}
+
+.fc .fc-daygrid-day-number {
+  font-weight: 500;
+  font-size: 14px;
+  color: #374151;
+}
+
+.fc .fc-event {
+  border-radius: 6px;
+  font-size: 13px;
+  padding: 2px 6px;
+  font-weight: 500;
+}
+
+.fc .fc-col-header-cell a {
+  text-decoration: none;
+}
+
+.fc .fc-daygrid-day-number {
+  text-decoration: none;
+}
+
+.fc .fc-daygrid-day:hover {
+  background-color: #f9fafb;
+}
+
+/* 일요일 날짜 숫자 텍스트 (빨간색) */
+.fc-day-sun .fc-daygrid-day-number {
+  color: #dc2626;
+}
+
+/* 토요일 날짜 숫자 텍스트 (파란색) */
+.fc-day-sat .fc-daygrid-day-number {
+  color: #2563eb;
+}
+
+/* 평일 날짜 숫자 텍스트 (진회색) */
+.fc-day-mon .fc-daygrid-day-number,
+.fc-day-tue .fc-daygrid-day-number,
+.fc-day-wed .fc-daygrid-day-number,
+.fc-day-thu .fc-daygrid-day-number,
+.fc-day-fri .fc-daygrid-day-number {
+  color: #111827;
+}
+
+/* 일요일 */
+.fc .fc-col-header-cell:nth-child(1) a {
+  color: #dc2626; /* 빨강 */
+}
+
+/* 토요일 */
+.fc .fc-col-header-cell:nth-child(7) a {
+  color: #2563eb; /* 파랑 */
+}
+
+/* 평일 (월~금) */
+.fc .fc-col-header-cell:nth-child(n+2):nth-child(-n+6) a {
+  color: #111827; /* 진회색 */
+}
+
+
+
+
