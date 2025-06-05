@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>카드 결제 내역</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <link rel="stylesheet" href="/.common css/sidebar.css">
+
+</head>
+<body>
+  <div class="cardlogs-main">
+    <!-- 사이드바 -->
+    <div class="sidebar">
+      <div class="sidebar-head">
+        <a href="index.html" class="sidebar-head-logo">
+          <img class="sidebar-head-loge-img" src="/.asset/img/logo.png">
+        </a>
+      </div>
+      <ul>
+        <li class="list">
+          <a href="applylist.html" class="list-content">
+            <span class="list-content-leftwrap">
+              <span class="list-content-icon">
+                <img src="/.asset/img/form.png" class="form-icon">
+              </span>
+              <span class="list-content-text">파티신청서</span>
+            </span>
+            <span class="list-content-arrow">
+              <img src="/.asset/img/arrow-right.png" class="arrow-right-icon">
+            </span>
+          </a>
+        </li>
+        <li class="list">
+          <a href="reservationlist.html" class="list-content">
+            <span class="list-content-leftwrap">
+              <span class="list-content-icon">
+                <img src="/.asset/img/reservationsheet.png" class="form-icon">
+              </span>
+              <span class="list-content-text">예약시트</span>
+            </span>
+            <span class="list-content-arrow">
+              <img src="/.asset/img/arrow-right.png" class="arrow-right-icon">
+            </span>
+          </a>
+        </li>
+        <li class="list">
+          <a href="#overview" class="list-content">
+            <span class="list-content-leftwrap">
+              <span class="list-content-icon">
+                <img src="/.asset/img/music.png" class="form-icon">
+              </span>
+              <span class="list-content-text">노래초성</span>
+            </span>
+            <span class="list-content-arrow">
+              <img src="/.asset/img/arrow-right.png" class="arrow-right-icon">
+            </span>
+          </a>
+        </li>
+        <li class="list">
+          <a href="#overview" class="list-content">
+            <span class="list-content-leftwrap">
+              <span class="list-content-icon">
+                <img src="/.asset/img/person.png" class="form-icon">
+              </span>
+              <span class="list-content-text">인물게임</span>
+            </span>
+            <span class="list-content-arrow">
+              <img src="/.asset/img/arrow-right.png" class="arrow-right-icon">
+            </span>
+          </a>
+        </li>
+        <li class="list">
+          <a href="#overview" class="list-content">
+            <span class="list-content-leftwrap">
+              <span class="list-content-icon">
+                <img src="/.asset/img/ppt.png" class="form-icon">
+              </span>
+              <span class="list-content-text">진행PPT</span>
+            </span>
+            <span class="list-content-arrow">
+              <img src="/.asset/img/arrow-right.png" class="arrow-right-icon">
+            </span>
+          </a>
+        </li>
+        <li class="list">
+          <a href="/DASHBOARD/calender.html" class="list-content">
+            <span class="list-content-leftwrap">
+              <span class="list-content-icon">
+                <img src="/.asset/img/calendar.png" class="form-icon">
+              </span>
+              <span class="list-content-text">캘린더</span>
+            </span>
+            <span class="list-content-arrow">
+              <img src="/.asset/img/arrow-right.png" class="arrow-right-icon">
+            </span>
+          </a>
+        </li>
+        <li class="list">
+          <a href="#overview" class="list-content">
+            <span class="list-content-leftwrap">
+              <span class="list-content-icon">
+                <img src="/.asset/img/creditcard.png" class="form-icon">
+              </span>
+              <span class="list-content-text">재무기록</span>
+            </span>
+            <span class="list-content-arrow">
+              <img src="/.asset/img/arrow-right.png" class="arrow-right-icon">
+            </span>
+          </a>
+        </li>
+      </ul>
+    </div>
+    <div class="table-wrapper">
+      <h2>💳 카드 결제 내역</h2>
+      <table id="log-table">
+        <thead>
+          <tr>
+            <th>시간</th>
+            <th>카테고리</th>
+            <th>금액</th>
+            <th>카드</th>
+            <th>종류</th>
+            <th>잔액</th>
+            <th>결제처</th>
+            <th>메모</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script>
+    // ✅ 변수명 이름 충돌 방지
+    const supa = window.supabase.createClient(
+      'https://wqxmvqqkbxiykiotbusd.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndxeG12cXFrYnhpeWtpb3RidXNkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg0NDcyOTYsImV4cCI6MjA2NDAyMzI5Nn0.RmB92YtjLPMx4tkQibuRVT_T4DL3_O8Pny3ZA9DU0tk'
+    );
+
+    const categories = ['광고', '장소 대관', '안주/주류', '비품', '업무추진비', '공과금', '파티비', '기타'];
+
+    async function loadInitialLogs() {
+      const { data, error } = await supa
+        .from('card_logs')
+        .select('*')
+        .order('timeline', { ascending: false });
+
+      if (error) {
+        console.error('초기 로드 오류:', error);
+        return;
+      }
+
+      const tbody = document.querySelector('#log-table tbody');
+      tbody.innerHTML = ''; // 초기 로딩 시 전체 채우기
+
+      data.forEach(row => {
+        appendRow(row);
+      });
+    }
+
+    function formatNumber(num) {
+      return typeof num === 'number' ? num.toLocaleString('ko-KR') : '';
+    } 
+
+    function formatDateCompact(dateString) {
+      const date = new Date(dateString);
+      const MM = String(date.getMonth() + 1).padStart(2, '0');
+      const DD = String(date.getDate()).padStart(2, '0');
+      const hh = String(date.getHours()).padStart(2, '0');
+      const mm = String(date.getMinutes()).padStart(2, '0');
+      return `${MM}/${DD} ${hh}:${mm}`;
+    }
+
+
+
+    function appendRow(row) {
+      const tbody = document.querySelector('#log-table tbody');
+      const tr = document.createElement('tr');
+
+            // 카테고리 드롭다운
+      const categoryOptions = categories.map(cat =>
+        `<option value="${cat}" ${row.category === cat ? 'selected' : ''}>${cat}</option>`
+      ).join('');
+
+      tr.innerHTML = `
+        <td>${formatDateCompact(row.timeline)}</td>
+        <td>
+          <select class="category-select" data-id="${row.id}" onchange="updateCategory(this)">
+            <option value="" hidden></option>
+            ${categoryOptions}
+          </select>
+        </td>
+        <td>${formatNumber(row.amount)}</td>
+        <td>${row.card}</td>
+        <td>${row.type}</td>
+        <td>${formatNumber(row.balance)}</td>
+        <td>${row.store}</td>
+        <td>
+          <input type="text" class="memo-input" value="${row.memo || ''}" 
+            data-id="${row.id}" onblur="updateMemo(this)" />
+        </td>
+      `;
+      tbody.prepend(tr); // 🆕 맨 위에 추가!
+    }
+
+    async function updateCategory(selectEl) {
+      const newCategory = selectEl.value;
+      const id = selectEl.getAttribute('data-id');
+
+      const { error } = await supa
+        .from('card_logs')
+        .update({ category: newCategory })
+        .eq('id', id);
+
+      if (error) {
+        alert('카테고리 업데이트 실패');
+        console.error(error);
+      } else {
+        console.log(`✅ 카테고리 업데이트 완료: ${newCategory}`);
+      }
+    }
+
+    async function updateMemo(inputEl) {
+      const newMemo = inputEl.value;
+      const id = inputEl.getAttribute('data-id');
+
+      const { error } = await supa
+        .from('card_logs')
+        .update({ memo: newMemo })
+        .eq('id', id);
+
+      if (error) {
+        alert('메모 업데이트 실패');
+        console.error(error);
+      } else {
+        console.log(`✅ 메모 업데이트 완료: ${newMemo}`);
+      }
+    }
+
+
+    // ✅ 최초 전체 로딩
+    loadInitialLogs();
+
+    // ✅ 실시간 삽입만 감지
+    supa
+      .channel('realtime:card_logs')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'card_logs' },
+        payload => {
+          console.log('🆕 새 데이터 감지됨:', payload.new);
+          appendRow(payload.new); // ✅ 새로운 행만 추가
+        }
+      )
+      .subscribe();
+  </script>
+
+</body>
+</html>

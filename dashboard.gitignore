@@ -1,0 +1,19 @@
+# 시스템 파일
+.DS_Store
+Thumbs.db
+
+# 환경설정 (보안)
+.env
+
+# Node 모듈 (자동 설치됨)
+node_modules/
+
+# 로그 파일
+*.log
+
+# VSCode 설정
+.vscode/
+
+# 빌드 결과물 (향후 번들링 시 대비)
+dist/
+build/

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>퀴즈 디스플레이</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: black;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    img {
+      max-width: 90vw;
+      max-height: 90vh;
+    }
+  </style>
+</head>
+<body>
+  <img id="quiz-img" src="" alt="퀴즈 이미지" />
+
+  <script>
+    let sequence = [];
+    let currentIndex = 0;
+    let mode = "game"; // 'game' | 'single'
+
+    const selected = JSON.parse(localStorage.getItem("selectedSets") || "[]");
+
+    // 초기 슬라이드 시퀀스 구성
+    selected.forEach(set => {
+      sequence.push(`quiz-sets/${set}/h1.png`);
+      sequence.push(`quiz-sets/${set}/h2.png`);
+      sequence.push(`quiz-sets/${set}/h3.png`);
+      sequence.push(`quiz-sets/${set}/answer.png`);
+    });
+
+    function updateImage() {
+      const img = document.getElementById("quiz-img");
+      const src = sequence[currentIndex];
+
+      if (!src) {
+        if (mode === "game") {
+          alert("✅ 퀴즈가 모두 끝났습니다!");
+        } else {
+          alert("✅ 해당 세트의 모든 이미지가 끝났습니다!");
+        }
+        return;
+      }
+
+      console.log("🖼️ 현재 이미지 경로:", src);
+
+      img.onerror = () => {
+        console.error("❌ 이미지 로딩 실패:", src);
+      };
+
+      img.src = src;
+    }
+
+    window.addEventListener("message", (e) => {
+      if (e.data.action === "next") {
+        currentIndex++;
+        updateImage();
+      } 
+      else if (e.data.action === "prev") {
+        if (currentIndex > 0) {
+          currentIndex--;
+          updateImage();
+        } else {
+          alert("🚫 처음 이미지입니다.");
+        }
+      } 
+      else if (e.data.action === "showSet" && e.data.set) {
+        const set = e.data.set;
+        mode = "single";
+        sequence = [
+          `quiz-sets/${set}/h1.png`,
+          `quiz-sets/${set}/h2.png`,
+          `quiz-sets/${set}/h3.png`,
+          `quiz-sets/${set}/answer.png`
+        ];
+        currentIndex = 0;
+        updateImage();
+      }
+    });
+
+    window.onload = () => {
+      if (selected.length === 0) {
+        alert("❌ 세트 정보가 없습니다. 컨트롤러에서 '게임 시작'으로 열어주세요.");
+      } else {
+        updateImage();
+      }
+    };
+  </script>
+</body>
+</html>
