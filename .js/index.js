@@ -10,7 +10,7 @@ const PORT = 3000;
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
 
 // JSON 파싱, CORS 허용
-app.use(express.static(path.join(__dirname)));
+app.use(express.static(path.join(__dirname, '../')));
 app.use(express.json());
 app.use(require('cors')());
 
