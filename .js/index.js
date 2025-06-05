@@ -10,9 +10,13 @@ const PORT = 3000;
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
 
 // JSON 파싱, CORS 허용
-app.use(express.static(path.join(__dirname, '../01main')));
+app.use(express.static(path.join(__dirname)));
 app.use(express.json());
 app.use(require('cors')());
+
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, '01main/index.html'));
+});
 
 // ✅ 날짜가 이미 YYYY-MM-DD 형식이면 그대로 사용
 function parseKoreanDate(dateStr) {
