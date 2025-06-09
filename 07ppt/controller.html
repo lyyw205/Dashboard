@@ -2,12 +2,12 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <title>퀴즈 컨트롤러</title>
-  <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="../common/sidebar.css" />
+  <title>📑 PPT 컨트롤러</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="../common/sidebar.css">
 </head>
 <body>
-  <div class="person-game">
+  <div class="ppt-main">
     <!-- 사이드바 -->
     <div class="sidebar">
       <div class="sidebar-head">
@@ -118,96 +118,98 @@
         </li>
       </ul>
     </div>
-  <div class="person-game-content"> 
-    <h2>🎮 퀴즈 컨트롤러</h2>
-    <div class="controler">
-      <div class="quiz-count">
-        <label class="quiz-count-text" for="count">출제할 문제 수</label>
-        <input class="quiz-count-input" type="number" id="count" value="5" min="1" max="20" />
-      </div>
-      <div class="joystick">
-        <button class="btn-gamestart" onclick="startGame()">게임 시작</button>
-        <div class="btn-prev-next">
-          <button class="btn-prev" onclick="send('prev')">이전</button>
-          <button class="btn-next" onclick="send('next')">다음</button>
+
+
+    <div class="ppt-slide">
+      <div class="ppt-controller">
+        <h2>📑 PPT 슬라이드 컨트롤러</h2>
+
+        <div class="controller">
+          <div class="joystick" style="width: 100%">
+            <button class="btn-gamestart" onclick="startPPT()">PPT 시작하기</button>
+          </div>
         </div>
+
+        <div id="all-sets"></div>
       </div>
     </div>
-    
-    <div id="set-list">
-      <strong class="all-set-list-header">🎯 선택된 퀴즈 세트:</strong>
-      <ul id="selected-sets"></ul>
-    </div>
-
-    <div id="all-set-list">
-      <strong class="all-set-list-header">📚 전체 퀴즈 세트:</strong>
-      <ul id="all-sets"></ul>
-    </div>
-  </div> 
-
+  </div>
   <script>
-    const quizSets = ['김연아', '김풍', '로다주', '박명수', '박정민', '손석구', '수지', '이제훈', '일론머스크', '지예은', '침착맨', '카더가든', '신민아', '구교환'];
-    let selected = [];
     let displayWindow = null;
 
-    function startGame() {
-      const count = parseInt(document.getElementById("count").value) || 5;
-
-      selected = quizSets
-        .sort(() => Math.random() - 0.5)
-        .slice(0, count);
-
-      localStorage.setItem("selectedSets", JSON.stringify(selected));
-      console.log("🎯 선택된 세트:", selected);
-
-      const selectedListEl = document.getElementById("selected-sets");
-      selectedListEl.innerHTML = "";
-      selected.forEach(name => {
-        const li = document.createElement("li");
-        li.textContent = name;
-        selectedListEl.appendChild(li);
-      });
-
-      renderAllSets(); // 🧠 선택 강조 재반영
-      // 참가자 화면 띄우기
-      displayWindow = window.open("quiz-display.html", "quiz-display", "width=800,height=600");
+    function startPPT() {
+      displayWindow = window.open("display.html", "display", "width=1000,height=700");
     }
 
-    function send(action) {
-      if (displayWindow) {
-        displayWindow.postMessage({ action }, "*");
-      } else {
-        alert("먼저 '게임 시작'을 눌러 참가자 화면을 여세요.");
+    function sendImage(path) {
+      if (!displayWindow) {
+        alert("먼저 'PPT 시작하기'를 눌러 참가자 화면을 여세요.");
+        return;
       }
+      displayWindow.postMessage({ type: "slide", src: path }, "*");
     }
 
-    // 전체 세트 목록 렌더링
-    function renderAllSets() {
-      const allListEl = document.getElementById("all-sets");
-      allListEl.innerHTML = "";
+    function makeSlideItem(src, labelText) {
+      const li = document.createElement("li");
 
-      quizSets
-        .slice()  // 원본 배열 손상 방지
-        .sort((a, b) => a.localeCompare(b, 'ko'))  // 한글 정렬
-        .forEach(set => {
-          const li = document.createElement("li");
-          li.textContent = set;
-          if (selected.includes(set)) {
-            li.classList.add("selected");
-          }
-          li.onclick = () => {
-            if (displayWindow) {
-              displayWindow.postMessage({ action: "showSet", set }, "*");
-            } else {
-              alert("참가자 화면이 열려 있지 않습니다.");
-            }
+      const img = document.createElement("img");
+      img.src = src;
+
+      const label = document.createElement("div");
+      label.textContent = labelText;
+
+      li.appendChild(img);
+      li.appendChild(label);
+      li.onclick = () => sendImage(src);
+      return li;
+    }
+
+  function enhanceGroupTitles() {
+    const groupTitles = document.querySelectorAll('.group-title');
+
+    groupTitles.forEach(title => {
+      // 기존에 아이콘이 없으면 이미지 삽입
+      if (!title.querySelector('.arrow-icon')) {
+        const arrow = document.createElement('img');
+        arrow.src = '../assets/arrow-right2.png';
+        arrow.alt = '화살표';
+        arrow.className = 'arrow-icon';
+        title.prepend(arrow);
+      }
+    });
+  }
+
+    // 기존 fetch 코드 내부에 enhanceGroupTitles() 실행 추가
+    fetch("slides.json")
+      .then(res => res.json())
+      .then(data => {
+        const container = document.getElementById("all-sets");
+
+        Object.entries(data).forEach(([group, files]) => {
+          const groupTitle = document.createElement("div");
+          groupTitle.textContent = `📂 ${group}`;
+          groupTitle.className = "group-title";
+          container.appendChild(groupTitle);
+
+          const ul = document.createElement("ul");
+          ul.className = "slide-list";
+
+          files.forEach(file => {
+            const fullPath = `ppt-slides/${group}/${file}`;
+            ul.appendChild(makeSlideItem(fullPath, file));
+          });
+
+          groupTitle.onclick = () => {
+            const isOpen = ul.classList.toggle("open");
+            groupTitle.classList.toggle("open", isOpen);
           };
-          allListEl.appendChild(li);
-        });
-    }
 
-    // ✅ 초기 전체 세트 렌더링 (선택 전에도 보여야 하므로)
-    renderAllSets();
+          container.appendChild(ul);
+        });
+
+        // ✅ 모든 group-title에 화살표 이미지 붙이기
+        enhanceGroupTitles();
+      });
 
     document.getElementById('sidebar-toggle').addEventListener('click', function () {
       document.querySelector('.sidebar').classList.toggle('collapsed');

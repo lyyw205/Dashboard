@@ -12,11 +12,17 @@
     <!-- 사이드바 -->
     <div class="sidebar">
       <div class="sidebar-head">
-        <a href="index.html" class="sidebar-head-logo">
+        <button id="sidebar-toggle">
+          <img class="hamburger-icon" src="../assets/hamburger.png">
+        </button>
+        <a href="../01main/index.html" class="sidebar-head-logo">
           <img class="sidebar-head-loge-img" src="../assets/logo.png">
         </a>
       </div>
       <ul>
+        <li class="list-category">
+          <span class="list-category-text">MANAGE</span>
+        </li>
         <li class="list">
           <a href="../02applylist/applylist.html" class="list-content">
             <span class="list-content-leftwrap">
@@ -44,38 +50,12 @@
           </a>
         </li>
         <li class="list">
-          <a href="#overview" class="list-content">
+          <a href="../05cardlogs/index.html" class="list-content">
             <span class="list-content-leftwrap">
               <span class="list-content-icon">
-                <img src="../assets/music.png" class="form-icon">
+                <img src="../assets/creditcard.png" class="form-icon">
               </span>
-              <span class="list-content-text">노래초성</span>
-            </span>
-            <span class="list-content-arrow">
-              <img src="../assets/arrow-right.png" class="arrow-right-icon">
-            </span>
-          </a>
-        </li>
-        <li class="list">
-          <a href="../06quizppt/index.html" class="list-content">
-            <span class="list-content-leftwrap">
-              <span class="list-content-icon">
-                <img src="../assets/person.png" class="form-icon">
-              </span>
-              <span class="list-content-text">인물게임</span>
-            </span>
-            <span class="list-content-arrow">
-              <img src="../assets/arrow-right.png" class="arrow-right-icon">
-            </span>
-          </a>
-        </li>
-        <li class="list">
-          <a href="#overview" class="list-content">
-            <span class="list-content-leftwrap">
-              <span class="list-content-icon">
-                <img src="../assets/ppt.png" class="form-icon">
-              </span>
-              <span class="list-content-text">진행PPT</span>
+              <span class="list-content-text">재무기록</span>
             </span>
             <span class="list-content-arrow">
               <img src="../assets/arrow-right.png" class="arrow-right-icon">
@@ -95,13 +75,42 @@
             </span>
           </a>
         </li>
+        <li class="list-category">
+          <span class="list-category-text">GAMES</span>
+        </li>
         <li class="list">
-          <a href="../05cardlogs/index.html" class="list-content">
+          <a href="../07ppt/controller.html" class="list-content">
             <span class="list-content-leftwrap">
               <span class="list-content-icon">
-                <img src="../assets/creditcard.png" class="form-icon">
+                <img src="../assets/ppt.png" class="form-icon">
               </span>
-              <span class="list-content-text">재무기록</span>
+              <span class="list-content-text">진행PPT</span>
+            </span>
+            <span class="list-content-arrow">
+              <img src="../assets/arrow-right.png" class="arrow-right-icon">
+            </span>
+          </a>
+        </li>
+                <li class="list">
+          <a href="#overview" class="list-content">
+            <span class="list-content-leftwrap">
+              <span class="list-content-icon">
+                <img src="../assets/music.png" class="form-icon">
+              </span>
+              <span class="list-content-text">노래초성</span>
+            </span>
+            <span class="list-content-arrow">
+              <img src="../assets/arrow-right.png" class="arrow-right-icon">
+            </span>
+          </a>
+        </li>
+        <li class="list">
+          <a href="../06quizppt/index.html" class="list-content">
+            <span class="list-content-leftwrap">
+              <span class="list-content-icon">
+                <img src="../assets/person.png" class="form-icon">
+              </span>
+              <span class="list-content-text">인물게임</span>
             </span>
             <span class="list-content-arrow">
               <img src="../assets/arrow-right.png" class="arrow-right-icon">
@@ -290,6 +299,10 @@
         }
       )
     .subscribe();
+    
+    document.getElementById('sidebar-toggle').addEventListener('click', function () {
+      document.querySelector('.sidebar').classList.toggle('collapsed');
+    });
   </script>
 
 </body>

@@ -1,0 +1,7 @@
+{
+  "game": ["01.png", "02.png", "03.png","04.png"],
+  "notice": ["01.png", "02.png", "03.png", "04.png", "05.png", "06.png", "07.png"],
+  "stick-game": ["01.png","red.png","red1.png","orange.png","orange1.png","yellow.png","yellow1.png","green.png","green1.png","blue.png","blue1.png","navy.png","navy1.png","purple.png","purple1.png"],
+  "balance-game": ["01.png","02.png","03.png","04.png","05.png","06.png","07.png","08.png","09.png"],
+  "seat-change": ["01.png"]
+}

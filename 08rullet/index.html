@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>룰렛 항목 입력</title>
+  <style>
+    body { font-family: Pretendard, sans-serif; text-align: center; padding: 50px; }
+    textarea { width: 300px; height: 200px; }
+    button { margin-top: 20px; padding: 10px 20px; font-size: 16px; }
+  </style>
+</head>
+<body>
+  <h2>룰렛 항목을 줄마다 입력하세요</h2>
+  <textarea id="entries" placeholder="예: 1등\n2등\n3등..."></textarea><br>
+  <button onclick="openWheel()">룰렛 돌리기</button>
+
+  <script>
+    function openWheel() {
+      const data = document.getElementById('entries').value
+        .split('\n')
+        .map(e => e.trim())
+        .filter(e => e !== '');
+
+      if (data.length === 0) {
+        alert('항목을 하나 이상 입력하세요.');
+        return;
+      }
+
+      localStorage.setItem('rouletteEntries', JSON.stringify(data));
+      window.open('wheel.html', '_blank', 'width=500,height=600');
+    }
+  </script>
+</body>
+</html>

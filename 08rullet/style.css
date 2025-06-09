@@ -1,0 +1,44 @@
+body {
+  background: #f8f9fa;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  margin: 0;
+  font-family: 'Pretendard', sans-serif;
+}
+canvas {
+  border: 10px solid white;
+  border-radius: 50%;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+#spin {
+  margin-top: 60px;
+  padding: 12px 24px;
+  font-size: 18px;
+  border: none;
+  background-color: #6bc5d2;
+  color: white;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+#wheel-container {
+  position: relative;
+  width: 400px;
+  height: 400px;
+}
+
+#pointer {
+  position: absolute;
+  left: 45%;
+  top: -5px;
+  width: 0;
+  height: 0;
+  border-left: 20px solid transparent;
+  border-right: 20px solid transparent;
+  border-bottom: 30px solid red;
+  z-index: 10;
+  transform: rotate(180deg);
+}

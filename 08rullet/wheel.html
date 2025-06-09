@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="style.css">
+  <title>룰렛 실행</title>
+</head>
+<body>
+  <div id="wheel-container">
+    <div id="pointer"></div>
+    <canvas id="wheel" width="400" height="400"></canvas>
+  </div>
+  <button id="spin">돌리기</button>
+
+  <script>
+    const canvas = document.getElementById("wheel");
+    const ctx = canvas.getContext("2d");
+    const size = canvas.width;
+    const center = size / 2;
+    const entries = JSON.parse(localStorage.getItem('rouletteEntries') || '["항목 없음"]');
+    const colors = ["#ffadad", "#ffd6a5", "#fdffb6", "#caffbf", "#9bf6ff", "#a0c4ff", "#bdb2ff", "#ffc6ff"];
+    const angle = (2 * Math.PI) / entries.length;
+    let rotation = 0;
+    let isSpinning = false;
+
+    function drawWheel() {
+      ctx.clearRect(0, 0, size, size);
+      for (let i = 0; i < entries.length; i++) {
+        const startAngle = i * angle + rotation;
+        const endAngle = startAngle + angle;
+
+        ctx.beginPath();
+        ctx.moveTo(center, center);
+        ctx.arc(center, center, center - 10, startAngle, endAngle);
+        ctx.fillStyle = colors[i % colors.length];
+        ctx.fill();
+
+        ctx.save();
+        ctx.translate(center, center);
+        ctx.rotate(startAngle + angle / 2);
+        ctx.textAlign = "right";
+        ctx.fillStyle = "#333";
+        ctx.font = "bold 16px Pretendard";
+        ctx.fillText(entries[i], center - 20, 10);
+        ctx.restore();
+      }
+    }
+
+    function easeInOutCubic(t) {
+      return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    }
+
+    function spinWheel() {
+      if (isSpinning) return;
+      isSpinning = true;
+      const targetRotation = rotation + Math.PI * 8 + Math.random() * Math.PI * 2;
+      const duration = 4000;
+      const start = performance.now();
+
+      function animate(now) {
+        const elapsed = now - start;
+        const progress = Math.min(elapsed / duration, 1);
+        const eased = easeInOutCubic(progress);
+        rotation = rotation + (targetRotation - rotation) * eased;
+        drawWheel();
+
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+        } else {
+          isSpinning = false;
+          const index = Math.floor(((2 * Math.PI - (rotation % (2 * Math.PI))) % (2 * Math.PI)) / angle);
+        }
+      }
+
+      requestAnimationFrame(animate);
+    }
+
+    document.getElementById("spin").addEventListener("click", spinWheel);
+    drawWheel();
+  </script>
+</body>
+</html>

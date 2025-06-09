@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>📺 PPT 디스플레이</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: black;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    img {
+      max-width: 90vw;
+      max-height: 90vh;
+    }
+  </style>
+</head>
+<body>
+  <img id="ppt-img" src="" alt="슬라이드 이미지" />
+
+  <script>
+    window.addEventListener("message", (e) => {
+      if (e.data.type === "slide") {
+        document.getElementById("ppt-img").src = e.data.src;
+      }
+    });
+
+
+    let displayWindow = null;
+
+    function startPPT() {
+      displayWindow = window.open("ppt-display.html", "ppt-display", "width=1000,height=700");
+    }
+
+    function sendImage(path) {
+      if (!displayWindow) {
+        alert("먼저 'PPT 시작하기'를 눌러 참가자 화면을 여세요.");
+        return;
+      }
+      displayWindow.postMessage({ type: "slide", src: path }, "*");
+    }
+
+    function makeSlideItem(src, labelText) {
+      const li = document.createElement("li");
+
+      const img = document.createElement("img");
+      img.src = src;
+
+      const label = document.createElement("div");
+      label.textContent = labelText;
+
+      li.appendChild(img);
+      li.appendChild(label);
+      li.onclick = () => sendImage(src);
+      return li;
+    }
+
+    fetch("slides.json")
+      .then(res => res.json())
+      .then(data => {
+        const container = document.getElementById("all-sets");
+
+        Object.entries(data).forEach(([category, groups]) => {
+          const catTitle = document.createElement("h3");
+          catTitle.textContent = `📁 ${category}`;
+          container.appendChild(catTitle);
+
+          // _slides: 카테고리 루트에 직접 있는 이미지들
+          if (groups["_slides"]) {
+            const ul = document.createElement("ul");
+            ul.className = "slide-list open";
+            groups["_slides"].forEach(file => {
+              ul.appendChild(makeSlideItem(`ppt-slides/${category}/${file}`, file));
+            });
+            container.appendChild(ul);
+          }
+
+          // 하위 그룹 처리
+          Object.entries(groups).forEach(([group, files]) => {
+            if (group === "_slides") return;
+
+            const groupTitle = document.createElement("div");
+            groupTitle.textContent = `📂 ${group}`;
+            groupTitle.className = "group-title";
+            container.appendChild(groupTitle);
+
+            const ul = document.createElement("ul");
+            ul.className = "slide-list";
+
+            files.forEach(file => {
+              ul.appendChild(makeSlideItem(`ppt-slides/${category}/${group}/${file}`, file));
+            });
+
+            groupTitle.onclick = () => {
+              const isOpen = ul.classList.toggle("open");
+              groupTitle.classList.toggle("open", isOpen);
+            };
+
+            container.appendChild(ul);
+          });
+        });
+      });
+  </script>
+</body>
+</html>
