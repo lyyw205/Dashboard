@@ -2,6 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>캘린더</title>
   <link rel="stylesheet" href="../common/sidebar.css" />
   <link rel="stylesheet" href="style-calender.css">
@@ -188,15 +189,8 @@
       calendar.render();
     });
 
-    const toggleBtn = document.getElementById('sidebar-toggle');
-    const sidebar = document.querySelector('.sidebar');
-
-    toggleBtn.addEventListener('click', () => {
-      if (window.innerWidth <= 768) {
-        sidebar.classList.toggle('open');
-      } else {
-        sidebar.classList.toggle('collapsed');
-      }
+    document.getElementById('sidebar-toggle').addEventListener('click', function () {
+      document.querySelector('.sidebar').classList.toggle('collapsed');
     });
   </script>
 
