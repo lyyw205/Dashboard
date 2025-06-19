@@ -326,15 +326,8 @@
       )
       .subscribe();
 
-    const toggleBtn = document.getElementById('sidebar-toggle');
-    const sidebar = document.querySelector('.sidebar');
-
-    toggleBtn.addEventListener('click', () => {
-      if (window.innerWidth <= 768) {
-        sidebar.classList.toggle('open');
-      } else {
-        sidebar.classList.toggle('collapsed');
-      }
+    document.getElementById('sidebar-toggle').addEventListener('click', function () {
+      document.querySelector('.sidebar').classList.toggle('collapsed');
     });
   </script>
 

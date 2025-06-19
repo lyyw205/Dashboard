@@ -170,17 +170,8 @@
     </main>
   </div>
   <script>
-    const toggleBtn = document.getElementById('sidebar-toggle');
-    const sidebar = document.querySelector('.sidebar');
-
-    toggleBtn.addEventListener('click', () => {
-      if (window.innerWidth <= 768) {
-        // ✅ 모바일: 아래로 ul 펼치기
-        sidebar.classList.toggle('open');
-      } else {
-        // ✅ 데스크탑: 좌우 접힘
-        sidebar.classList.toggle('collapsed');
-      }
+    document.getElementById('sidebar-toggle').addEventListener('click', function () {
+      document.querySelector('.sidebar').classList.toggle('collapsed');
     });
   </script>
 </body>
