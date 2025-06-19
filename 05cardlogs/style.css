@@ -1,8 +1,6 @@
 body {
-  font-family: 'Segoe UI', sans-serif;
-  background-color: #f8f9fb;
-  color: #333;
-  padding: 0;
+  font-family: 'Pretendard', sans-serif;
+  background: #f9f9fb;
   margin: 0;
 }
 
@@ -114,7 +112,8 @@ tbody td {
 }
 
 
-select.category-select {
+select.category-select,
+select.type-select {
   appearance: none;
   border: none;
   border-radius: 6px;
@@ -139,7 +138,8 @@ select.category-select:focus {
 }
 
 
-select.category-select {
+select.category-select,
+select.type-select {
   background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg fill='%23999' viewBox='0 0 24 24' width='24' height='24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 3px center;
@@ -149,6 +149,18 @@ select.category-select {
   
 }
 
+.type-select.deposit {
+  background-color: #ebf9ff; /* 하늘색 */
+}
+
+.type-select.withdrawal {
+  background-color: #ffeeee; /* 연빨강 */
+}
+
+.type-select.cancel,
+.type-select.other {
+  background-color: #f0f0f0; /* 회색 */
+}
 
 .memo-input {
   border: none;

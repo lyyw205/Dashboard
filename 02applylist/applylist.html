@@ -75,6 +75,32 @@
             </span>
           </a>
         </li>
+        <li class="list">
+          <a href="../09party-cards-data/party_cards.html" class="list-content">
+            <span class="list-content-leftwrap">
+              <span class="list-content-icon">
+                <img src="../assets/calendar.png" class="form-icon">
+              </span>
+              <span class="list-content-text">파티카드 데이터</span>
+            </span>
+            <span class="list-content-arrow">
+              <img src="../assets/arrow-right.png" class="arrow-right-icon">
+            </span>
+          </a>
+        </li>
+        <li class="list">
+          <a href="../10accounts/accounts.html" class="list-content">
+            <span class="list-content-leftwrap">
+              <span class="list-content-icon">
+                <img src="../assets/calendar.png" class="form-icon">
+              </span>
+              <span class="list-content-text">게릴라 계정</span>
+            </span>
+            <span class="list-content-arrow">
+              <img src="../assets/arrow-right.png" class="arrow-right-icon">
+            </span>
+          </a>
+        </li>
         <li class="list-category">
           <span class="list-category-text">GAMES</span>
         </li>
@@ -92,12 +118,12 @@
           </a>
         </li>
                 <li class="list">
-          <a href="#overview" class="list-content">
+          <a href="/11stickgame/controller.html" class="list-content">
             <span class="list-content-leftwrap">
               <span class="list-content-icon">
-                <img src="../assets/music.png" class="form-icon">
+                <img src="../assets/stick.png" class="form-icon">
               </span>
-              <span class="list-content-text">노래초성</span>
+              <span class="list-content-text">막대게임</span>
             </span>
             <span class="list-content-arrow">
               <img src="../assets/arrow-right.png" class="arrow-right-icon">
@@ -135,7 +161,7 @@
             <option value="2025-06-21">2025-06-21</option>
             <option value="2025-05-30">2025-05-30</option>
           </select>
-          <button onclick="loadResponses()">🔍 필터 적용</button>
+          <button class="filter-apply-btn" onclick="loadResponses()">🔍 필터 적용</button>
         </div>
       </div>
       <table class="table-table">
@@ -300,10 +326,16 @@
       )
     .subscribe();
     
-    document.getElementById('sidebar-toggle').addEventListener('click', function () {
-      document.querySelector('.sidebar').classList.toggle('collapsed');
+    const toggleBtn = document.getElementById('sidebar-toggle');
+    const sidebar = document.querySelector('.sidebar');
+
+    toggleBtn.addEventListener('click', () => {
+      if (window.innerWidth <= 768) {
+        sidebar.classList.toggle('open');
+      } else {
+        sidebar.classList.toggle('collapsed');
+      }
     });
   </script>
-
 </body>
 </html>

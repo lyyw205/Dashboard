@@ -1,0 +1,86 @@
+  body {
+    font-family: 'Pretendard', sans-serif;
+    background: #f9f9fb;
+    margin: 0;
+  }
+
+  .stickgame-wrapper {
+    display: flex;
+    flex-direction: row;
+
+  }
+
+  .game-wrapper {
+    display: flex;
+    flex-direction: column;
+    padding: 40px;
+  }
+
+  .ppt-start-button {
+    width: 200px;
+    font-weight: bold;
+  }
+
+  h2 {
+    margin-bottom: 30px;
+    font-size: 22px;
+    color: #333;
+    white-space: nowrap;
+  }
+
+  #input-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+.set-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  background: #fff;
+  padding: 14px 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  min-width: 120px;
+}
+.set-group input[type="color"] {
+  flex: 0 0 100px;
+  height: 38px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.set-group input[type="text"] {
+  flex: 1 1 150px;
+  min-width: 100px;
+  max-width: 250px;  /* ✅ 최대 너비 제한 */
+  padding: 8px 10px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  transition: border 0.2s;
+}
+
+  .set-group input[type="text"]:focus {
+    border-color: #7278D7;
+    outline: none;
+  }
+
+  .ppt-start-button {
+    margin-top: 30px;
+    padding: 12px 24px;
+    background: #7278D7;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .ppt-start-button:hover {
+    background: #5a60c4;
+  }

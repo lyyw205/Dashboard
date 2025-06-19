@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>🎬 컬러 PPT 디스플레이</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: #000;
+      overflow: hidden;
+      font-family: sans-serif;
+    }
+
+    #slide-container {
+      width: 100%;
+      height: 100%;
+      position: relative;
+    }
+
+    .slide {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+    }
+
+    .text-box {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 64px;
+      font-weight: bold;
+      color: white;
+      white-space: pre-line;
+      opacity: 0;
+      transition: transform 0.6s ease, opacity 0.4s ease;
+    }
+
+    .text-box.enter-left {
+      transform: translate(-150%, -50%);
+      opacity: 0;
+    }
+
+    .text-box.enter-right {
+      transform: translate(250%, -50%);
+      opacity: 0;
+    }
+
+    .text-box.visible {
+      transform: translate(-50%, -50%);
+      opacity: 1;
+    }
+
+    .text-box.exit-left {
+      transform: translate(-150%, -50%);
+      opacity: 0;
+    }
+
+    .text-box.exit-right {
+      transform: translate(250%, -50%);
+      opacity: 0;
+    }
+  </style>
+</head>
+<body>
+  <div id="slide-container"></div>
+
+  <script>
+    let slides = [];
+    let currentIndex = -1;
+
+    window.addEventListener("message", (event) => {
+      if (event.data.type === "colorppt") {
+        slides = event.data.slides;
+        currentIndex = -1;
+        nextSlide(); // 바로 첫 슬라이드 표시
+      }
+    });
+
+    function nextSlide(forward = true) {
+      const container = document.getElementById("slide-container");
+
+      // 다음 인덱스 계산 (먼저 미리 계산해서 유효성 확인)
+      let nextIndex = forward ? currentIndex + 1 : currentIndex - 1;
+
+      // ✅ 범위 초과 시 아무 동작 안 함
+      if (nextIndex < 0 || nextIndex >= slides.length) return;
+
+      // 현재 텍스트 박스 제거 (애니메이션으로)
+      const currentText = document.querySelector(".text-box.visible");
+      if (currentText) {
+        currentText.classList.remove("visible");
+        currentText.classList.add(forward ? "exit-right" : "exit-left");
+        setTimeout(() => currentText.remove(), 500);
+      }
+
+      currentIndex = nextIndex;
+
+      const slide = slides[currentIndex];
+      if (!slide) return;
+
+      // 배경색 바꾸기
+      document.body.style.backgroundColor = slide.bg;
+
+      // 새 텍스트 삽입
+      const textDiv = document.createElement("div");
+      textDiv.className = "text-box " + (forward ? "enter-left" : "enter-right");
+      textDiv.textContent = slide.text;
+      container.appendChild(textDiv);
+
+      requestAnimationFrame(() => {
+        textDiv.classList.remove("enter-left", "enter-right");
+        textDiv.classList.add("visible");
+      });
+    }
+
+
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowRight") {
+        nextSlide(true);
+      } else if (e.key === "ArrowLeft") {
+        nextSlide(false);
+      }
+    });
+  </script>
+</body>
+</html>

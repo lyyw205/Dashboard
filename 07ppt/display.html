@@ -23,87 +23,42 @@
   <img id="ppt-img" src="" alt="슬라이드 이미지" />
 
   <script>
+    let slides = [];     // 슬라이드 이미지 경로 배열
+    let currentIndex = 0;
+
+    // 메시지 수신 (controller.html에서 전송된 슬라이드 목록)
     window.addEventListener("message", (e) => {
-      if (e.data.type === "slide") {
-        document.getElementById("ppt-img").src = e.data.src;
+      if (e.data.type === "slides" && Array.isArray(e.data.slides)) {
+        slides = e.data.slides;
+        currentIndex = 0;
+        showSlide();
       }
     });
 
-
-    let displayWindow = null;
-
-    function startPPT() {
-      displayWindow = window.open("ppt-display.html", "ppt-display", "width=1000,height=700");
-    }
-
-    function sendImage(path) {
-      if (!displayWindow) {
-        alert("먼저 'PPT 시작하기'를 눌러 참가자 화면을 여세요.");
-        return;
+    // 현재 슬라이드 보여주기
+    function showSlide() {
+      const img = document.getElementById("ppt-img");
+      if (slides.length > 0) {
+        img.src = slides[currentIndex];
       }
-      displayWindow.postMessage({ type: "slide", src: path }, "*");
     }
 
-    function makeSlideItem(src, labelText) {
-      const li = document.createElement("li");
-
-      const img = document.createElement("img");
-      img.src = src;
-
-      const label = document.createElement("div");
-      label.textContent = labelText;
-
-      li.appendChild(img);
-      li.appendChild(label);
-      li.onclick = () => sendImage(src);
-      return li;
-    }
-
-    fetch("slides.json")
-      .then(res => res.json())
-      .then(data => {
-        const container = document.getElementById("all-sets");
-
-        Object.entries(data).forEach(([category, groups]) => {
-          const catTitle = document.createElement("h3");
-          catTitle.textContent = `📁 ${category}`;
-          container.appendChild(catTitle);
-
-          // _slides: 카테고리 루트에 직접 있는 이미지들
-          if (groups["_slides"]) {
-            const ul = document.createElement("ul");
-            ul.className = "slide-list open";
-            groups["_slides"].forEach(file => {
-              ul.appendChild(makeSlideItem(`ppt-slides/${category}/${file}`, file));
-            });
-            container.appendChild(ul);
-          }
-
-          // 하위 그룹 처리
-          Object.entries(groups).forEach(([group, files]) => {
-            if (group === "_slides") return;
-
-            const groupTitle = document.createElement("div");
-            groupTitle.textContent = `📂 ${group}`;
-            groupTitle.className = "group-title";
-            container.appendChild(groupTitle);
-
-            const ul = document.createElement("ul");
-            ul.className = "slide-list";
-
-            files.forEach(file => {
-              ul.appendChild(makeSlideItem(`ppt-slides/${category}/${group}/${file}`, file));
-            });
-
-            groupTitle.onclick = () => {
-              const isOpen = ul.classList.toggle("open");
-              groupTitle.classList.toggle("open", isOpen);
-            };
-
-            container.appendChild(ul);
-          });
-        });
-      });
+    // 키보드 입력 처리
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowRight") {
+        // 다음 슬라이드
+        if (currentIndex < slides.length - 1) {
+          currentIndex++;
+          showSlide();
+        }
+      } else if (e.key === "ArrowLeft") {
+        // 이전 슬라이드
+        if (currentIndex > 0) {
+          currentIndex--;
+          showSlide();
+        }
+      }
+    });
   </script>
 </body>
 </html>

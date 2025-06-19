@@ -1,154 +1,142 @@
-
 body {
-  font-family: sans-serif;
-  padding: 0;
+  font-family: 'Pretendard', sans-serif;
+  background: #f9f9fb;
   margin: 0;
 }
 
-h2 {
-  margin: 10px;
-  
-}
-
-.ppt-main{
+.ppt-main {
   display: flex;
   flex-direction: row;
 }
-.ppt-slide {
-  flex: 1;
-  margin: 30px
-}
 
-button {
-  margin: 10px;
-  padding: 10px 16px;
-  font-size: 15px;
-}
-
-.person-game-content{
-  flex: 1;
-  margin: 30px;
-  max-width: 1000px;
-}
-
-input{
-  margin: 10px;
-  padding: 10px 16px;
-  font-size: 15px;
-  text-align: center;
-}
-
-.controller {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  max-width: 600px;
-}
-
-.joystick {
+.slide-controller-wrapper {
   display: flex;
   flex-direction: column;
-  width: 70%;
-  padding: 20px 20px;
+  margin: 40px;
+  width: 80vw;
 }
 
+.ppt-start-button {
+  width: 200px;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid #dbdbdb;
+  margin-bottom: 30px;
+}
+
+.ppt-start-text {
+  font-size: 16px;
+}
+
+.slide-list ul {
+  display: flex;
+  gap: 12px;  /* li 사이 간격 */
+  flex-wrap: wrap;
+  list-style: none;
+  padding-left: 0;  /* 들여쓰기 제거 */
+}
+
+.slide-list ul li img {
+  width: 210px;       /* 원하는 고정 너비 */
+  height: auto;      /* 원하는 고정 높이 */
+  object-fit: cover;  /* 이미지 비율 맞춰서 자르기 */
+  border-radius: 6px; /* 모서리 둥글게 (선택) */
+}
+
+.slide-item {
+  position: relative;
+  border-radius: 8px;
+  transition: background-color 0.3s;
+}
+
+.slide-item.selected {
+  background-color: rgba(118, 128, 222, 0.2); /* 전체 배경에 연한 하늘색 */
+  outline: 2px solid #7680DE;
+  border-radius: 8px;
+}
+
+.slide-item img {
+  display: block;
+  width: 100%;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.slide-label {
+  text-align: center;
+  margin-top: 8px;
+  color: #333;
+  background: none;
+  font-weight: bold;
+}
+
+#selected-slides {
+  display: flex;
+  flex-direction: row;
+  height: 200px;
+  gap: 20px;
+  max-width: 90%;            /* ✅ 전체 화면 폭까지 사용 */
+  overflow-x: auto;           /* ✅ 가로 스크롤 활성화 */
+  overflow-y: hidden;
+  white-space: nowrap;        /* ✅ 줄바꿈 방지 */
+  padding: 30px 20px 10px 20px;
+  background-color: #f3f3f3;
+  border: 1px solid #ececec;
+  border-radius: 20px;
+  margin-bottom: 30px;
+}
 
 #all-sets {
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: 10px;
-  padding: 0;
-  margin-top: 5px;
+  width: 90%;               /* 🔒 뷰포트 기준으로 고정 */
+  overflow-x: hidden;         /* 🔒 내부는 스크롤 안 생기게 */
+  box-sizing: border-box;
 }
 
-#all-sets li {
-  background: #fff;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 10px;
-  text-align: center;
-  transition: 0.2s;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+.slide-thumb {
+  position: relative;         /* 🔸 기준 잡기 */
 }
 
-#all-sets li:hover {
-  background: #f0f4ff;
-  cursor: pointer;
-  border-color: #739ae9;
+.slide-thumb img {
+  width: 300px;       /* 원하는 고정 너비 */
+  height: auto;      /* 원하는 고정 높이 */
+  object-fit: cover;  /* 이미지 비율 맞춰서 자르기 */
+  border-radius: 6px; /* 모서리 둥글게 (선택) */
 }
 
-.all-set-list-header {
-  display: inline-block; /* 또는 block */
-  margin: 30px 10px 15px 10px;
-}
-
-#all-sets li.selected {
+.remove-btn {
+  position: absolute;         /* 🔸 부모를 기준으로 고정 */
+  top: 6px;
+  right: 6px;
+  background: rgb(161, 161, 161);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  font-size: 14px;
   font-weight: bold;
-  color: #679aff;
-  border: 1px solid #739ae9;
-  background: #eef3ff;
-}
-
-#selected-sets {
-  margin-bottom: 20px;
-  padding: 10px;
-  background: #f9f9f9;
-  border: 1px solid #f1f1f1;
-  border-radius: 20px;
-}
-
-#selected-sets li {
-  padding: 4px 15px;
-  border-radius: 4px;
-  font-weight: 500;
-}
-
-ul {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.group-title {
-  display: flex;
-  align-items: center;
+  line-height: 1;
   cursor: pointer;
-  margin: 10px 0;
+  z-index: 10;
 }
 
-.group-title img.arrow-icon {
-  width: 14px;
-  height: 14px;
-  margin-right: 6px;
-  transition: transform 0.2s ease;
+/* 🧼 WebKit 기반 브라우저용 (Chrome, Edge, Safari 등) */
+#selected-slides::-webkit-scrollbar {
+  height: 8px;
+  margin-top: 6px;              /* ✅ 직접 안 먹히므로 padding으로 대신 처리 */
 }
 
-.group-title.open img.arrow-icon {
-  transform: rotate(90deg);
+#selected-slides::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 0 12px;              /* ✅ 좌우 양 끝 좁히기 */
 }
 
-.slide-list {
-  display: none;
+#selected-slides::-webkit-scrollbar-thumb {
+  background-color: #aaa;
+  border-radius: 10px;
+  margin-top: 6px;
 }
 
-.slide-list.open {
-  display: grid !important;
-  grid-template-columns: repeat(2, 50%);
-  gap: 12px;
-  justify-content: flex-start;
-  margin-bottom: 20px;
-}
-
-
-img {
-  width: 100%;
-  border-radius: 6px;
-}
-
-.arrow-icon {
-  margin-top: 2px;
-}
-
-.person-game-content {
-  max-width: 1000px;
-  margin: auto;
+#selected-slides::-webkit-scrollbar-thumb:hover {
+  background-color: #666;
 }

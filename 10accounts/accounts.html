@@ -1,15 +1,14 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <link rel="stylesheet" href="../common/sidebar.css" />
-  <link rel="stylesheet" href="style.css" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+  <meta charset="UTF-8" />
+  <title>계정 정보</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <link rel="stylesheet" href="accounts.css">
+  <link rel="stylesheet" href="/common/sidebar.css">
 </head>
 <body>
-  <div class="dashboard">
-    
+  <div class="accounts-wrapper">
     <!-- 사이드바 -->
     <div class="sidebar">
       <div class="sidebar-head">
@@ -122,7 +121,7 @@
           <a href="/11stickgame/controller.html" class="list-content">
             <span class="list-content-leftwrap">
               <span class="list-content-icon">
-                <img src="../assets/stick.png" class="form-icon">
+                <img src="../assets/music.png" class="form-icon">
               </span>
               <span class="list-content-text">막대게임</span>
             </span>
@@ -146,39 +145,161 @@
         </li>
       </ul>
     </div>
+    <div class="accounts-main">
+      <h2>🔐 가입 사이트 계정 정보</h2>
+      <table class="account-table">
+        <thead>
+          <tr>
+            <th>사이트</th>
+            <th>아이디</th>
+            <th>비밀번호</th>
+            <th>마지막 수정일</th>
+            <th>삭제</th>
+          </tr>
+        </thead>
+        <tbody id="account-body">
+          <!-- JS에서 채워짐 -->
+        </tbody>
+      </table>
 
-    <!-- 메인 콘텐츠 -->
-    <main class="main">
-      <header class="main-header">
-        <h1>나의 대시보드</h1>
-      </header>
-
-      <section id="overview" class="section">
-        <h2>개요</h2>
-        <p>여기에 요약 정보나 상태 등을 표시</p>
-      </section>
-
-      <section id="games" class="section">
-        <h2>인물게임</h2>
-        <!-- 여기엔 슬라이드 이미지 게임이 들어갈 수 있음 -->
-      </section>
-
-      <section id="settings" class="section">
-        <h2>설정업데이트</h2>
-        <p>난이도, 문제 수, 공개 여부 등을 설정</p>
-      </section>
-    </main>
+      <div class="button-wrapper">
+        <button class="add-row-btn" onclick="addRow()">+ 행 추가</button>
+        <button class="save-button" onclick="saveChanges()">💾 저장하기</button>
+      </div>
+    </div>
   </div>
+
+  <!-- ✅ JavaScript는 마지막에 삽입 -->
   <script>
+    // ⚠️ Supabase 연결은 이 아래에서 선언돼야 함
+    const supabaseClient = supabase.createClient('https://wqxmvqqkbxiykiotbusd.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndxeG12cXFrYnhpeWtpb3RidXNkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg0NDcyOTYsImV4cCI6MjA2NDAyMzI5Nn0.RmB92YtjLPMx4tkQibuRVT_T4DL3_O8Pny3ZA9DU0tk') // 생략');
+
+
+    let rowsData = [];
+    let newRows = [];
+    let editedRows = new Set();
+
+    async function loadData() {
+      const { data, error } = await supabaseClient
+        .from('accounts')
+        .select('*')
+        .order('updated_at', { ascending: true });
+
+      if (error) {
+        alert('불러오기 실패: ' + error.message);
+        return;
+      }
+
+      rowsData = data;
+      newRows = [];
+      editedRows.clear();
+      renderTable();
+    }
+
+    function renderTable() {
+      const tbody = document.getElementById('account-body');
+      tbody.innerHTML = '';
+
+      rowsData.forEach(row => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><input type="text" value="${row.site}" onchange="markEdited(${row.id}, this, 'site')" /></td>
+          <td><input type="text" value="${row.username}" onchange="markEdited(${row.id}, this, 'username')" /></td>
+          <td><input type="text" value="${row.password}" onchange="markEdited(${row.id}, this, 'password')" /></td>
+          <td>${new Date(row.updated_at).toLocaleDateString('ko-KR', {
+            month: 'long',
+            day: 'numeric'
+          })}</td>
+          <td><button class="btn delete-btn" onclick="deleteRow(${row.id})">삭제</button></td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      newRows.forEach((row, index) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><input type="text" placeholder="사이트" value="${row.site}" oninput="updateNewRow(${index}, 'site', this.value)" /></td>
+          <td><input type="text" placeholder="아이디" value="${row.username}" oninput="updateNewRow(${index}, 'username', this.value)" /></td>
+          <td><input type="text" placeholder="비밀번호" value="${row.password}" oninput="updateNewRow(${index}, 'password', this.value)" /></td>
+          <td>-</td>
+          <td><button class="btn delete-btn" onclick="removeNewRow(${index})">삭제</button></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function markEdited(id, input, field) {
+      const row = rowsData.find(r => r.id === id);
+      if (row && row[field] !== input.value) {
+        row[field] = input.value;
+        editedRows.add(id);
+      }
+    }
+
+    function updateNewRow(index, field, value) {
+      newRows[index][field] = value;
+    }
+
+    function addRow() {
+      newRows.push({ site: '', username: '', password: '' });
+      renderTable();
+    }
+
+    function removeNewRow(index) {
+      newRows.splice(index, 1);
+      renderTable();
+    }
+
+    async function deleteRow(id) {
+      if (!confirm('정말 삭제하시겠습니까?')) return;
+      await supabaseClient.from('accounts').delete().eq('id', id);
+      rowsData = rowsData.filter(row => row.id !== id);
+      renderTable();
+    }
+
+    async function saveChanges() {
+      for (const id of editedRows) {
+        const row = rowsData.find(r => r.id === id);
+        const { error } = await supabaseClient.from('accounts').update({
+          site: row.site,
+          username: row.username,
+          password: row.password,
+          updated_at: new Date().toISOString()
+        }).eq('id', id);
+
+        if (error) {
+          alert(`❌ 업데이트 실패 (id=${id}): ${error.message}`);
+          return;
+        }
+      }
+
+      const validNew = newRows.filter(r => r.site && r.username && r.password);
+      if (validNew.length > 0) {
+        // ✅ updated_at 직접 추가
+        validNew.forEach(row => {
+          row.updated_at = new Date().toISOString();
+        });
+
+        const { error } = await supabaseClient.from('accounts').insert(validNew);
+        if (error) {
+          alert("❌ 추가 실패: " + error.message);
+          return;
+        }
+      }
+
+      alert("✅ 저장 완료");
+      loadData();
+    }
+
+    loadData();
+
     const toggleBtn = document.getElementById('sidebar-toggle');
     const sidebar = document.querySelector('.sidebar');
 
     toggleBtn.addEventListener('click', () => {
       if (window.innerWidth <= 768) {
-        // ✅ 모바일: 아래로 ul 펼치기
         sidebar.classList.toggle('open');
       } else {
-        // ✅ 데스크탑: 좌우 접힘
         sidebar.classList.toggle('collapsed');
       }
     });

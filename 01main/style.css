@@ -1,8 +1,8 @@
 /* 전체 기본 스타일 */
 body {
+  font-family: 'Pretendard', sans-serif;
+  background: #f9f9fb;
   margin: 0;
-  font-family: 'Noto Sans KR', sans-serif;
-  background-color: #f4f4f4;
 }
 
 /* 대시보드 전체 래퍼 */

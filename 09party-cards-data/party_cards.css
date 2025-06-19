@@ -1,0 +1,100 @@
+body {
+  font-family: 'Pretendard', sans-serif;
+  background: #f9f9fb;
+  margin: 0;
+}
+
+h2 {
+  white-space: nowrap; 
+}
+.party_cards-wrapper {
+  display: flex;
+  flex-direction: row;
+}
+.party_cards-main {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow-x: auto; /* ✅ 가로 스크롤 추가 */
+  margin: 50px 20px 0 40px;
+}
+table {
+  width: max-content;          /* ✅ 내용 크기만큼 너비 설정 */
+  min-width: unset;             /* ✅ 너무 작아지지 않도록 */
+  border-collapse: collapse;
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  table-layout: auto; /* ✅ 셀 너비 고정 */
+}
+th, td {
+  padding: 8px 10px;
+  border: 1px solid #ddd;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+}
+th {
+  background-color: #f1f5f9;
+}
+td[contenteditable="true"]:focus {
+  outline: 2px solid #6366f1;
+}
+td {
+  background-color: #fcfcfc;
+}
+.delete-btn {
+  background: #ef4444;
+  color: white;
+  padding: 4px 10px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.row-buttons {
+  display: flex;
+  flex-direction: row;
+}
+.add-row-btn,
+#save-button {
+  margin-top: 20px;
+  padding: 12px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  color: white;
+  white-space: nowrap; 
+}
+.add-row-btn {
+  background-color: #3b82f6;
+  margin-right: 10px;
+}
+#save-button {
+  background-color: #10b981;
+}
+
+td input[type="text"] {
+  width: 100%;
+  min-width: 0;
+  padding: 4px 6px;
+  font-size: 15px;
+  border: none;
+  background: transparent;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+td input[type="text"]:focus {
+  outline: 2px solid #6366f1;
+  background-color: #fff;
+}
+
+td:nth-child(1), th:nth-child(1) { max-width: 60px; }  /* 제목 */
+td:nth-child(2), th:nth-child(2) { max-width: 100px; }  /* 날짜 */
+td:nth-child(3), th:nth-child(3) { max-width: 150px; }   /* 시간 */
+td:nth-child(4), th:nth-child(4) { max-width: 120px; }  /* 장소 */
+td:nth-child(5), th:nth-child(5) { max-width: 200px; }   /* 성비 */
+td:nth-child(6), th:nth-child(6) { max-width: 140px; }  /* 마감일시 */
+td:nth-child(7), th:nth-child(7) { max-width: 250px; }  /* 폼 URL */
+td:nth-child(8), th:nth-child(8) { max-width: 60px; }   /* 삭제 버튼 */

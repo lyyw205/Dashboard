@@ -1,15 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <link rel="stylesheet" href="../common/sidebar.css" />
-  <link rel="stylesheet" href="style.css" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+  <title>🎨 컬러 PPT 컨트롤러</title>
+  <link rel="stylesheet" href="stickgame.css">
+  <link rel="stylesheet" href="/common/sidebar.css">
 </head>
 <body>
-  <div class="dashboard">
-    
+  <div class="stickgame-wrapper">
     <!-- 사이드바 -->
     <div class="sidebar">
       <div class="sidebar-head">
@@ -146,42 +144,78 @@
         </li>
       </ul>
     </div>
-
-    <!-- 메인 콘텐츠 -->
-    <main class="main">
-      <header class="main-header">
-        <h1>나의 대시보드</h1>
-      </header>
-
-      <section id="overview" class="section">
-        <h2>개요</h2>
-        <p>여기에 요약 정보나 상태 등을 표시</p>
-      </section>
-
-      <section id="games" class="section">
-        <h2>인물게임</h2>
-        <!-- 여기엔 슬라이드 이미지 게임이 들어갈 수 있음 -->
-      </section>
-
-      <section id="settings" class="section">
-        <h2>설정업데이트</h2>
-        <p>난이도, 문제 수, 공개 여부 등을 설정</p>
-      </section>
-    </main>
+    <div class="game-wrapper">
+      <h2>🎨 PPT 슬라이드 조합 입력</h2>
+      <div id="input-container"></div>
+      <button onclick="startPPT()" class="ppt-start-button">PPT 시작하기</button>
+    </div>
   </div>
   <script>
-    const toggleBtn = document.getElementById('sidebar-toggle');
-    const sidebar = document.querySelector('.sidebar');
+    const inputContainer = document.getElementById("input-container");
 
-    toggleBtn.addEventListener('click', () => {
-      if (window.innerWidth <= 768) {
-        // ✅ 모바일: 아래로 ul 펼치기
-        sidebar.classList.toggle('open');
-      } else {
-        // ✅ 데스크탑: 좌우 접힘
-        sidebar.classList.toggle('collapsed');
+    // 10개까지 입력 필드 생성
+    for (let i = 0; i < 8; i++) {
+      const group = document.createElement("div");
+      group.className = "set-group";
+
+      group.innerHTML = `
+        <input type="color" class="color-picker" value="#ececec" />
+        <input type="text" class="color-code" value="#ececec" placeholder="#컬러코드" />
+        <input type="text" class="textA-input" placeholder="색상 (ex. #빨강)" />
+        <input type="text" class="textB-input" placeholder="키워드 (ex. #궁합)" />
+      `;
+
+      // 동기화: 스포이드 선택 → 텍스트 코드 반영
+      const colorPicker = group.querySelector(".color-picker");
+      const colorCode = group.querySelector(".color-code");
+
+      colorPicker.addEventListener("input", () => {
+        colorCode.value = colorPicker.value;
+      });
+
+      // 동기화: 텍스트 입력 → 스포이드 색 반영
+      colorCode.addEventListener("input", () => {
+        if (/^#([0-9A-Fa-f]{6})$/.test(colorCode.value)) {
+          colorPicker.value = colorCode.value;
+        }
+      });
+
+      inputContainer.appendChild(group);
+    }
+
+    function startPPT() {
+      const colors = [...document.querySelectorAll(".color-code")].map(input => input.value);
+      const textsA = [...document.querySelectorAll(".textA-input")].map(input => input.value);
+      const textsB = [...document.querySelectorAll(".textB-input")].map(input => input.value);
+
+      const slideSets = [];
+
+      for (let i = 0; i < colors.length; i++) {
+        if (textsA[i].trim() && textsB[i].trim()) {
+          slideSets.push([
+            { bg: colors[i], text: textsA[i] },
+            { bg: colors[i], text: textsB[i] }
+          ]);
+        }
       }
-    });
+
+      if (!slideSets.length) {
+        alert("유효한 슬라이드 조합이 없습니다.");
+        return;
+      }
+
+      // 슬라이드 세트 랜덤 섞기
+      const shuffled = slideSets
+        .map(set => ({ set, sort: Math.random() }))
+        .sort((a, b) => a.sort - b.sort)
+        .flatMap(item => item.set); // 세트 내 순서는 유지하면서 펼치기
+
+      // 디스플레이 페이지 오픈 및 데이터 전송
+      const displayWindow = window.open("display.html", "display", "width=1000,height=700");
+      setTimeout(() => {
+        displayWindow.postMessage({ type: "colorppt", slides: shuffled }, "*");
+      }, 500);
+    }
   </script>
 </body>
 </html>

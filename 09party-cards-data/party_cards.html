@@ -1,15 +1,14 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <link rel="stylesheet" href="../common/sidebar.css" />
-  <link rel="stylesheet" href="style.css" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+  <meta charset="UTF-8" />
+  <title>파티 카드 관리</title>
+  <link rel="stylesheet" href="party_cards.css">
+  <link rel="stylesheet" href="../common/sidebar.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 </head>
 <body>
-  <div class="dashboard">
-    
+  <div class="party_cards-wrapper">
     <!-- 사이드바 -->
     <div class="sidebar">
       <div class="sidebar-head">
@@ -146,39 +145,152 @@
         </li>
       </ul>
     </div>
-
-    <!-- 메인 콘텐츠 -->
-    <main class="main">
-      <header class="main-header">
-        <h1>나의 대시보드</h1>
-      </header>
-
-      <section id="overview" class="section">
-        <h2>개요</h2>
-        <p>여기에 요약 정보나 상태 등을 표시</p>
-      </section>
-
-      <section id="games" class="section">
-        <h2>인물게임</h2>
-        <!-- 여기엔 슬라이드 이미지 게임이 들어갈 수 있음 -->
-      </section>
-
-      <section id="settings" class="section">
-        <h2>설정업데이트</h2>
-        <p>난이도, 문제 수, 공개 여부 등을 설정</p>
-      </section>
-    </main>
+    <div class="party_cards-main">
+      <h2>📋 파티 카드 수정</h2>
+      <table id="party-table">
+        <thead>
+          <tr>
+            <th>제목</th>
+            <th>날짜</th>
+            <th>시간</th>
+            <th>장소</th>
+            <th>성비</th>
+            <th>마감일시</th>
+            <th>폼 URL</th>
+            <th>삭제</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <div class="row-buttons">
+        <button class="add-row-btn">+ 행 추가</button>
+        <button id="save-button">변경사항 저장</button>
+      </div>
+    </div>
   </div>
   <script>
+    const supabase = window.supabase.createClient(
+      "https://wqxmvqqkbxiykiotbusd.supabase.co",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndxeG12cXFrYnhpeWtpb3RidXNkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg0NDcyOTYsImV4cCI6MjA2NDAyMzI5Nn0.RmB92YtjLPMx4tkQibuRVT_T4DL3_O8Pny3ZA9DU0tk"
+    );
+
+    const fields = ["title", "date", "time", "location", "gender", "deadline", "form_url"];
+    const tbody = document.querySelector("#party-table tbody");
+
+    function formatDeadline(deadlineStr) {
+      const utc = new Date(deadlineStr);
+      const local = new Date(utc.getTime() + (utc.getTimezoneOffset() * 60000)); // ✅ 다시 로컬로 변환
+
+      const yyyy = local.getFullYear();
+      const mm = String(local.getMonth() + 1).padStart(2, "0");
+      const dd = String(local.getDate()).padStart(2, "0");
+      const hh = String(local.getHours()).padStart(2, "0");
+      const mi = String(local.getMinutes()).padStart(2, "0");
+      return `${yyyy}-${mm}-${dd} ${hh}:${mi}`;
+    }
+
+    function createRow(row = {}, id = "") {
+      const tr = document.createElement("tr");
+      tr.dataset.id = id;
+
+      fields.forEach(key => {
+        const td = document.createElement("td");
+        td.dataset.key = key;
+
+        const value = key === "deadline" && row[key]
+          ? formatDeadline(row[key])
+          : (row[key] ?? "");
+
+        td.innerHTML = `<input type="text" value="${value}">`;
+        tr.appendChild(td);
+      });
+
+      const deleteTd = document.createElement("td");
+      deleteTd.innerHTML = '<button class="delete-btn">삭제</button>';
+      tr.appendChild(deleteTd);
+
+      tbody.appendChild(tr);
+    }
+
+    async function loadData() {
+      const { data, error } = await supabase
+        .from("party_cards")
+        .select("*")
+        .order("id", { ascending: true });
+
+      if (error) return alert("❌ 불러오기 실패: " + error.message);
+      tbody.innerHTML = "";
+      data.forEach(row => createRow(row, row.id));
+    }
+
+    document.querySelector(".add-row-btn").addEventListener("click", () => {
+      createRow(); // 빈 행 추가
+    });
+
+    document.getElementById("save-button").addEventListener("click", async () => {
+      const rows = document.querySelectorAll("tbody tr");
+
+      for (const tr of rows) {
+        const id = tr.dataset.id;
+        const cells = tr.querySelectorAll("td[data-key]");
+        const rowData = {}; // ✅ 여기에 선언 추가
+
+        cells.forEach(td => {
+          const key = td.dataset.key;
+          const input = td.querySelector("input");
+          rowData[key] = input.value.trim();
+        });
+
+        const isEmpty = Object.values(rowData).every(v => v === "");
+        if (isEmpty) continue;
+
+        // 마감일시 변환
+        if (rowData.deadline && !rowData.deadline.includes("T")) {
+          const local = new Date(rowData.deadline.replace(" ", "T") + ":00");
+          const utc = new Date(local.getTime() - (local.getTimezoneOffset() * 60000));
+          rowData.deadline = utc.toISOString();
+        }
+
+        if (id) {
+          const { error } = await supabase.from("party_cards").update(rowData).eq("id", id);
+          if (error) alert(`❌ 업데이트 실패 (id=${id}): ${error.message}`);
+        } else {
+          const { error } = await supabase.from("party_cards").insert([rowData]);
+          if (error) alert("❌ 추가 실패: " + error.message);
+        }
+      }
+
+      alert("✅ 저장 완료!");
+      loadData();
+    });
+
+    tbody.addEventListener("click", async (e) => {
+      if (e.target.classList.contains("delete-btn")) {
+        const tr = e.target.closest("tr");
+        const id = tr.dataset.id;
+
+        if (!id) {
+          tr.remove();
+        } else {
+          const ok = confirm("정말 삭제할까요?");
+          if (!ok) return;
+
+          const { error } = await supabase.from("party_cards").delete().eq("id", id);
+          if (error) return alert("❌ 삭제 실패: " + error.message);
+          tr.remove();
+        }
+      }
+    });
+
+    loadData();
+
     const toggleBtn = document.getElementById('sidebar-toggle');
     const sidebar = document.querySelector('.sidebar');
 
     toggleBtn.addEventListener('click', () => {
       if (window.innerWidth <= 768) {
-        // ✅ 모바일: 아래로 ul 펼치기
         sidebar.classList.toggle('open');
       } else {
-        // ✅ 데스크탑: 좌우 접힘
         sidebar.classList.toggle('collapsed');
       }
     });

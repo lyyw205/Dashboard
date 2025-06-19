@@ -74,6 +74,32 @@
             </span>
           </a>
         </li>
+        <li class="list">
+          <a href="../09party-cards-data/party_cards.html" class="list-content">
+            <span class="list-content-leftwrap">
+              <span class="list-content-icon">
+                <img src="../assets/calendar.png" class="form-icon">
+              </span>
+              <span class="list-content-text">파티카드 데이터</span>
+            </span>
+            <span class="list-content-arrow">
+              <img src="../assets/arrow-right.png" class="arrow-right-icon">
+            </span>
+          </a>
+        </li>
+        <li class="list">
+          <a href="../10accounts/accounts.html" class="list-content">
+            <span class="list-content-leftwrap">
+              <span class="list-content-icon">
+                <img src="../assets/calendar.png" class="form-icon">
+              </span>
+              <span class="list-content-text">게릴라 계정</span>
+            </span>
+            <span class="list-content-arrow">
+              <img src="../assets/arrow-right.png" class="arrow-right-icon">
+            </span>
+          </a>
+        </li>
         <li class="list-category">
           <span class="list-category-text">GAMES</span>
         </li>
@@ -91,12 +117,12 @@
           </a>
         </li>
                 <li class="list">
-          <a href="#overview" class="list-content">
+          <a href="/11stickgame/controller.html" class="list-content">
             <span class="list-content-leftwrap">
               <span class="list-content-icon">
-                <img src="../assets/music.png" class="form-icon">
+                <img src="../assets/stick.png" class="form-icon">
               </span>
-              <span class="list-content-text">노래초성</span>
+              <span class="list-content-text">막대게임</span>
             </span>
             <span class="list-content-arrow">
               <img src="../assets/arrow-right.png" class="arrow-right-icon">
@@ -118,102 +144,144 @@
         </li>
       </ul>
     </div>
-
-
-    <div class="ppt-slide">
-      <div class="ppt-controller">
-        <h2>📑 PPT 슬라이드 컨트롤러</h2>
-
-        <div class="controller">
-          <div class="joystick" style="width: 100%">
-            <button class="btn-gamestart" onclick="startPPT()">PPT 시작하기</button>
-          </div>
-        </div>
-
-        <div id="all-sets"></div>
-      </div>
+    <div class="slide-controller-wrapper">
+      <h2>📑 PPT 슬라이드 컨트롤러</h2>
+      <button onclick="startPPT()" class="ppt-start-button"><span class="ppt-start-text">PPT 시작하기</span></button>
+      <h3>✅ 선택된 슬라이드</h3>
+      <div id="selected-slides"></div>
+      <div class="slide-list" id="all-sets"></div>
     </div>
   </div>
+
   <script>
     let displayWindow = null;
+    const selectedSlides = [];
+    const slideItemsMap = {};
 
     function startPPT() {
+      if (!selectedSlides.length) return alert("선택된 슬라이드가 없습니다.");
       displayWindow = window.open("display.html", "display", "width=1000,height=700");
-    }
-
-    function sendImage(path) {
-      if (!displayWindow) {
-        alert("먼저 'PPT 시작하기'를 눌러 참가자 화면을 여세요.");
-        return;
-      }
-      displayWindow.postMessage({ type: "slide", src: path }, "*");
+      setTimeout(() => {
+        displayWindow.postMessage({ type: "slides", slides: selectedSlides }, "*");
+      }, 500);
     }
 
     function makeSlideItem(src, labelText) {
       const li = document.createElement("li");
+      li.className = "slide-item";
 
       const img = document.createElement("img");
       img.src = src;
 
       const label = document.createElement("div");
-      label.textContent = labelText;
+      label.className = "slide-label";
+      label.textContent = labelText.replace(/\.[^/.]+$/, "");
 
       li.appendChild(img);
       li.appendChild(label);
-      li.onclick = () => sendImage(src);
+
+      // 🧠 선택된 이미지 토글 가능하게
+      li.onclick = () => {
+        const index = selectedSlides.indexOf(src);
+        if (index !== -1) {
+          selectedSlides.splice(index, 1);
+          li.classList.remove("selected");
+          renderSelectedSlides();
+        } else {
+          selectedSlides.push(src);
+          li.classList.add("selected");
+          renderSelectedSlides();
+        }
+      };
+
+      slideItemsMap[src] = li; // 슬라이드 항목 추적용
+
       return li;
     }
 
-  function enhanceGroupTitles() {
-    const groupTitles = document.querySelectorAll('.group-title');
-
-    groupTitles.forEach(title => {
-      // 기존에 아이콘이 없으면 이미지 삽입
-      if (!title.querySelector('.arrow-icon')) {
-        const arrow = document.createElement('img');
-        arrow.src = '../assets/arrow-right2.png';
-        arrow.alt = '화살표';
-        arrow.className = 'arrow-icon';
-        title.prepend(arrow);
+    function addToSelected(src) {
+      if (!selectedSlides.includes(src)) {
+        selectedSlides.push(src);
+        slideItemsMap[src]?.classList.add("selected"); // ✅ 선택 표시 추가
+        renderSelectedSlides();
       }
-    });
-  }
+    }
 
-    // 기존 fetch 코드 내부에 enhanceGroupTitles() 실행 추가
+    function renderSelectedSlides() {
+      const container = document.getElementById("selected-slides");
+      container.innerHTML = "";
+      selectedSlides.forEach((src, index) => {
+        const div = document.createElement("div");
+        div.className = "slide-thumb";
+        div.draggable = true;
+
+        const img = document.createElement("img");
+        img.src = src;
+
+        const btn = document.createElement("button");
+        btn.textContent = "x";
+        btn.className = "remove-btn";
+        btn.onclick = (e) => {
+          e.stopPropagation();
+          selectedSlides.splice(index, 1);
+
+          // ✅ slide-list에 있는 해당 항목의 선택 표시 제거
+          if (slideItemsMap[src]) {
+            slideItemsMap[src].classList.remove("selected");
+          }
+
+          renderSelectedSlides();
+        };
+
+        div.appendChild(img);
+        div.appendChild(btn);
+
+        div.ondragstart = (e) => {
+          e.dataTransfer.setData("index", index);
+        };
+
+        div.ondragover = (e) => e.preventDefault();
+        div.ondrop = (e) => {
+          const from = e.dataTransfer.getData("index");
+          const to = index;
+          const moved = selectedSlides.splice(from, 1)[0];
+          selectedSlides.splice(to, 0, moved);
+          renderSelectedSlides();
+        };
+
+        container.appendChild(div);
+      });
+    }
+
     fetch("slides.json")
       .then(res => res.json())
       .then(data => {
         const container = document.getElementById("all-sets");
-
         Object.entries(data).forEach(([group, files]) => {
-          const groupTitle = document.createElement("div");
-          groupTitle.textContent = `📂 ${group}`;
-          groupTitle.className = "group-title";
-          container.appendChild(groupTitle);
+          const title = document.createElement("h3");
+          title.textContent = group;
+          container.appendChild(title);
 
           const ul = document.createElement("ul");
-          ul.className = "slide-list";
-
           files.forEach(file => {
             const fullPath = `ppt-slides/${group}/${file}`;
             ul.appendChild(makeSlideItem(fullPath, file));
           });
-
-          groupTitle.onclick = () => {
-            const isOpen = ul.classList.toggle("open");
-            groupTitle.classList.toggle("open", isOpen);
-          };
-
           container.appendChild(ul);
         });
-
-        // ✅ 모든 group-title에 화살표 이미지 붙이기
-        enhanceGroupTitles();
       });
+  </script>
+  <script>
+      const toggleBtn = document.getElementById('sidebar-toggle');
+      const sidebar = document.querySelector('.sidebar');
 
-    document.getElementById('sidebar-toggle').addEventListener('click', function () {
-      document.querySelector('.sidebar').classList.toggle('collapsed');
-    });
+      toggleBtn.addEventListener('click', () => {
+        if (window.innerWidth <= 768) {
+          sidebar.classList.toggle('open');
+        } else {
+          sidebar.classList.toggle('collapsed');
+        }
+      });
   </script>
 </body>
 </html>
