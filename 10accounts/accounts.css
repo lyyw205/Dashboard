@@ -17,7 +17,6 @@ h2 {
   flex-direction: column;
   flex: 1;
   overflow-x: auto; /* ✅ 가로 스크롤 추가 */
-  margin: 50px 20px 0 40px;
   width: 100%;
 }
 .account-table {

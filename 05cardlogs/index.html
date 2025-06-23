@@ -285,26 +285,27 @@
         </li>
       </ul>
     </div>
-    <div class="table-wrapper">
-      <h2>💳 카드 결제 내역</h2>
-      <table id="log-table">
-        <thead>
-          <tr>
-            <th>시간</th>
-            <th>카테고리</th>
-            <th>금액</th>
-            <th>카드</th>
-            <th>종류</th>
-            <th>잔액</th>
-            <th>결제처</th>
-            <th>메모</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
+    <div class="reservation container-fluid px-4 mt-5">
+      <div class="table-wrapper d-flex flex-column mt-5 mt-md-0 mb-3">
+        <h2 class="mb-3 mb-md-3">💳카드 결제 내역</h2>
+        <table id="log-table">
+          <thead>
+            <tr>
+              <th>시간</th>
+              <th>카테고리</th>
+              <th>금액</th>
+              <th>카드</th>
+              <th>종류</th>
+              <th>잔액</th>
+              <th>결제처</th>
+              <th>메모</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
     </div>
   </div>
-
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <script>

@@ -283,22 +283,23 @@
         </li>
       </ul>
     </div>
-  <div class="person-game-content"> 
-    <h2>🎮 퀴즈 컨트롤러</h2>
-    <div class="controler">
-      <div class="quiz-count">
-        <label class="quiz-count-text" for="count">출제할 문제 수</label>
-        <input class="quiz-count-input" type="number" id="count" value="5" min="1" max="20" />
-      </div>
-      <div class="joystick">
-        <button class="btn-gamestart" onclick="startGame()">게임 시작</button>
-        <div class="btn-prev-next">
-          <button class="btn-prev" onclick="send('prev')">이전</button>
-          <button class="btn-next" onclick="send('next')">다음</button>
+    <div class="container-fluid px-4 mt-5">
+      <div class="person-game-content d-flex flex-column mt-5 mt-md-0 mb-3">
+        <h2 class="mb-3 mb-md-3">🎮 퀴즈 컨트롤러</h2>
+      <div class="controler">
+        <div class="quiz-count">
+          <label class="quiz-count-text" for="count">출제할 문제 수</label>
+          <input class="quiz-count-input" type="number" id="count" value="5" min="1" max="20" />
+        </div>
+        <div class="joystick">
+          <button class="btn-gamestart" onclick="startGame()">게임 시작</button>
+          <div class="btn-prev-next">
+            <button class="btn-prev" onclick="send('prev')">이전</button>
+            <button class="btn-next" onclick="send('next')">다음</button>
+          </div>
         </div>
       </div>
     </div>
-    
     <div id="set-list">
       <strong class="all-set-list-header">🎯 선택된 퀴즈 세트:</strong>
       <ul id="selected-sets"></ul>
