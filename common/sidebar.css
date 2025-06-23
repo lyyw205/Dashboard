@@ -1,23 +1,15 @@
 /* 기본 사이드바 스타일 */
 .sidebar {
   width: 260px;
-  background-color: #ffffff;
-  display: flex;
-  flex-direction: column;
   position: relative;
-  height: 100%;
   z-index: 1000;
   flex-shrink: 0;
-  box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.04);
   transition: width 0.3s ease, margin-left 0.3s ease;
 }
 
 .sidebar-head {
-  display: flex;
-  align-items: center;
   width: 100%;
   height: 65px;
-  border-bottom: 1px solid #ebebeb;
 }
 
 .sidebar-head-logo {
@@ -25,12 +17,14 @@
   padding: 0;
 }
 
-.sidebar.collapsed .sidebar-head-logo {
-  display: none;
+.sidebar .list {
+  height: 48px; /* 또는 50px, 52px 등 원하는 고정값 */
+  display: flex;
+  align-items: center;
 }
 
-.sidebar.collapsed .list-category {
-  border-top: 1px solid #ebebeb;
+.sidebar.collapsed .sidebar-head-logo {
+  display: none;
 }
 
 .sidebar.collapsed .list-category-text {
@@ -64,15 +58,11 @@
   object-fit: contain;
 }
 
+
 #sidebar-toggle:hover {
   background-color: #f1f3f5;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
   border-color: #cbd1d9;
-}
-
-/* 리스트 항목 */
-.list {
-  display: flex;
 }
 
 .list-content {
@@ -87,15 +77,9 @@
   width: 100%;
 }
 
-.list-content-leftwrap {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-}
-
 .list-content-text {
   font-family: Arial, Helvetica, sans-serif;
-  padding-left: 5px;
+  padding-top: 2px;
   color: #8094b6;
   font-weight: 600;
   white-space: nowrap;
@@ -129,22 +113,106 @@
 }
 
 
-/* ✅ 접혔을 때 스타일 */
+/* ✅ 사이드바 접힘 시 스타일 */
 .sidebar.collapsed {
   width: 60px;
+  transition: width 0.3s ease;
 }
 
-.sidebar.collapsed .list-content {
-  padding: 12px 0;
-  justify-content: center;
-}
-
-.sidebar.collapsed .list-content-leftwrap {
-  justify-content: center;
-  width: 100%;
-}
-
+.sidebar.collapsed .sidebar-head-logo,
 .sidebar.collapsed .list-content-text,
 .sidebar.collapsed .list-content-arrow {
-  display: none;
+  display: none !important;
+}
+
+.sidebar.collapsed .list-category-text {
+  visibility: hidden;   /* 내용은 숨김 */
+  height: auto;         /* 높이 유지 */
+  display: block;       /* inline 요소일 경우 필요 */
+}
+
+
+.sidebar.collapsed .list-content {
+  justify-content: center;
+}
+
+.sidebar.collapsed .list-content .list-content-icon {
+  margin-right: 0;
+}
+
+.dashboard {
+  display: flex;
+}
+
+@media (max-width: 768px) {
+  .dashboard {
+    flex-direction: column; /* 모바일에선 세로로 */
+  }
+
+  .sidebar {
+    display: none !important;
+  }
+
+  .main {
+    width: 100%;
+  }
+}
+
+.mobile-menu {
+  position: absolute; /* 또는 fixed */
+  top: 56px; /* 모바일 nav 높이만큼 */
+  left: 0;
+  width: 100%;
+  background: white;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+  z-index: 999;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.mobile-menu.show {
+  max-height: 500px; /* 실제 높이보다 조금 크게 설정 */
+}
+
+#mobile-menu ul {
+  list-style: none;
+  padding: 0 10px;
+  margin: 0;
+}
+
+.list:hover {
+  background-color: #e3e7f1;  /* 원하는 hover 색상으로 교체 */
+  cursor: pointer;
+}
+
+.list.nav-item.touched {
+  background-color: #f4f6fc; /* 터치 시 배경색 */
+  transition: background-color 0.2s ease;
+  border-radius: 10px; /* ← 여기서 라운드 조절 */
+}
+
+#mobile-menu li:last-child {
+  margin-bottom: 20px; /* 원하는 만큼 조절 */
+}
+
+#mobile-menu-toggle {
+  background-color: transparent;
+  border: none;
+  padding: 8px;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#mobile-menu-toggle:hover {
+  background-color: #f1f3f5;
+}
+
+#mobile-menu-toggle:focus,
+#mobile-menu-toggle:focus-visible {
+  outline: none;
+  box-shadow: none;
 }

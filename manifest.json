@@ -1,0 +1,20 @@
+{
+  "name": "게릴라 파티",
+  "short_name": "파티앱",
+  "start_url": "/01main/index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#333333",
+  "icons": [
+    {
+      "src": "/assets/apk.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/assets/apk.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

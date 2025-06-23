@@ -22,3 +22,34 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
+
+
+// 햄버거 버튼과 메뉴 요소를 가져옴
+const menuToggle = document.getElementById('mobile-menu-toggle');
+const menu = document.getElementById('mobile-menu');
+
+// 버튼 클릭 시 토글 동작
+menuToggle.addEventListener('click', () => {
+  if (menu.classList.contains('open')) {
+    menu.style.maxHeight = null;
+    menu.classList.remove('open');
+  } else {
+    menu.style.maxHeight = menu.scrollHeight + "px";
+    menu.classList.add('open');
+  }
+});
+
+// ✅ 모바일 터치용 hover 효과 추가
+const menuItems = document.querySelectorAll('#mobile-menu .list.nav-item');
+
+menuItems.forEach(item => {
+  item.addEventListener('touchstart', () => {
+    item.classList.add('touched');
+  });
+
+  item.addEventListener('touchend', () => {
+    setTimeout(() => {
+      item.classList.remove('touched');
+    }, 200); // 터치 효과 유지 시간 (ms)
+  });
+});

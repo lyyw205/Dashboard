@@ -7,6 +7,7 @@ body {
 h2 {
   white-space: nowrap; 
 }
+
 .accounts-wrapper {
   display: flex;
   flex-direction: row;
@@ -26,16 +27,13 @@ h2 {
   box-shadow: 0 2px 6px rgba(0,0,0,0.05);
   table-layout: auto; /* ✅ 셀 너비 고정 */
 }
+
 th, td {
-  padding: 10px;
-  border: 1px solid #ddd;
   white-space: nowrap;         /* ✅ 줄바꿈 방지 */
   overflow: hidden;            /* ✅ 넘치는 부분 감춤 */
   text-align: center;
 }
-th {
-  background-color: #f1f5f9;
-}
+
 td[contenteditable="true"]:focus {
   outline: 2px solid #6366f1;
 }
@@ -43,14 +41,19 @@ td {
   background-color: #fcfcfc;
 }
 .delete-btn {
-  background: #ef4444;
-  color: white;
+  background: #dc3545;
+  color: #dc3545; /* 부트스트랩 danger 색상 */
+  border: 1px solid #dc3545;
   padding: 4px 10px;
-  border: none;
   border-radius: 6px;
   cursor: pointer;
-  margin: 0 5px;
 }
+
+.delete-btn:hover {
+  background-color: #dc3545;
+  color: #fff;
+}
+
 .button-wrapper {
   display: flex;
   flex-direction: row;
@@ -86,13 +89,8 @@ td input[type="text"] {
   box-sizing: border-box;
 }
 
-td input[type="text"]:focus {
-  outline: 2px solid #6366f1;
-  background-color: #fff;
-}
-
-td:nth-child(1), th:nth-child(1) { max-width: 20%; }  /* 사이트 */
-td:nth-child(2), th:nth-child(2) { max-width: 30%; }  /* 아이디 */
-td:nth-child(3), th:nth-child(3) { max-width: 25%; }   /* 비밀번호 */
-td:nth-child(4), th:nth-child(4) { max-width: 12.5%; }  /* 마지막수정일 */
-td:nth-child(5), th:nth-child(5) { max-width: 12.5%; }   /* 삭제 */
+td:nth-child(1), th:nth-child(1) { min-width: 150px; }  /* 사이트 */
+td:nth-child(2), th:nth-child(2) { min-width: 180px; }  /* 아이디 */
+td:nth-child(3), th:nth-child(3) { min-width: 150px; }   /* 비밀번호 */
+td:nth-child(4), th:nth-child(4) { min-width: 80px; }  /* 마지막수정일 */
+td:nth-child(5), th:nth-child(5) { min-width: 80px; }   /* 삭제 */

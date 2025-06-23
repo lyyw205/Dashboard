@@ -5,14 +5,152 @@
   <title>응답자 리스트</title>
   <link rel="stylesheet" href="style-applylist.css" />
   <link rel="stylesheet" href="../common/sidebar.css" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
   <div class="dashboard">
-    <!-- 사이드바 -->
-    <div class="sidebar">
-      <div class="sidebar-head">
+    <!-- 모바일 네비바 -->
+    <nav class="mobile-navbar d-md-none d-flex justify-content-between align-items-center px-3 py-2 bg-white shadow-sm fixed-top">
+      <button id="mobile-menu-toggle" class="btn" aria-expanded="false">
+        <img src="../assets/hamburger.png" alt="메뉴" width="24">
+      </button>
+      <a href="../01main/index.html" style="width: 120px; height: 40px; display: flex; align-items: center;">
+        <img src="../assets/logo.png" alt="로고" style="height: 24px;">
+      </a>
+    </nav>
+    <!-- 모바일용 접히는 메뉴 영역 -->
+    <div id="mobile-menu" class="mobile-menu d-md-none">
+      <ul>
+        <li class="list-category text-uppercase fw-bold text-muted small px-3 mt-4">
+          <span class="list-category-text">MANAGE</span>
+        </li>
+        <li class="list nav-item pt-2 pb-2">
+          <a href="../02applylist/applylist.html" class="list-content nav-link d-flex justify-content-between align-items-center px-3">
+            <span class="d-flex align-items-center">
+              <span class="list-content-icon d-flex justify-content-center align-items-center me-2" style="width: 24px; height: 24px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8094b6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-spreadsheet-icon lucide-file-spreadsheet"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M8 13h2"/><path d="M14 13h2"/><path d="M8 17h2"/><path d="M14 17h2"/></svg>
+              </span>
+              <span class="list-content-text">파티신청서</span>
+            </span>
+            <span class="list-content-arrow">
+              <svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#8094b6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right-icon lucide-chevron-right"><path d="m9 18 6-6-6-6"/></svg>
+            </span>
+          </a>
+        </li>
+        <li class="list nav-item pt-2 pb-2">
+          <a href="../03reservationlist/reservationlist.html" class="list-content nav-link d-flex justify-content-between align-items-center px-3">
+            <span class="d-flex align-items-center">
+              <span class="list-content-icon d-flex justify-content-center align-items-center me-2" style="width: 24px; height: 24px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8094b6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sheet-icon lucide-sheet"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><line x1="3" x2="21" y1="9" y2="9"/><line x1="3" x2="21" y1="15" y2="15"/><line x1="9" x2="9" y1="9" y2="21"/><line x1="15" x2="15" y1="9" y2="21"/></svg>
+              </span>
+              <span class="list-content-text">예약시트</span>
+            </span>
+            <span class="list-content-arrow">
+              <svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#8094b6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right-icon lucide-chevron-right"><path d="m9 18 6-6-6-6"/></svg>
+            </span>
+          </a>
+        </li>
+        <li class="list nav-item pt-2 pb-2">
+          <a href="../05cardlogs/index.html" class="list-content nav-link d-flex justify-content-between align-items-center px-3">
+            <span class="d-flex align-items-center">
+              <span class="list-content-icon d-flex justify-content-center align-items-center me-2" style="width: 24px; height: 24px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8094b6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-piggy-bank-icon lucide-piggy-bank"><path d="M11 17h3v2a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-3a3.16 3.16 0 0 0 2-2h1a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1h-1a5 5 0 0 0-2-4V3a4 4 0 0 0-3.2 1.6l-.3.4H11a6 6 0 0 0-6 6v1a5 5 0 0 0 2 4v3a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1z"/><path d="M16 10h.01"/><path d="M2 8v1a2 2 0 0 0 2 2h1"/></svg>
+              </span>
+              <span class="list-content-text">재무기록</span>
+            </span>
+            <span class="list-content-arrow">
+              <svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#8094b6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right-icon lucide-chevron-right"><path d="m9 18 6-6-6-6"/></svg>
+            </span>
+          </a>
+        </li>
+        <li class="list nav-item pt-2 pb-2">
+          <a href="../04calendar/calender.html" class="list-content nav-link d-flex justify-content-between align-items-center px-3">
+            <span class="d-flex align-items-center">
+              <span class="list-content-icon d-flex justify-content-center align-items-center me-2" style="width: 24px; height: 24px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8094b6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar-days-icon lucide-calendar-days"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/><path d="M16 18h.01"/></svg>
+              </span>
+              <span class="list-content-text">캘린더</span>
+            </span>
+            <span class="list-content-arrow">
+              <svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#8094b6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right-icon lucide-chevron-right"><path d="m9 18 6-6-6-6"/></svg>
+            </span>
+          </a>
+        </li>
+        <li class="list nav-item pt-2 pb-2">
+          <a href="../09party-cards-data/party_cards.html" class="list-content nav-link d-flex justify-content-between align-items-center px-3">
+            <span class="d-flex align-items-center">
+              <span class="list-content-icon d-flex justify-content-center align-items-center me-2" style="width: 24px; height: 24px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8094b6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-square-terminal-icon lucide-square-terminal"><path d="m7 11 2-2-2-2"/><path d="M11 13h4"/><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/></svg>
+              </span>
+              <span class="list-content-text">파티카드 데이터</span>
+            </span>
+            <span class="list-content-arrow">
+              <svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#8094b6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right-icon lucide-chevron-right"><path d="m9 18 6-6-6-6"/></svg>
+            </span>
+          </a>
+        </li>
+        <li class="list nav-item pt-2 pb-2">
+          <a href="../10accounts/accounts.html" class="list-content nav-link d-flex justify-content-between align-items-center px-3">
+            <span class="d-flex align-items-center">
+              <span class="list-content-icon d-flex justify-content-center align-items-center me-2" style="width: 24px; height: 24px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8094b6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-key-round-icon lucide-key-round"><path d="M2.586 17.414A2 2 0 0 0 2 18.828V21a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h1a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h.172a2 2 0 0 0 1.414-.586l.814-.814a6.5 6.5 0 1 0-4-4z"/><circle cx="16.5" cy="7.5" r=".5" fill="currentColor"/></svg>
+              </span>
+              <span class="list-content-text">게릴라 계정</span>
+            </span>
+            <span class="list-content-arrow">
+              <svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#8094b6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right-icon lucide-chevron-right"><path d="m9 18 6-6-6-6"/></svg>
+            </span>
+          </a>
+        </li>
+        <li class="list-category text-uppercase fw-bold text-muted small px-3 mt-4">
+          <span class="list-category-text">GAMES</span>
+        </li>
+        <li class="list nav-item pt-2 pb-2">
+          <a href="../07ppt/controller.html" class="list-content nav-link d-flex justify-content-between align-items-center px-3">
+            <span class="d-flex align-items-center">
+              <span class="list-content-icon d-flex justify-content-center align-items-center me-2" style="width: 24px; height: 24px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8094b6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-app-window-icon lucide-app-window"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M10 4v4"/><path d="M2 8h20"/><path d="M6 4v4"/></svg>
+              </span>
+              <span class="list-content-text">진행 PPT</span>
+            </span>
+            <span class="list-content-arrow">
+              <svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#8094b6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right-icon lucide-chevron-right"><path d="m9 18 6-6-6-6"/></svg>
+            </span>
+          </a>
+        </li>
+        <li class="list nav-item pt-2 pb-2">
+          <a href="../11stickgame/controller.html" class="list-content nav-link d-flex justify-content-between align-items-center px-3">
+            <span class="d-flex align-items-center">
+              <span class="list-content-icon d-flex justify-content-center align-items-center me-2" style="width: 24px; height: 24px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8094b6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-candy-cane-icon lucide-candy-cane"><path d="M5.7 21a2 2 0 0 1-3.5-2l8.6-14a6 6 0 0 1 10.4 6 2 2 0 1 1-3.464-2 2 2 0 1 0-3.464-2Z"/><path d="M17.75 7 15 2.1"/><path d="M10.9 4.8 13 9"/><path d="m7.9 9.7 2 4.4"/><path d="M4.9 14.7 7 18.9"/></svg>
+              </span>
+              <span class="list-content-text">막대게임</span>
+            </span>
+            <span class="list-content-arrow">
+              <svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#8094b6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right-icon lucide-chevron-right"><path d="m9 18 6-6-6-6"/></svg>
+            </span>
+          </a>
+        </li>
+        <li class="list nav-item pt-2 pb-2">
+          <a href="../06quizppt/index.html" class="list-content nav-link d-flex justify-content-between align-items-center px-3">
+            <span class="d-flex align-items-center">
+              <span class="list-content-icon d-flex justify-content-center align-items-center me-2" style="width: 24px; height: 24px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8094b6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-smile-icon lucide-smile"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" x2="9.01" y1="9" y2="9"/><line x1="15" x2="15.01" y1="9" y2="9"/></svg>
+              </span>
+              <span class="list-content-text">인물게임</span>
+            </span>
+            <span class="list-content-arrow">
+              <svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#8094b6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right-icon lucide-chevron-right"><path d="m9 18 6-6-6-6"/></svg>
+            </span>
+          </a>
+        </li>
+      </ul>
+    </div>
+    <!-- 데스크탑 사이드바 -->
+    <div class="sidebar d-none d-md-flex flex-column bg-white shadow" style="height: 100vh;">
+      <div class="sidebar-head d-flex align-items-center border-bottom py-2">
         <button id="sidebar-toggle">
           <img class="hamburger-icon" src="../assets/hamburger.png">
         </button>
@@ -21,172 +159,173 @@
         </a>
       </div>
       <ul>
-        <li class="list-category">
+        <li class="list-category text-uppercase fw-bold text-muted small px-3 mt-4">
           <span class="list-category-text">MANAGE</span>
         </li>
-        <li class="list">
-          <a href="../02applylist/applylist.html" class="list-content">
-            <span class="list-content-leftwrap">
-              <span class="list-content-icon">
-                <img src="../assets/form.png" class="form-icon">
+        <li class="list nav-item pt-2 pb-2">
+          <a href="../02applylist/applylist.html" class="list-content nav-link d-flex justify-content-between align-items-center px-3">
+            <span class="d-flex align-items-center">
+              <span class="list-content-icon d-flex justify-content-center align-items-center me-2" style="width: 24px; height: 24px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8094b6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-spreadsheet-icon lucide-file-spreadsheet"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M8 13h2"/><path d="M14 13h2"/><path d="M8 17h2"/><path d="M14 17h2"/></svg>
               </span>
               <span class="list-content-text">파티신청서</span>
             </span>
             <span class="list-content-arrow">
-              <img src="../assets/arrow-right.png" class="arrow-right-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#8094b6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right-icon lucide-chevron-right"><path d="m9 18 6-6-6-6"/></svg>
             </span>
           </a>
         </li>
-        <li class="list">
-          <a href="../03reservationlist/reservationlist.html" class="list-content">
-            <span class="list-content-leftwrap">
-              <span class="list-content-icon">
-                <img src="../assets/reservationsheet.png" class="form-icon">
+        <li class="list nav-item pt-2 pb-2">
+          <a href="../03reservationlist/reservationlist.html" class="list-content nav-link d-flex justify-content-between align-items-center px-3">
+            <span class="d-flex align-items-center">
+              <span class="list-content-icon d-flex justify-content-center align-items-center me-2" style="width: 24px; height: 24px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8094b6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sheet-icon lucide-sheet"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><line x1="3" x2="21" y1="9" y2="9"/><line x1="3" x2="21" y1="15" y2="15"/><line x1="9" x2="9" y1="9" y2="21"/><line x1="15" x2="15" y1="9" y2="21"/></svg>
               </span>
               <span class="list-content-text">예약시트</span>
             </span>
             <span class="list-content-arrow">
-              <img src="../assets/arrow-right.png" class="arrow-right-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#8094b6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right-icon lucide-chevron-right"><path d="m9 18 6-6-6-6"/></svg>
             </span>
           </a>
         </li>
-        <li class="list">
-          <a href="../05cardlogs/index.html" class="list-content">
-            <span class="list-content-leftwrap">
-              <span class="list-content-icon">
-                <img src="../assets/creditcard.png" class="form-icon">
+        <li class="list nav-item pt-2 pb-2">
+          <a href="../05cardlogs/index.html" class="list-content nav-link d-flex justify-content-between align-items-center px-3">
+            <span class="d-flex align-items-center">
+              <span class="list-content-icon d-flex justify-content-center align-items-center me-2" style="width: 24px; height: 24px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8094b6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-piggy-bank-icon lucide-piggy-bank"><path d="M11 17h3v2a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-3a3.16 3.16 0 0 0 2-2h1a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1h-1a5 5 0 0 0-2-4V3a4 4 0 0 0-3.2 1.6l-.3.4H11a6 6 0 0 0-6 6v1a5 5 0 0 0 2 4v3a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1z"/><path d="M16 10h.01"/><path d="M2 8v1a2 2 0 0 0 2 2h1"/></svg>
               </span>
               <span class="list-content-text">재무기록</span>
             </span>
             <span class="list-content-arrow">
-              <img src="../assets/arrow-right.png" class="arrow-right-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#8094b6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right-icon lucide-chevron-right"><path d="m9 18 6-6-6-6"/></svg>
             </span>
           </a>
         </li>
-        <li class="list">
-          <a href="../04calendar/calender.html" class="list-content">
-            <span class="list-content-leftwrap">
-              <span class="list-content-icon">
-                <img src="../assets/calendar.png" class="form-icon">
+        <li class="list nav-item pt-2 pb-2">
+          <a href="../04calendar/calender.html" class="list-content nav-link d-flex justify-content-between align-items-center px-3">
+            <span class="d-flex align-items-center">
+              <span class="list-content-icon d-flex justify-content-center align-items-center me-2" style="width: 24px; height: 24px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8094b6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar-days-icon lucide-calendar-days"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/><path d="M16 18h.01"/></svg>
               </span>
               <span class="list-content-text">캘린더</span>
             </span>
             <span class="list-content-arrow">
-              <img src="../assets/arrow-right.png" class="arrow-right-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#8094b6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right-icon lucide-chevron-right"><path d="m9 18 6-6-6-6"/></svg>
             </span>
           </a>
         </li>
-        <li class="list">
-          <a href="../09party-cards-data/party_cards.html" class="list-content">
-            <span class="list-content-leftwrap">
-              <span class="list-content-icon">
-                <img src="../assets/calendar.png" class="form-icon">
+        <li class="list nav-item pt-2 pb-2">
+          <a href="../09party-cards-data/party_cards.html" class="list-content nav-link d-flex justify-content-between align-items-center px-3">
+            <span class="d-flex align-items-center">
+              <span class="list-content-icon d-flex justify-content-center align-items-center me-2" style="width: 24px; height: 24px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8094b6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-square-terminal-icon lucide-square-terminal"><path d="m7 11 2-2-2-2"/><path d="M11 13h4"/><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/></svg>
               </span>
               <span class="list-content-text">파티카드 데이터</span>
             </span>
             <span class="list-content-arrow">
-              <img src="../assets/arrow-right.png" class="arrow-right-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#8094b6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right-icon lucide-chevron-right"><path d="m9 18 6-6-6-6"/></svg>
             </span>
           </a>
         </li>
-        <li class="list">
-          <a href="../10accounts/accounts.html" class="list-content">
-            <span class="list-content-leftwrap">
-              <span class="list-content-icon">
-                <img src="../assets/calendar.png" class="form-icon">
+        <li class="list nav-item pt-2 pb-2">
+          <a href="../10accounts/accounts.html" class="list-content nav-link d-flex justify-content-between align-items-center px-3">
+            <span class="d-flex align-items-center">
+              <span class="list-content-icon d-flex justify-content-center align-items-center me-2" style="width: 24px; height: 24px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8094b6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-key-round-icon lucide-key-round"><path d="M2.586 17.414A2 2 0 0 0 2 18.828V21a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h1a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h.172a2 2 0 0 0 1.414-.586l.814-.814a6.5 6.5 0 1 0-4-4z"/><circle cx="16.5" cy="7.5" r=".5" fill="currentColor"/></svg>
               </span>
               <span class="list-content-text">게릴라 계정</span>
             </span>
             <span class="list-content-arrow">
-              <img src="../assets/arrow-right.png" class="arrow-right-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#8094b6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right-icon lucide-chevron-right"><path d="m9 18 6-6-6-6"/></svg>
             </span>
           </a>
         </li>
-        <li class="list-category">
+        <li class="list-category text-uppercase fw-bold text-muted small px-3 mt-4">
           <span class="list-category-text">GAMES</span>
         </li>
-        <li class="list">
-          <a href="../07ppt/controller.html" class="list-content">
-            <span class="list-content-leftwrap">
-              <span class="list-content-icon">
-                <img src="../assets/ppt.png" class="form-icon">
+        <li class="list nav-item pt-2 pb-2">
+          <a href="../07ppt/controller.html" class="list-content nav-link d-flex justify-content-between align-items-center px-3">
+            <span class="d-flex align-items-center">
+              <span class="list-content-icon d-flex justify-content-center align-items-center me-2" style="width: 24px; height: 24px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8094b6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-app-window-icon lucide-app-window"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M10 4v4"/><path d="M2 8h20"/><path d="M6 4v4"/></svg>
               </span>
-              <span class="list-content-text">진행PPT</span>
+              <span class="list-content-text">진행 PPT</span>
             </span>
             <span class="list-content-arrow">
-              <img src="../assets/arrow-right.png" class="arrow-right-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#8094b6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right-icon lucide-chevron-right"><path d="m9 18 6-6-6-6"/></svg>
             </span>
           </a>
         </li>
-                <li class="list">
-          <a href="/11stickgame/controller.html" class="list-content">
-            <span class="list-content-leftwrap">
-              <span class="list-content-icon">
-                <img src="../assets/stick.png" class="form-icon">
+        <li class="list nav-item pt-2 pb-2">
+          <a href="../11stickgame/controller.html" class="list-content nav-link d-flex justify-content-between align-items-center px-3">
+            <span class="d-flex align-items-center">
+              <span class="list-content-icon d-flex justify-content-center align-items-center me-2" style="width: 24px; height: 24px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8094b6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-candy-cane-icon lucide-candy-cane"><path d="M5.7 21a2 2 0 0 1-3.5-2l8.6-14a6 6 0 0 1 10.4 6 2 2 0 1 1-3.464-2 2 2 0 1 0-3.464-2Z"/><path d="M17.75 7 15 2.1"/><path d="M10.9 4.8 13 9"/><path d="m7.9 9.7 2 4.4"/><path d="M4.9 14.7 7 18.9"/></svg>
               </span>
               <span class="list-content-text">막대게임</span>
             </span>
             <span class="list-content-arrow">
-              <img src="../assets/arrow-right.png" class="arrow-right-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#8094b6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right-icon lucide-chevron-right"><path d="m9 18 6-6-6-6"/></svg>
             </span>
           </a>
         </li>
-        <li class="list">
-          <a href="../06quizppt/index.html" class="list-content">
-            <span class="list-content-leftwrap">
-              <span class="list-content-icon">
-                <img src="../assets/person.png" class="form-icon">
+        <li class="list nav-item pt-2 pb-2">
+          <a href="../06quizppt/index.html" class="list-content nav-link d-flex justify-content-between align-items-center px-3">
+            <span class="d-flex align-items-center">
+              <span class="list-content-icon d-flex justify-content-center align-items-center me-2" style="width: 24px; height: 24px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8094b6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-smile-icon lucide-smile"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" x2="9.01" y1="9" y2="9"/><line x1="15" x2="15.01" y1="9" y2="9"/></svg>
               </span>
               <span class="list-content-text">인물게임</span>
             </span>
             <span class="list-content-arrow">
-              <img src="../assets/arrow-right.png" class="arrow-right-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#8094b6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right-icon lucide-chevron-right"><path d="m9 18 6-6-6-6"/></svg>
             </span>
           </a>
         </li>
       </ul>
     </div>
-    <div class="table">
-      <div class="table-header">
-        <h2>📋 참여 신청자 목록</h2>
-        <div id="filters">
-          <input class="filter-input" type="text" id="search-name" placeholder="이름 검색..." />
-          <select id="filter-gender">
-            <option value="">전체 성별</option>
+    <div class="table container-fluid px-4 mt-5">
+      <div class="table-header d-flex flex-column mt-5 mt-md-0 mb-3">
+        <h2 class="mb-2 mb-md-3">📋 참여 신청자 목록</h2>
+        <div id="filters" class="d-flex flex-wrap gap-2 mt-2 mb-3">
+          <input class="form-control form-control-sm" type="text" id="search-name" placeholder="이름 검색..." style="max-width: 250px;"/>
+          <select id="filter-gender" class="form-select form-select-sm" style="max-width: 100px;">
+            <option value="">성별</option>
             <option value="남자">남자</option>
             <option value="여자">여자</option>
           </select>
-          <select id="filter-date">
-            <option value="">전체 날짜</option>
+          <select id="filter-date" class="form-select form-select-sm" style="max-width: 100px;">
+            <option value="">날짜</option>
             <option value="2025-06-20">2025-06-20</option>
             <option value="2025-06-21">2025-06-21</option>
             <option value="2025-05-30">2025-05-30</option>
           </select>
-          <button class="filter-apply-btn" onclick="loadResponses()">🔍 필터 적용</button>
+          <button class="btn btn-dark btn-sm" onclick="loadResponses()">🔍 필터 적용</button>
         </div>
       </div>
-      <table class="table-table">
-        <thead>
-          <tr>
-            <th class="submit-time">제출시각</th>
-            <th class="submit-name">이름</th>
-            <th class="submit-birth">출생년도</th>
-            <th class="submit-phone">전화번호</th>
-            <th class="submit-gender">성별</th>
-            <th class="submit-mbti">MBTI</th>
-            <th class="submit-date">참여 날짜</th>
-            <th class="submit-tmi">TMI</th>
-            <th class="automessage-deposit">입금문자</th>
-            <th class="checkbox-deposit">입금확인</th>
-            <th class="automessage-location">장소문자</th>
-            <th class="checkbox-afterparty">애프터</th>
-            <th class="memo">메모</th>
-          </tr>
-        </thead>
-        <tbody id="response-table">
-          <tr><td colspan="7">로딩 중...</td></tr>
-        </tbody>
-      </table>
+      <div class="table-responsive">
+        <table class="table responsive-table table-table table-borderless table-striped table-hover align-middle text-nowrap">
+          <thead class="table-dark">
+            <tr>
+              <th class="submit-time">제출시각</th>
+              <th class="submit-name">이름</th>
+              <th class="submit-birth">출생년도</th>
+              <th class="submit-phone">전화번호</th>
+              <th class="submit-gender">성별</th>
+              <th class="submit-mbti">MBTI</th>
+              <th class="submit-date">참여 날짜</th>
+              <th class="submit-tmi">TMI</th>
+              <th class="automessage-deposit">입금문자</th>
+              <th class="checkbox-deposit">입금확인</th>
+              <th class="automessage-location">장소문자</th>
+              <th class="checkbox-afterparty">애프터</th>
+              <th class="memo">메모</th>
+            </tr>
+          </thead>
+          <tbody id="response-table" class="background-light">
+            <tr><td colspan="13" class="text-center text-muted py-3">로딩 중...</td></tr>
+          </tbody>
+        </table>
       </div>
     </div>
 
@@ -234,9 +373,9 @@
           <td>${formatApplyDate(row.apply_date)}</td>
           <td>${row.tmi || ''}</td>
           <td><input type="text" class="memo-input" data-id="${row.id}" data-field="memo1" value="${row.memo1 || ''}" readonly></td>
-          <td><input type="checkbox" class="memo-checkbox" data-id="${row.id}" data-field="memo2" ${row.memo2 === true ? 'checked' : ''}></td>
+          <td><input type="checkbox" class="form-check-input memo-checkbox" data-id="${row.id}" data-field="memo2" ${row.memo2 === true ? 'checked' : ''}></td>
           <td><input type="text" class="memo-input" data-id="${row.id}" data-field="memo3" value="${row.memo3 || ''}" readonly></td>
-          <td><input type="checkbox" class="memo-checkbox" data-id="${row.id}" data-field="memo4" ${row.memo4 === true ? 'checked' : ''}></td>
+          <td><input type="checkbox" class="form-check-input memo-checkbox" data-id="${row.id}" data-field="memo4" ${row.memo4 === true ? 'checked' : ''}></td>
           <td><input type="text" class="memo-input" data-id="${row.id}" data-field="memo5" value="${row.memo5 || ''}"></td>
         `;
         tableBody.appendChild(tr);
@@ -328,5 +467,6 @@
     .subscribe();
   </script>
   <script src="/common/sidebar.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q" crossorigin="anonymous"></script>
 </body>
 </html>

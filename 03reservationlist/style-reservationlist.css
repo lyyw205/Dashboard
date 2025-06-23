@@ -15,7 +15,6 @@ h2 {
   overflow-x: auto;           /* ✅ 가로 스크롤 허용 */
   white-space: nowrap;
   gap: 0.5rem;
-  padding-bottom: 8px;
   scrollbar-width: thin;      /* Firefox */
 }
 
@@ -56,55 +55,76 @@ thead th {
   color: #666;
   border-bottom: 1px solid #e0e0e0;
   white-space: nowrap;
+  height: 45px;
 }
 
-th:nth-child(1) {
-  width: 60px;
+th:nth-child(1),
+td:nth-child(1) {
+  width: 6%;
+  min-width: 60px;
   text-align: center;
 }
 
-th:nth-child(2) {
-  width: 100px;
+th:nth-child(2),
+td:nth-child(2) {
+  width: 10%;
+  min-width: 100px;
   text-align: center;
 }
 
-th:nth-child(3) {
-  width: 70px;
+th:nth-child(3),
+td:nth-child(3) {
+  width: 7%;
+  min-width: 70px;
   text-align: center;
 }
 
-th:nth-child(4) {
-  width: 100px;
+th:nth-child(4),
+td:nth-child(4) {
+  width: 10%;
+  min-width: 100px;
   text-align: center;
 }
 
-th:nth-child(5) {
-  width: 60px;
+th:nth-child(5),
+td:nth-child(5) {
+  width: 6%;
+  min-width: 60px;
   text-align: center;
 }
 
-th:nth-child(6) {
-  width: 250px;
+th:nth-child(6),
+td:nth-child(6) {
+  width: 17%;
+  min-width: 250px;
   text-align: center;
 }
 
-th:nth-child(7) {
-  width: 80px;
+th:nth-child(7),
+td:nth-child(7) {
+  width: 8%;
+  min-width: 80px;
   text-align: center;
 }
 
-th:nth-child(8) {
-  width: 60px;
+th:nth-child(8),
+td:nth-child(8) {
+  width: 6%;
+  min-width: 60px;
   text-align: center;
 }
 
-th:nth-child(9) {
-  width: 300px;
+th:nth-child(9),
+td:nth-child(9) {
+  width: 20%;
+  min-width: 300px;
   text-align: center;
 }
 
-th:nth-child(10) {
-  width: 100px;
+th:nth-child(10),
+td:nth-child(10) {
+  width: 10%;
+  min-width: 100px;
   text-align: center;
 }
 
@@ -146,7 +166,7 @@ tbody td {
 
 .my-table {
   min-width: 1000px;
-  width: max-content;
+  width: 100%;
   table-layout: fixed;
 }
 
