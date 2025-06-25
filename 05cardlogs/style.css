@@ -1,19 +1,12 @@
-body {
-  font-family: 'Pretendard', sans-serif;
-  background: #f9f9fb;
-  margin: 0;
-}
-
 .cardlogs-main {
   display: flex;
   flex-direction: row;
-  width: 100%;
 }
 
-html, body {
-  height: 100%;
-  margin: 0;
-  padding: 0;
+.reservation {
+  display: flex;
+  flex-direction: column;
+  overflow-x: auto; /* ✅ 가로 스크롤 추가 */
 }
 
 .table-wrapper {
@@ -21,11 +14,6 @@ html, body {
   flex-direction: column;
   flex: 1; /* ✅ 남은 공간을 채움 */
   overflow: auto;
-}
-
-h2 {
-  font-size: 1.5rem;
-  margin-bottom: 1rem;
 }
 
 #log-table {
@@ -36,58 +24,78 @@ h2 {
   width: 100%;
 }
 
-
-
-thead th {
-  text-align: center;
-  padding: 12px 4px;
-  background-color: #f1f3f7;
-  font-size: 13px;
-  color: #666;
-  border-bottom: 1px solid #e0e0e0;
+td {
+  font-family: 'Pretendard Variable', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  height: 45px;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+}
+
+th {
+  font-family: 'Pretendard Variable', sans-serif;
+  font-weight: 600;
+  font-size: 15px;
+  height: 45px;
+  overflow: hidden;
+  align-content: center;
+  text-align: center;
+  background-color: #f1f3f7 !important; /* 테이블헤더 배경색상 */
+  color: #666 !important; /* 테이블헤더 텍스트색상 */
 }
 
 th:nth-child(1) {
-  width: 11%;
+  width: 100px;
   text-align: center;
 }
 
 th:nth-child(2) {
-  width: 11%;
+  width: 120px;
   text-align: center;
 }
 
 th:nth-child(3) {
-  width: 11%;
+  width: 100px;
   text-align: center;
 }
 
 th:nth-child(4) {
-  width: 7%;
+  width: 60px;
   text-align: center;
 }
 
 th:nth-child(5) {
-  width: 7%;
+  width: 80px;
   text-align: center;
 }
 
 th:nth-child(6) {
-  width: 11%;
+  width: 100px;
   text-align: center;
 }
 
 th:nth-child(7) {
-  width: 14%;
+  width: 140px;
   text-align: center;
 }
 
 th:nth-child(8) {
-  width: 28%;
+  width: 250px;
   text-align: center;
 }
 
+/* 짝수행 배경색상 */
+.table-striped-custom > tbody > tr:nth-child(even) td {
+  background-color: #fbfbfb;
+}
+
+/* 홀수행 배경색상 */
+.table-striped-custom > tbody > tr:nth-child(odd) td {
+  background-color: #ffffff;
+}
 
 tbody tr {
   background-color: #fff;
@@ -98,18 +106,6 @@ tbody tr {
 tbody tr:hover {
   background-color: #f5f7fa;
 }
-
-tbody td {
-  max-width: 100px;
-  padding: 10px 4px;
-  font-size: 14px;
-  border-bottom: 1px solid #f0f0f0;
-  text-align: center;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
 
 select.category-select,
 select.type-select {

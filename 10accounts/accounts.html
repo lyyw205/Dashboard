@@ -284,23 +284,25 @@
         </li>
       </ul>
     </div>
-    <div class="container-fluid px-4 mt-5">
-      <div class="accounts-main d-flex flex-column mt-5 mt-md-0 mb-3">
+    <div class="accounts-main container-fluid px-4 mt-5">
+      <div class="accounts-start d-flex flex-column mt-5 mt-md-0 mb-3">
         <h2 class="mb-3 mb-md-3">🔐 가입 사이트 계정 정보</h2>
-        <table class="account-table table table-borderless table-hover align-middle text-center table-striped">
-          <thead class="table-dark" style="height: 50px; vertical-align: middle;">
-            <tr>
-              <th>사이트</th>
-              <th>아이디</th>
-              <th>비밀번호</th>
-              <th>마지막 수정일</th>
-              <th>삭제</th>
-            </tr>
-          </thead>
-          <tbody id="account-body">
-            <!-- JS에서 채워짐 -->
-          </tbody>
-        </table>
+        <div class="table-responsive">
+          <table class="account-table table table-borderless table-hover align-middle text-center table-striped-custom">
+            <thead class="table-dark">
+              <tr>
+                <th>사이트</th>
+                <th>아이디</th>
+                <th>비밀번호</th>
+                <th>마지막 수정일</th>
+                <th>삭제</th>
+              </tr>
+            </thead>
+            <tbody id="account-body">
+              <!-- JS에서 채워짐 -->
+            </tbody>
+          </table>
+        </div>
       </div>
       <div class="button-wrapper">
         <button class="add-row-btn" onclick="addRow()">+ 행 추가</button>
@@ -343,14 +345,11 @@
       rowsData.forEach(row => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
-          <td><input type="text" class="form-control" value="${row.site}" onchange="markEdited(${row.id}, this, 'site')" /></td>
-          <td><input type="text" class="form-control" value="${row.username}" onchange="markEdited(${row.id}, this, 'username')" /></td>
-          <td><input type="text" class="form-control" value="${row.password}" onchange="markEdited(${row.id}, this, 'password')" /></td>
-          <td>${new Date(row.updated_at).toLocaleDateString('ko-KR', {
-            month: 'long',
-            day: 'numeric'
-          })}</td>
-          <td><button class="btn delete-btn" onclick="deleteRow(${row.id})">            
+          <td data-label="사이트"><input type="text" class="form-control" value="${row.site}" onchange="markEdited(${row.id}, this, 'site')" /></td>
+          <td data-label="아이디"><input type="text" class="form-control" value="${row.username}" onchange="markEdited(${row.id}, this, 'username')" /></td>
+          <td data-label="비밀번호"><input type="text" class="form-control" value="${row.password}" onchange="markEdited(${row.id}, this, 'password')" /></td>
+          <td data-label="마지막 수정일"><span class="last-edit-date">${new Date(row.updated_at).toLocaleDateString('ko-KR', {month: 'long', day: 'numeric'})}</span></td>
+          <td data-label="삭제"><button class="btn delete-btn" onclick="deleteRow(${row.id})">            
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
             class="lucide lucide-trash2-icon lucide-trash-2">
@@ -367,11 +366,11 @@
       newRows.forEach((row, index) => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
-          <td><input type="text" class="form-control" placeholder="사이트명을 입력해주세요" value="${row.site}" oninput="updateNewRow(${index}, 'site', this.value)" /></td>
-          <td><input type="text" class="form-control" placeholder="아이디를 입력해주세요" value="${row.username}" oninput="updateNewRow(${index}, 'username', this.value)" /></td>
-          <td><input type="text" class="form-control" placeholder="비밀번호를 입력해주세요" value="${row.password}" oninput="updateNewRow(${index}, 'password', this.value)" /></td>
-          <td>-</td>
-          <td><button class="btn delete-btn" onclick="removeNewRow(${index})">          
+          <td data-label="사이트"><input type="text" class="form-control" placeholder="사이트명을 입력해주세요" value="${row.site}" oninput="updateNewRow(${index}, 'site', this.value)" /></td>
+          <td data-label="아이디"><input type="text" class="form-control" placeholder="아이디를 입력해주세요" value="${row.username}" oninput="updateNewRow(${index}, 'username', this.value)" /></td>
+          <td data-label="비밀번호"><input type="text" class="form-control" placeholder="비밀번호를 입력해주세요" value="${row.password}" oninput="updateNewRow(${index}, 'password', this.value)" /></td>
+          <td data-label="마지막 수정일"><span class="last-edit-date">${new Date(row.updated_at).toLocaleDateString('ko-KR', {month: 'long', day: 'numeric'})}</span></td>
+          <td data-label="삭제"><button class="btn delete-btn" onclick="removeNewRow(${index})">          
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
             class="lucide lucide-trash2-icon lucide-trash-2">

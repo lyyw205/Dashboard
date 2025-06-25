@@ -7,16 +7,10 @@
 .accounts-main {
   display: flex;
   flex-direction: column;
-  flex: 1;
   overflow-x: auto; /* ✅ 가로 스크롤 추가 */
-  width: 100%;
 }
 .account-table {
-  width: 100%;     /* 내용 크기만큼 늘어나도록 */
-  border-collapse: collapse;
-  background: #fff;
   box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-  table-layout: auto; /* ✅ 셀 너비 고정 */
 }
 
 th, td {
@@ -25,33 +19,44 @@ th, td {
   text-align: center;
 }
 
-td[contenteditable="true"]:focus {
-  outline: 2px solid #6366f1;
+td {
+  font-family: 'Pretendard Variable', sans-serif;
+  font-weight: 400;
+  height: 45px;
 }
 
 th {
   font-family: 'Pretendard Variable', sans-serif;
   font-weight: 600;
   font-size: 15px;
+  height: 45px;
+  background-color: #f1f3f7 !important; /* 테이블헤더 배경색상 */
+  color: #666 !important; /* 테이블헤더 텍스트색상 */
+  vertical-align: middle;
 }
 
-td {
+/* 짝수행 배경색상 */
+.table-striped-custom > tbody > tr:nth-child(even) td {
+  background-color: #fafafa;
+}
+
+/* 홀수행 배경색상 */
+.table-striped-custom > tbody > tr:nth-child(odd) td {
+  background-color: #ffffff;
+}
+
+.last-edit-date,
+td input[type="text"] {
   font-family: 'Pretendard Variable', sans-serif;
   font-weight: 400;
-  font-size: 14px;
-  background-color: #fcfcfc;
-}
-
-
-td input[type="text"] {
+  font-size: 16px;
   width: 100%;
   min-width: 0;
   padding: 4px 6px;
-  font-size: 15px;
   border: none;
   background: transparent;
-  text-align: center;
   box-sizing: border-box;
+  text-align: center;
 }
 
 td:nth-child(1), th:nth-child(1) { min-width: 150px; }  /* 사이트 */
@@ -81,7 +86,7 @@ td:nth-child(5), th:nth-child(5) { min-width: 80px; }   /* 삭제 */
 .add-row-btn {
   font-weight: 400;
   color: #000;
-  background-color: #e9eaf8; /* 보라색 배경 */
+  background-color: #e9eaf8; 
   border: 1px solid #cacbd6;
   border-radius: 6px;
   padding: 10px 20px;
@@ -91,7 +96,7 @@ td:nth-child(5), th:nth-child(5) { min-width: 80px; }   /* 삭제 */
   margin-right: 10px;
 }
 .add-row-btn:hover {
-  background-color: #d0d1d6; /* hover시 조금 어두운 보라 */
+  background-color: #d0d1d6;
   border-color: #bdbdbd;
   color: #000;
 }
@@ -106,7 +111,90 @@ td:nth-child(5), th:nth-child(5) { min-width: 80px; }   /* 삭제 */
   text-align: center;
 }
 .delete-btn:hover {
-  background-color: #e2e2e2; /* hover시 조금 어두운 보라 */
+  background-color: #e2e2e2;
   border-color: #b9b9b9;
   color: #000;
+}
+
+
+
+/* 미디어쿼리 768px 미만 */
+@media (max-width: 767.98px) {
+  .account-table thead {
+    display: none; /* 헤더 숨김 */
+  }
+
+  .account-table tbody tr {
+    display: block; /* 카드 간 간격 */
+    margin-bottom: 16px; /* 카드 간 간격 */
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* 카드 그림자 */
+    overflow: hidden;
+  }
+  
+  
+  .account-table td[data-label="사이트"],
+  .account-table td[data-label="아이디"],
+  .account-table td[data-label="비밀번호"],
+  .account-table td[data-label="마지막 수정일"],
+  .account-table td[data-label="삭제"] {
+    display: flex; 
+    justify-content: flex-start;
+    align-items: center;
+    padding: 10px 12px;
+    font-size: 14px;
+  }
+
+  .last-edit-date,
+  td input[type="text"] {
+    font-family: 'Pretendard Variable', sans-serif;
+    font-weight: 400;
+    font-size: 16px;
+    width: 100%;
+    min-width: 0;
+    padding: 4px 6px;
+    border: none;
+    background: transparent;
+    box-sizing: border-box;
+    text-align: left;
+  }
+
+  /* 짝수행 배경색상 */
+  .table-striped-custom > tbody > tr:nth-child(even) td {
+    background-color: #fdfdfd;
+  }
+
+  /* 홀수행 배경색상 */
+  .table-striped-custom > tbody > tr:nth-child(odd) td {
+    background-color: #ffffff;
+  }
+
+  .account-table tbody td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: #777;
+    flex: 0 0 auto;
+    min-width: 100px;
+    max-width: 120px;
+    text-align: left;
+    padding-top: 1px;
+  }
+
+  .account-table tbody td:last-child {
+    border-bottom: none;
+  }
+
+  .button-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: stretch;
+    margin-bottom: 20px;
+  }
+
+  .add-row-btn,
+  .save-button {
+    width: 100%;
+  }
 }

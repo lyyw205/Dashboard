@@ -336,9 +336,21 @@
       const tr = document.createElement("tr");
       tr.dataset.id = id;
 
+      // ✅ 라벨 텍스트와 key를 매핑
+      const labels = {
+        title: "제목",
+        date: "날짜",
+        time: "시간",
+        location: "장소",
+        gender: "성비",
+        deadline: "마감일시",
+        form_url: "폼 URL"
+      };
+
       fields.forEach(key => {
         const td = document.createElement("td");
         td.dataset.key = key;
+        td.setAttribute("data-label", labels[key]); // ✅ 라벨 속성 추가
 
         const value = key === "deadline" && row[key]
           ? formatDeadline(row[key])
@@ -348,7 +360,9 @@
         tr.appendChild(td);
       });
 
+      // 삭제 버튼 열
       const deleteTd = document.createElement("td");
+      deleteTd.setAttribute("data-label", "삭제"); // ✅ 삭제 버튼도 라벨 추가
       deleteTd.innerHTML = `
         <button class="delete-btn">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
@@ -419,20 +433,21 @@
     });
 
     tbody.addEventListener("click", async (e) => {
-      if (e.target.classList.contains("delete-btn")) {
-        const tr = e.target.closest("tr");
-        const id = tr.dataset.id;
+      const deleteBtn = e.target.closest(".delete-btn");
+      if (!deleteBtn) return;
 
-        if (!id) {
-          tr.remove();
-        } else {
-          const ok = confirm("정말 삭제할까요?");
-          if (!ok) return;
+      const tr = deleteBtn.closest("tr");
+      const id = tr.dataset.id;
 
-          const { error } = await supabase.from("party_cards").delete().eq("id", id);
-          if (error) return alert("❌ 삭제 실패: " + error.message);
-          tr.remove();
-        }
+      if (!id) {
+        tr.remove();
+      } else {
+        const ok = confirm("정말 삭제할까요?");
+        if (!ok) return;
+
+        const { error } = await supabase.from("party_cards").delete().eq("id", id);
+        if (error) return alert("❌ 삭제 실패: " + error.message);
+        tr.remove();
       }
     });
 
