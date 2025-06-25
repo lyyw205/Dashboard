@@ -1,12 +1,4 @@
-body {
-  font-family: 'Pretendard', sans-serif;
-  background: #f9f9fb;
-  margin: 0;
-}
-
-h2 {
-  white-space: nowrap; 
-}
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css");
 
 .accounts-wrapper {
   display: flex;
@@ -36,46 +28,20 @@ th, td {
 td[contenteditable="true"]:focus {
   outline: 2px solid #6366f1;
 }
+
+th {
+  font-family: 'Pretendard Variable', sans-serif;
+  font-weight: 600;
+  font-size: 15px;
+}
+
 td {
+  font-family: 'Pretendard Variable', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
   background-color: #fcfcfc;
 }
-.delete-btn {
-  background: #dc3545;
-  color: #dc3545; /* 부트스트랩 danger 색상 */
-  border: 1px solid #dc3545;
-  padding: 4px 10px;
-  border-radius: 6px;
-  cursor: pointer;
-}
 
-.delete-btn:hover {
-  background-color: #dc3545;
-  color: #fff;
-}
-
-.button-wrapper {
-  display: flex;
-  flex-direction: row;
-}
-
-.add-row-btn,
-.save-button {
-  margin-top: 20px;
-  padding: 12px 20px;
-  font-size: 16px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  color: white;
-  white-space: nowrap; 
-}
-.add-row-btn {
-  background-color: #3b82f6;
-  margin-right: 10px;
-}
-.save-button {
-  background-color: #10b981;
-}
 
 td input[type="text"] {
   width: 100%;
@@ -89,7 +55,58 @@ td input[type="text"] {
 }
 
 td:nth-child(1), th:nth-child(1) { min-width: 150px; }  /* 사이트 */
-td:nth-child(2), th:nth-child(2) { min-width: 180px; }  /* 아이디 */
+td:nth-child(2), th:nth-child(2) { min-width: 250px; }  /* 아이디 */
 td:nth-child(3), th:nth-child(3) { min-width: 150px; }   /* 비밀번호 */
 td:nth-child(4), th:nth-child(4) { min-width: 80px; }  /* 마지막수정일 */
 td:nth-child(5), th:nth-child(5) { min-width: 80px; }   /* 삭제 */
+
+
+/* 버튼 css */
+.save-button {
+  font-weight: 400;
+  color: #fff;
+  background-color: #7278D7; /* 보라색 배경 */
+  border: 1px solid #646abd;
+  border-radius: 6px;
+  padding: 10px 20px;
+  transition: background-color 0.2s, border-color 0.2s;
+  text-align: center;
+  display: inline-block;
+}
+.save-button:hover {
+  background-color: #676dc2; /* hover시 조금 어두운 보라 */
+  border-color: #5e63b1;
+  color: #ffffff;
+}
+.add-row-btn {
+  font-weight: 400;
+  color: #000;
+  background-color: #e9eaf8; /* 보라색 배경 */
+  border: 1px solid #cacbd6;
+  border-radius: 6px;
+  padding: 10px 20px;
+  transition: background-color 0.2s, border-color 0.2s;
+  text-align: center;
+  display: inline-block;
+  margin-right: 10px;
+}
+.add-row-btn:hover {
+  background-color: #d0d1d6; /* hover시 조금 어두운 보라 */
+  border-color: #bdbdbd;
+  color: #000;
+}
+.delete-btn {
+  font-weight: 400;
+  color: #3d3d3d;
+  background-color: transparent;
+  border: none;
+  border-radius: 6px;
+  padding: 5px 10px 7px 10px;
+  transition: background-color 0.2s, border-color 0.2s;
+  text-align: center;
+}
+.delete-btn:hover {
+  background-color: #e2e2e2; /* hover시 조금 어두운 보라 */
+  border-color: #b9b9b9;
+  color: #000;
+}

@@ -1,4 +1,4 @@
-
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css");
 
 #date-tabs {
   width: 100%;
@@ -44,10 +44,12 @@
 
 
 thead th {
+  font-family: 'Pretendard Variable', sans-serif;
+  font-weight: 600;
+  font-size: 15px;
   text-align: center;
   padding: 12px 4px;
   background-color: #f1f3f7; /* 테이블헤더 배경색상 */
-  font-size: 13px;
   color: #666; /* 테이블헤더 텍스트색상 */
   border-bottom: 1px solid #e0e0e0;
   white-space: nowrap;
@@ -132,9 +134,11 @@ tbody tr {
 }
 
 tbody td {
+  font-family: 'Pretendard Variable', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
   max-width: 100px;
   padding: 12px 4px;
-  font-size: 14px;
   border-bottom: 1px solid #f0f0f0;
   text-align: center;
   white-space: nowrap;

@@ -1,3 +1,5 @@
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css");
+
 .dashboard {
   display: flex;
 }
@@ -20,26 +22,26 @@
   box-sizing: border-box;
 }
 
-.table-table th {
-  font-size: 13px;
-  white-space: nowrap;
-}
-
 tr {
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
   transition: background 0.2s;   
 }
 
 td {
+  font-family: 'Pretendard Variable', sans-serif;
+  font-weight: 400;
   font-size: 14px;
   height: 45px;
   white-space: nowrap;
   overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 th {
+  font-family: 'Pretendard Variable', sans-serif;
+  font-weight: 600;
+  font-size: 15px;
   height: 45px;
+  white-space: nowrap;
   overflow: hidden;
   align-content: center;
   background-color: #f1f3f7 !important; /* 테이블헤더 배경색상 */
