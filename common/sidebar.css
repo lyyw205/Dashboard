@@ -1,3 +1,19 @@
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+
+body {
+  font-family: 'Pretendard', sans-serif;
+  background: #f7f7f8 !important;
+  margin: 0;
+  padding: 0;
+}
+
+h2 {
+  font-family: 'Pretendard', sans-serif;
+  font-size: 27px !important; /* 원하는 픽셀값으로 고정 */
+  white-space: nowrap;
+  font-weight: bold;
+}
+
 /* 기본 사이드바 스타일 */
 .sidebar {
   width: 260px;

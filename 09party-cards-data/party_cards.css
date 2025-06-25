@@ -1,76 +1,44 @@
-body {
-  font-family: 'Pretendard', sans-serif;
-  background: #f9f9fb;
-  margin: 0;
-}
 
-h2 {
-  white-space: nowrap; 
-}
-.party_cards-wrapper {
+.party_cards {
   display: flex;
   flex-direction: row;
 }
-.party_cards-main {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  overflow-x: auto; /* ✅ 가로 스크롤 추가 */
+
+.table-wrapper {
+  overflow: auto;
+  width: 100%;
 }
-table {
-  width: max-content;          /* ✅ 내용 크기만큼 너비 설정 */
-  min-width: unset;             /* ✅ 너무 작아지지 않도록 */
-  border-collapse: collapse;
-  background: #fff;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-  table-layout: auto; /* ✅ 셀 너비 고정 */
+
+.table {
+  table-layout: fixed;
 }
-th, td {
-  padding: 8px 10px;
-  border: 1px solid #ddd;
+
+td {
+  font-size: 14px;
+  height: 45px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   text-align: center;
 }
+
 th {
-  background-color: #f1f5f9;
+  height: 45px;
+  overflow: hidden;
+  align-content: center;
+  text-align: center;
+  background-color: #f1f3f7 !important; /* 테이블헤더 배경색상 */
+  color: #666 !important; /* 테이블헤더 텍스트색상 */
 }
-td[contenteditable="true"]:focus {
-  outline: 2px solid #6366f1;
+
+/* 짝수행 배경색상 */
+.table-striped-custom > tbody > tr:nth-child(even) td {
+  background-color: #fafafa;
 }
-td {
-  background-color: #fcfcfc;
-}
-.delete-btn {
-  background: #ef4444;
-  color: white;
-  padding: 4px 10px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-}
-.row-buttons {
-  display: flex;
-  flex-direction: row;
-}
-.add-row-btn,
-#save-button {
-  margin-top: 20px;
-  padding: 12px 20px;
-  font-size: 16px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  color: white;
-  white-space: nowrap; 
-}
-.add-row-btn {
-  background-color: #3b82f6;
-  margin-right: 10px;
-}
-#save-button {
-  background-color: #10b981;
+
+/* 홀수행 배경색상 */
+.table-striped-custom > tbody > tr:nth-child(odd) td {
+  background-color: #ffffff;
 }
 
 td input[type="text"] {
@@ -89,11 +57,65 @@ td input[type="text"]:focus {
   background-color: #fff;
 }
 
-td:nth-child(1), th:nth-child(1) { max-width: 60px; }  /* 제목 */
-td:nth-child(2), th:nth-child(2) { max-width: 100px; }  /* 날짜 */
-td:nth-child(3), th:nth-child(3) { max-width: 150px; }   /* 시간 */
-td:nth-child(4), th:nth-child(4) { max-width: 120px; }  /* 장소 */
-td:nth-child(5), th:nth-child(5) { max-width: 200px; }   /* 성비 */
-td:nth-child(6), th:nth-child(6) { max-width: 140px; }  /* 마감일시 */
-td:nth-child(7), th:nth-child(7) { max-width: 250px; }  /* 폼 URL */
-td:nth-child(8), th:nth-child(8) { max-width: 60px; }   /* 삭제 버튼 */
+td:nth-child(1), th:nth-child(1) { width: 60px; }  /* 제목 */
+td:nth-child(2), th:nth-child(2) { width: 100px; }  /* 날짜 */
+td:nth-child(3), th:nth-child(3) { width: 150px; }   /* 시간 */
+td:nth-child(4), th:nth-child(4) { width: 120px; }  /* 장소 */
+td:nth-child(5), th:nth-child(5) { width: 200px; }   /* 성비 */
+td:nth-child(6), th:nth-child(6) { width: 160px; }  /* 마감일시 */
+td:nth-child(7), th:nth-child(7) { width: 250px; }  /* 폼 URL */
+td:nth-child(8), th:nth-child(8) { width: 80px; }   /* 삭제 버튼 */
+
+
+
+
+
+/* 버튼 css */
+#save-button {
+  font-weight: 400;
+  color: #fff;
+  background-color: #7278D7; /* 보라색 배경 */
+  border: 1px solid #646abd;
+  border-radius: 6px;
+  padding: 10px 20px;
+  transition: background-color 0.2s, border-color 0.2s;
+  text-align: center;
+  display: inline-block;
+}
+#save-button:hover {
+  background-color: #676dc2; /* hover시 조금 어두운 보라 */
+  border-color: #5e63b1;
+  color: #ffffff;
+}
+.add-row-btn {
+  font-weight: 400;
+  color: #000;
+  background-color: #e9eaf8; /* 보라색 배경 */
+  border: 1px solid #cacbd6;
+  border-radius: 6px;
+  padding: 10px 20px;
+  transition: background-color 0.2s, border-color 0.2s;
+  text-align: center;
+  display: inline-block;
+  margin-right: 10px;
+}
+.add-row-btn:hover {
+  background-color: #d0d1d6; /* hover시 조금 어두운 보라 */
+  border-color: #bdbdbd;
+  color: #000;
+}
+.delete-btn {
+  font-weight: 400;
+  color: #3d3d3d;
+  background-color: transparent;
+  border: none;
+  border-radius: 6px;
+  padding: 5px 10px 7px 10px;
+  transition: background-color 0.2s, border-color 0.2s;
+  text-align: center;
+}
+.delete-btn:hover {
+  background-color: #e2e2e2; /* hover시 조금 어두운 보라 */
+  border-color: #b9b9b9;
+  color: #000;
+}

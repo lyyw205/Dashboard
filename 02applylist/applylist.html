@@ -284,7 +284,7 @@
         </li>
       </ul>
     </div>
-    <div class="table container-fluid px-4 mt-5">
+    <div class="table-wrapper container-fluid px-4 mt-5">
       <div class="table-header d-flex flex-column mt-5 mt-md-0 mb-3">
         <h2 class="mb-2 mb-md-3">📋 참여 신청자 목록</h2>
         <div id="filters" class="d-flex flex-wrap gap-2 mt-2 mb-3">
@@ -304,8 +304,8 @@
         </div>
       </div>
       <div class="table-responsive">
-        <table class="table responsive-table table-table table-borderless table-striped table-hover align-middle text-nowrap">
-          <thead class="table-dark">
+        <table class="table table-striped-custom table-table table-borderless table-hover align-middle text-nowrap">
+          <thead class="table-header-wrapper">
             <tr>
               <th class="submit-time">제출시각</th>
               <th class="submit-name">이름</th>
@@ -322,7 +322,7 @@
               <th class="memo">메모</th>
             </tr>
           </thead>
-          <tbody id="response-table" class="background-light">
+          <tbody id="response-table">
             <tr><td colspan="13" class="text-center text-muted py-3">로딩 중...</td></tr>
           </tbody>
         </table>

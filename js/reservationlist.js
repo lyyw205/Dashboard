@@ -83,14 +83,14 @@ function renderTable(data) {
     <tbody>
       ${data.map(row => `
         <tr>
-          <td><input type="checkbox" ${row.incheck ? 'checked' : ''} data-id="${row.id}" data-field="incheck" /></td>
+          <td><input type="checkbox" class="form-check-input memo-checkbox" ${row.incheck ? 'checked' : ''} data-id="${row.id}" data-field="incheck" /></td>
           <td><input type="text" class="nicknameinput" value="${row.nickname || ''}" data-id="${row.id}" data-field="nickname" /></td>  
           <td>${row.name || ''}</td>
           <td>${row.phone || ''}</td>
           <td>${row.gender || ''}</td>
           <td>${row.mbti || ''}</td>
           <td>${row.memo3 || ''}</td>
-          <td><input type="checkbox" ${row.memo4 ? 'checked' : ''} data-id="${row.id}" data-field="memo4" /></td>
+          <td><input type="checkbox" class="form-check-input memo-checkbox" ${row.memo4 ? 'checked' : ''} data-id="${row.id}" data-field="memo4" /></td>
           <td><input type="text" class="memoinput" value="${row.memo5 || ''}" data-id="${row.id}" data-field="memo5" /></td>
         </tr>
       `).join('')}

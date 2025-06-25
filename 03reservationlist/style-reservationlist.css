@@ -1,21 +1,11 @@
-body {
-  font-family: 'Pretendard', sans-serif;
-  background: #f9f9fb;
-  margin: 0;
-}
 
-h2 {
-  font-size: 1.5rem;
-  margin-bottom: 1rem;
-}
 
 #date-tabs {
   width: 100%;
   display: flex;
   overflow-x: auto;           /* ✅ 가로 스크롤 허용 */
   white-space: nowrap;
-  gap: 0.5rem;
-  scrollbar-width: thin;      /* Firefox */
+  gap: 6px;
 }
 
 #date-tabs button {
@@ -33,109 +23,112 @@ h2 {
   border-color: #c2c8d0;
 }
 
-#date-tabs::-webkit-scrollbar {
+/* 날짜탭 스크롤 css (크롬) */
+/* #date-tabs::-webkit-scrollbar {
   height: 6px;
 }
 #date-tabs::-webkit-scrollbar-thumb {
   background: #ccc;
   border-radius: 3px;
+} */
+
+#date-tabs {
+  overflow: auto;               /* 스크롤 기능 유지 */
+  scrollbar-width: none;        /* Firefox 스크롤 안보이게 */
+  -ms-overflow-style: none;     /* IE, Edge 스크롤 안보이게 */
 }
 
-table {
-  border-collapse: separate;
-  border-spacing: 0 5px;
-  table-layout: fixed;
+#date-tabs::-webkit-scrollbar {
+  display: none;                /* Chrome, Safari 스크롤 안보이게 */
 }
+
 
 thead th {
   text-align: center;
   padding: 12px 4px;
-  background-color: #f1f3f7;
+  background-color: #f1f3f7; /* 테이블헤더 배경색상 */
   font-size: 13px;
-  color: #666;
+  color: #666; /* 테이블헤더 텍스트색상 */
   border-bottom: 1px solid #e0e0e0;
   white-space: nowrap;
+  overflow: hidden;
+  align-content: center;
   height: 45px;
+}
+
+/* 짝수행 배경색상 */
+.my-table > tbody > tr:nth-child(even) td {
+  background-color: #fafafa;
+}
+
+/* 홀수행 배경색상 */
+.my-table > tbody > tr:nth-child(odd) td {
+  background-color: #ffffff;
 }
 
 th:nth-child(1),
 td:nth-child(1) {
   width: 6%;
   min-width: 60px;
-  text-align: center;
 }
 
 th:nth-child(2),
 td:nth-child(2) {
   width: 10%;
   min-width: 100px;
-  text-align: center;
 }
 
 th:nth-child(3),
 td:nth-child(3) {
   width: 7%;
   min-width: 70px;
-  text-align: center;
 }
 
 th:nth-child(4),
 td:nth-child(4) {
   width: 10%;
   min-width: 100px;
-  text-align: center;
 }
 
 th:nth-child(5),
 td:nth-child(5) {
   width: 6%;
   min-width: 60px;
-  text-align: center;
 }
 
 th:nth-child(6),
 td:nth-child(6) {
   width: 17%;
   min-width: 250px;
-  text-align: center;
 }
 
 th:nth-child(7),
 td:nth-child(7) {
   width: 8%;
   min-width: 80px;
-  text-align: center;
 }
 
 th:nth-child(8),
 td:nth-child(8) {
   width: 6%;
   min-width: 60px;
-  text-align: center;
 }
 
 th:nth-child(9),
 td:nth-child(9) {
   width: 20%;
   min-width: 300px;
-  text-align: center;
 }
 
 th:nth-child(10),
 td:nth-child(10) {
   width: 10%;
   min-width: 100px;
-  text-align: center;
 }
 
 tbody tr {
-  background-color: #fff;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
   transition: background 0.2s;
-}
-
-tbody tr:hover {
-  background-color: #f5f7fa;
 }
 
 tbody td {
@@ -157,11 +150,8 @@ tbody td {
 .reservation {
   display: flex;
   flex-direction: column;
-  margin: 0 0 0 40px;
-}
-
-#reservation-list {
-  overflow-x: auto;
+  flex-grow: 1;
+  overflow-x: hidden;
 }
 
 .my-table {
@@ -173,7 +163,6 @@ tbody td {
 .table-wrapper {
   overflow-x: auto;
 }
-
 
 .nicknameinput, .memoinput {
   border: none;
@@ -187,14 +176,25 @@ tbody td {
   height: 100%;
 }
 
+
+/* 날짜탭 과거날짜, 활성화날짜 색상 */
 #date-tabs button.past-date {
   background-color: #f0f0f0;
   color: #aaa;
 }
-
 #date-tabs button.active {
   background-color: #333;
   color: #fff;
   border-color: #333;
 }
 
+
+/* 체크박스 크기/색상 */
+.form-check-input.memo-checkbox {
+  width: 18px;
+  height: 18px;
+}
+.form-check-input.memo-checkbox:checked {
+  background-color: #6366f1;      /* 체크된 배경색 */
+  border-color: #6366f1;          /* 체크된 테두리색 */
+}

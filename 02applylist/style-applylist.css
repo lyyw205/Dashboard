@@ -1,26 +1,27 @@
-body {
-  font-family: 'Pretendard', sans-serif;
-  background: #f9f9fb;
-  margin: 0;
-}
-
 .dashboard {
   display: flex;
 }
 
 .table-table {
   table-layout: fixed;
-  width: 100%;
-  border-collapse: separate;
-  border-spacing: 0 5px;
-  white-space: nowrap;
+  /* border-collapse: separate; 행 분리 */
+  /* border-spacing: 0 5px; 분리된 행 사이 간격 / 두개는 세트옵션 */
+  width: max-content;
+}
+
+.table-wrapper {
+  flex-grow: 1;
+  overflow-x: hidden; /* ← 페이지에 스크롤 안 생기게 */
+}
+
+.table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  box-sizing: border-box;
 }
 
 .table-table th {
-  text-align: center;
-  padding: 12px 4px;
   font-size: 13px;
-  color: #666;
   white-space: nowrap;
 }
 
@@ -29,22 +30,7 @@ tr {
   transition: background 0.2s;   
 }
 
-body {
-  font-family: sans-serif;
-  padding: 0;
-  display: flex;
-  background-color: #F5F6FA;
-  margin: 0;
-}
-
-table {
-  border-collapse: separate;
-  border-spacing: 0 5px;
-  table-layout: fixed;
-}
-
 td {
-  max-width: 100px;
   font-size: 14px;
   height: 45px;
   white-space: nowrap;
@@ -54,12 +40,21 @@ td {
 
 th {
   height: 45px;
-  background-color: #f2f2f2;
   overflow: hidden;
-  white-space: nowrap;
   align-content: center;
+  background-color: #f1f3f7 !important; /* 테이블헤더 배경색상 */
+  color: #666 !important; /* 테이블헤더 텍스트색상 */
 }
 
+/* 짝수행 배경색상 */
+.table-striped-custom > tbody > tr:nth-child(even) td {
+  background-color: #fafafa;
+}
+
+/* 홀수행 배경색상 */
+.table-striped-custom > tbody > tr:nth-child(odd) td {
+  background-color: #ffffff;
+}
 
 th:nth-child(1),
 td:nth-child(1) {
