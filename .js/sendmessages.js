@@ -26,7 +26,7 @@ async function fetchTargets() {
 async function markAsSent(id) {
   const { error } = await supabase
     .from('responses')
-    .update({ memo1: '문자발송완료' })
+    .update({ memo1: '✅발송완료' })
     .eq('id', id);
 
   if (error) {

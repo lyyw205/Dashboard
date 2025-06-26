@@ -94,7 +94,7 @@ h2 {
 .list-content-text {
   font-family: Arial, Helvetica, sans-serif;
   padding-top: 2px;
-  color: #8094b6;
+  color: #7282A6;
   font-weight: 600;
   white-space: nowrap;
 }
@@ -173,7 +173,7 @@ h2 {
 }
 
 .mobile-menu {
-  position: absolute; /* 또는 fixed */
+  position: fixed; /* 또는 fixed */
   top: 56px; /* 모바일 nav 높이만큼 */
   left: 0;
   width: 100%;
@@ -229,4 +229,27 @@ h2 {
 #mobile-menu-toggle:focus-visible {
   outline: none;
   box-shadow: none;
+}
+
+.Gue {
+    font-family: 'Pretendard', 'sans-serif';
+    font-size: 30px;
+    font-weight: 900;
+    text-decoration: none;
+    color: #222;
+  }
+
+.rrilla {
+  font-family: 'Pretendard', 'sans-serif';
+  font-size: 30px;
+  font-weight: 900;
+  text-decoration: none;
+  color: #636dc4;
+}
+
+.sidebar-head-logo,
+.sidebar-head-logo:link,
+.sidebar-head-logo:visited {
+  text-decoration: none;
+  color: inherit;
 }

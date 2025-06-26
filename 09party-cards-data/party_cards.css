@@ -63,6 +63,11 @@ td input[type="text"]:focus {
   background-color: #fff;
 }
 
+.table-hover > tbody > tr:hover {
+  --bs-table-hover-bg: #f5f7fd;  /* Bootstrap 변수 방식 */
+  background-color: #f5f7fd !important;  /* 강제 적용 */
+}
+
 td:nth-child(1), th:nth-child(1) { width: 60px; }  /* 제목 */
 td:nth-child(2), th:nth-child(2) { width: 100px; }  /* 날짜 */
 td:nth-child(3), th:nth-child(3) { width: 150px; }   /* 시간 */

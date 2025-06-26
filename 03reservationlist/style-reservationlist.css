@@ -164,7 +164,7 @@ tbody td {
   table-layout: fixed;
 }
 
-.table-wrapper {
+.table-responsive {
   overflow-x: auto;
 }
 

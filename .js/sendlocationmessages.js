@@ -12,9 +12,9 @@ const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY
   const { data: rows, error } = await supabase
     .from('responses')
     .select('*')
-    .eq('memo1', '문자발송완료')
+    .eq('memo1', '✅발송완료')
     .eq('memo2', true)
-    .not('memo3', 'eq', '문자발송완료');
+    .not('memo3', 'eq', '✅발송완료');
 
   if (error) {
     console.error('❌ 대상자 조회 실패:', error);
@@ -33,7 +33,7 @@ const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY
     // 실제 문자 발송은 생략, 대신 memo3 필드 업데이트 테스트
     const { error: updateError } = await supabase
       .from('responses')
-      .update({ memo3: '문자발송완료' })
+      .update({ memo3: '✅발송완료' })
       .eq('id', row.id);
 
     if (updateError) {

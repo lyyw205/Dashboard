@@ -9,6 +9,7 @@
   flex-direction: column;
   overflow-x: auto; /* ✅ 가로 스크롤 추가 */
 }
+
 .account-table {
   box-shadow: 0 2px 6px rgba(0,0,0,0.05);
 }
@@ -116,6 +117,11 @@ td:nth-child(5), th:nth-child(5) { min-width: 80px; }   /* 삭제 */
   color: #000;
 }
 
+.table-hover > tbody > tr:hover {
+  --bs-table-hover-bg: #f5f7fd;  /* Bootstrap 변수 방식 */
+  background-color: #f5f7fd !important;  /* 강제 적용 */
+}
+
 
 
 /* 미디어쿼리 768px 미만 */
@@ -147,7 +153,9 @@ td:nth-child(5), th:nth-child(5) { min-width: 80px; }   /* 삭제 */
   }
 
   .last-edit-date,
-  td input[type="text"] {
+  td input.site,
+  td input.id,
+  td input.password {
     font-family: 'Pretendard Variable', sans-serif;
     font-weight: 400;
     font-size: 16px;
@@ -158,6 +166,10 @@ td:nth-child(5), th:nth-child(5) { min-width: 80px; }   /* 삭제 */
     background: transparent;
     box-sizing: border-box;
     text-align: left;
+  }
+
+  td input.site {
+    font-weight: 700;
   }
 
   /* 짝수행 배경색상 */
@@ -186,15 +198,27 @@ td:nth-child(5), th:nth-child(5) { min-width: 80px; }   /* 삭제 */
   }
 
   .button-wrapper {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: #fff;
+    padding: 12px 16px;
+    border-top: 1px solid #ddd;
     display: flex;
-    flex-direction: column;
-    gap: 10px;
-    align-items: stretch;
-    margin-bottom: 20px;
+    justify-content: space-between;
+    z-index: 1000;
   }
 
   .add-row-btn,
-  .save-button {
+  .save-button 
+  {
     width: 100%;
+  }
+
+  #account-body::after {
+    content: "";
+    display: block;
+    height: 40px; /* 원하는 만큼 여백 */
   }
 }
