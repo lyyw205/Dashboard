@@ -321,15 +321,23 @@
     const tbody = document.querySelector("#party-table tbody");
 
     function formatDeadline(deadlineStr) {
-      const utc = new Date(deadlineStr);
-      const local = new Date(utc.getTime() + (utc.getTimezoneOffset() * 60000)); // ✅ 다시 로컬로 변환
+        if (!deadlineStr || !deadlineStr.includes('T')) {
+            // 이미 'YYYY-MM-DD HH:mm' 형식이거나 비어있으면 그대로 반환
+            return deadlineStr || "";
+        }
 
-      const yyyy = local.getFullYear();
-      const mm = String(local.getMonth() + 1).padStart(2, "0");
-      const dd = String(local.getDate()).padStart(2, "0");
-      const hh = String(local.getHours()).padStart(2, "0");
-      const mi = String(local.getMinutes()).padStart(2, "0");
-      return `${yyyy}-${mm}-${dd} ${hh}:${mi}`;
+        const date = new Date(deadlineStr);
+        // getTimezoneOffset()은 분 단위 오프셋을 반환 (KST의 경우 -540)
+        // UTC와 KST의 차이는 -540분이므로, UTC 시간에 이 차이를 빼주면 KST가 됩니다.
+        const offset = date.getTimezoneOffset() * 60000; // 밀리초 단위로 변환
+        const localTime = new Date(date.getTime() - offset);
+
+        // 이제 localTime은 KST 기준 시간을 나타냅니다.
+        // 이 시간을 "YYYY-MM-DDTHH:mm:ss.sssZ" 형식으로 바꾸고 필요한 부분만 잘라냅니다.
+        const isoString = localTime.toISOString(); // 결과: "2025-08-01T20:00:00.000Z"
+        
+        // "YYYY-MM-DD HH:mm" 형식으로 최종 반환
+        return isoString.substring(0, 16).replace('T', ' ');
     }
 
     function createRow(row = {}, id = "") {
@@ -406,9 +414,9 @@
       const rows = document.querySelectorAll("tbody tr");
 
       for (const tr of rows) {
-        const id = tr.dataset.id;
+        const id = tr.dataset.id?.trim();  // ✅ 공백 제거도 포함
         const cells = tr.querySelectorAll("td[data-key]");
-        const rowData = {}; // ✅ 여기에 선언 추가
+        const rowData = {};
 
         cells.forEach(td => {
           const key = td.dataset.key;
@@ -420,17 +428,25 @@
         if (isEmpty) continue;
 
         // 마감일시 변환
-        if (rowData.deadline && !rowData.deadline.includes("T")) {
-          const local = new Date(rowData.deadline.replace(" ", "T") + ":00");
-          const utc = new Date(local.getTime() - (local.getTimezoneOffset() * 60000));
-          rowData.deadline = utc.toISOString();
+        if (rowData.deadline) {
+            // 입력값에 'T'나 'Z'가 포함되어 있지 않은, 'YYYY-MM-DD HH:mm' 같은 단순 형식일 때만 변환
+            if (!rowData.deadline.includes('T') && !rowData.deadline.includes('Z')) {
+                const localDate = new Date(rowData.deadline.replace(" ", "T"));
+                // 유효한 날짜일 때만 변환
+                if (!isNaN(localDate.getTime())) {
+                    rowData.deadline = localDate.toISOString();
+                }
+            }
+            // 이미 UTC 형식이면 아무것도 하지 않고 그대로 둡니다.
         }
 
         if (id) {
+          // ✅ id가 존재하면 update
           const { error } = await supabase.from("party_cards").update(rowData).eq("id", id);
           if (error) alert(`❌ 업데이트 실패 (id=${id}): ${error.message}`);
         } else {
-          delete rowData.id; // ✅ 이 한 줄이 핵심!
+          // ✅ id가 없으면 삽입, UUID는 자동 생성되므로 id 제거
+          delete rowData.id;
           const { error } = await supabase.from("party_cards").insert([rowData]);
           if (error) alert("❌ 추가 실패: " + error.message);
         }
