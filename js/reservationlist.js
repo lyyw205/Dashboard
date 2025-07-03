@@ -64,6 +64,8 @@ function renderTable(data) {
     return;
   }
 
+  renderSummary(data);
+
   const table = document.createElement('table');
   table.className = 'my-table';
   table.innerHTML = `
@@ -174,7 +176,47 @@ async function fetchData() {
   renderTable(groupedData[sortedDates[0]]);
 }
 
+function renderSummary(data) {
+  const summaryEl = document.getElementById('summary-stats');
+  summaryEl.className = 'summary-container';
 
+  let maleCount = 0;
+  let femaleCount = 0;
+  let afterCount = 0;
+
+  data.forEach(row => {
+    if (row.gender === '남자') maleCount++;
+    else if (row.gender === '여자') femaleCount++;
+
+    if (row.memo4) afterCount++;
+  });
+
+  const total = data.length;
+  const afterRatio = total > 0 ? Math.round((afterCount / total) * 100) : 0;
+
+  summaryEl.innerHTML = `
+    <div class="summary-box-sex">
+      <div class="summary-box summary-male">
+        <span class="summary-label">남자</span>
+        <span class="summary-value">${maleCount}명</span>
+      </div>
+      <div class="summary-box summary-female">
+        <span class="summary-label">여자</span>
+        <span class="summary-value">${femaleCount}명</span>
+      </div>
+    </div>
+    <div class="summary-box-data">
+      <div class="summary-box summary-total">
+        <span class="summary-label">총원</span>
+        <span class="summary-value">${total}명</span>
+      </div>
+      <div class="summary-box summary-after">
+        <span class="summary-label">애프터 신청률</span>
+        <span class="summary-value">${afterRatio}%</span>
+      </div>
+    </div>
+  `;
+}
 
 function formatKoreanDate(isoStr) {
   const date = new Date(isoStr);

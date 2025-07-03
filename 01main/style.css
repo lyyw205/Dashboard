@@ -47,3 +47,47 @@ body {
     padding: 20px;
   }
 }
+
+/* 📦 카드 전체 레이아웃 */
+.card {
+  border: none;
+  border-radius: 16px;
+  background-color: #ffffff;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+  padding: 24px;
+  transition: all 0.2s ease;
+}
+
+/* 카드 hover 시 약간 떠오르는 효과 */
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* 🧾 카드 제목 */
+.card h5 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 12px;
+}
+
+/* 💰 금액 텍스트 */
+.card .fs-5 {
+  font-size: 20px;
+  color: #2b2b2b;
+}
+
+/* 🎯 필터 select box */
+#range-select {
+  font-size: 14px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+/* 📊 Chart 반응형 대응 */
+canvas {
+  max-width: 100% !important;
+  height: auto !important;
+}

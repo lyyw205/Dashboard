@@ -430,6 +430,7 @@
           const { error } = await supabase.from("party_cards").update(rowData).eq("id", id);
           if (error) alert(`❌ 업데이트 실패 (id=${id}): ${error.message}`);
         } else {
+          delete rowData.id; // ✅ 이 한 줄이 핵심!
           const { error } = await supabase.from("party_cards").insert([rowData]);
           if (error) alert("❌ 추가 실패: " + error.message);
         }
