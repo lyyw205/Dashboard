@@ -4,6 +4,16 @@ const supabaseUrl = 'https://wqxmvqqkbxiykiotbusd.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndxeG12cXFrYnhpeWtpb3RidXNkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg0NDcyOTYsImV4cCI6MjA2NDAyMzI5Nn0.RmB92YtjLPMx4tkQibuRVT_T4DL3_O8Pny3ZA9DU0tk'; // 생략
 const supabase = createClient(supabaseUrl, supabaseKey);
 
+function debounce(func, delay) {
+  let timeoutId;
+  return function(...args) {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => {
+      func.apply(this, args);
+    }, delay);
+  };
+}
+
 
 const tabContainer = document.getElementById('date-tabs');
 const tableContainer = document.getElementById('reservation-list');
@@ -102,22 +112,33 @@ function renderTable(data) {
   tableContainer.appendChild(table);
 
   // 자동 저장: 텍스트 입력
+  const saveData = async (inputElement) => {
+    const id = inputElement.dataset.id;
+    const field = inputElement.dataset.field;
+    const value = inputElement.value;
+
+    const { error } = await supabase
+      .from('responses')
+      .update({ [field]: value })
+      .eq('id', id);
+
+    if (error) {
+      console.error(`❌ ${field} 저장 실패:`, error.message);
+    } else {
+      console.log(`✅ ${field} 저장 완료 (디바운스)`);
+    }
+  };
+
+  // 2. 디바운스 함수 생성 (3초 지연)
+  const debouncedSave = debounce(saveData, 3000);
+
+  // 자동 저장: 텍스트 입력
   document.querySelectorAll('input[type="text"][data-field]').forEach(input => {
-    input.addEventListener('input', async () => {
-      const id = input.dataset.id;
-      const field = input.dataset.field;
-      const value = input.value;
-
-      const { error } = await supabase
-        .from('responses')
-        .update({ [field]: value })
-        .eq('id', id);
-
-      if (error) {
-        console.error(`❌ ${field} 저장 실패:`, error.message);
-      } else {
-        console.log(`✅ ${field} 저장 완료`);
-      }
+    // 3. 'input' 이벤트에 디바운스 적용된 함수 연결
+    input.addEventListener('input', () => {
+      // 이벤트 리스너는 debouncedSave를 호출하고,
+      // debouncedSave는 3초 후에 saveData를 실행합니다.
+      debouncedSave(input);
     });
   });
 
@@ -161,19 +182,29 @@ async function fetchData() {
   }
 
   groupedData = groupByDate(data);
-  const dates = Object.keys(groupedData).sort();
 
   const today = new Date();
+  today.setHours(0, 0, 0, 0); // 오늘 날짜의 시간을 자정으로 설정
+
   const sortedDates = Object.keys(groupedData).sort((a, b) => {
     const aDate = new Date(a);
     const bDate = new Date(b);
+    
+    // aDate는 이미 자정 기준이므로, setHours가 필요 없습니다.
+    // today와 비교할 때 aDate가 더 작은지만 확인하면 됩니다.
     const aIsPast = aDate < today ? 1 : 0;
     const bIsPast = bDate < today ? 1 : 0;
+    
     return aIsPast - bIsPast || aDate - bDate;
   });
 
   renderTabs(sortedDates);
-  renderTable(groupedData[sortedDates[0]]);
+  // 첫 렌더링 시 테이블이 비어있지 않도록 수정
+  if (sortedDates.length > 0) {
+      renderTable(groupedData[sortedDates[0]]);
+  } else {
+      renderTable([]); // 데이터가 없을 경우 빈 테이블 렌더링
+  }
 }
 
 function renderSummary(data) {
