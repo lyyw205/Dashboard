@@ -1,114 +1,98 @@
-const express = require('express');
-const path = require('path');
+// netlify/functions/webhook.js (올바른 코드)
+
 const { createClient } = require('@supabase/supabase-js');
-require('dotenv').config();
 
-const app = express();
-const PORT = 3000;
-
-// Supabase 연결
+// Netlify 환경 변수에서 URL과 키를 가져와 Supabase 클라이언트 생성
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
 
-// JSON 파싱, CORS 허용
-app.use(express.static(path.join(__dirname, '../')));
-app.use(express.json());
-app.use(require('cors')());
-
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, '../01main/index.html'));
-});
-
-// ✅ 날짜가 이미 YYYY-MM-DD 형식이면 그대로 사용
+// 날짜 변환 함수
 function parseKoreanDate(dateStr) {
   try {
     if (!dateStr) return null;
-
-    // 이미 YYYY-MM-DD 형식이면 그대로 사용
     if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return dateStr;
-
-    // '6월 20일 (토)' 형식일 경우
     const match = dateStr.match(/(\d{1,2})월\s*(\d{1,2})일/);
     if (!match) return null;
-
     const [, month, day] = match;
     const year = new Date().getFullYear();
-    return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+    return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
   } catch (e) {
     return null;
   }
 }
 
-
-
-// ✅ 성별 UUID → 사람이 읽는 값으로 변환
+// 성별 UUID 맵
 const genderMap = {
   '2fef7478-255d-4fa2-8a46-0ab754993fa1': '남자',
   '3cab93e0-4a1b-449b-895b-ecd659767364': '여자'
 };
 
-app.post('/webhook', async (req, res) => {
-  const raw = req.body;
-  console.log('🔥 받은 데이터:', raw);
+// Tally 필드 키 맵
+const fieldMap = {
+  question_NlOAMp: 'name',
+  question_zyVpkM: 'birth_year',
+  question_Y08D1v: 'phone',
+  question_da7LOd: 'gender',
+  question_Y02E1W: 'mbti',
+  question_zylEMM: 'apply_date',
+  question_lepoxN: 'tmi',
+};
 
-  const fieldsArray = raw.data?.fields || [];
-
-  // ✅ Tally 자동 생성 질문키 → 우리가 사용하는 필드명으로 매핑
-  const fieldMap = {
-    question_NlOAMp: 'name',
-    question_zyVpkM: 'birth_year',
-    question_Y08D1v: 'phone',
-    question_da7LOd: 'gender',
-    question_Y02E1W: 'mbti',
-    question_zylEMM: 'apply_date',
-    question_lepoxN: 'tmi',
-  };
-
-  // ✅ fieldMap 기준으로 키 변환
-  const formData = {};
-  fieldsArray.forEach((field) => {
-    console.log('🧩 key:', field.key, '| value:', field.value);
-    const mappedKey = fieldMap[field.key];
-    if (mappedKey && field.value) {
-      formData[mappedKey] = Array.isArray(field.value)
-        ? field.value[0]
-        : field.value;
-    }
-  });
-
-  console.log('✅ 파싱된 폼 데이터:', formData);
-
-  // ✅ 날짜 변환
-  const applyDateFormatted = parseKoreanDate(formData.apply_date);
-
-  console.log('📅 원본 날짜:', formData.apply_date);
-  console.log('📅 변환된 날짜:', applyDateFormatted);
-
-  // ✅ 성별 UUID → 텍스트로 변환
-  const genderUUID = formData.gender;
-  const gender = genderMap[genderUUID] || genderUUID;
-
-  // ✅ Supabase 저장
-  const { error } = await supabase.from('responses').insert([
-    {
-      name: formData.name,
-      birth_year: parseInt(formData.birth_year),
-      phone: formData.phone,
-      gender: gender,
-      apply_date: applyDateFormatted,
-      mbti: formData.mbti,
-      tmi: formData.tmi,
-    }
-  ]);
-
-  if (error) {
-    console.error('❌ Supabase insert error:', error);
-    return res.status(500).send('Error saving to Supabase');
+// Netlify Function의 시작점인 exports.handler
+exports.handler = async function(event) {
+  if (event.httpMethod !== 'POST') {
+    return { statusCode: 405, body: 'Method Not Allowed' };
   }
 
-  res.send('✅ 저장 성공');
-});
+  try {
+    const raw = JSON.parse(event.body);
+    console.log('🔥 받은 데이터:', raw);
 
-// 서버 실행
-app.listen(PORT, () => {
-  console.log(`🚀 서버 실행 중: http://localhost:${PORT}`);
-});
+    const fieldsArray = raw.data?.fields || [];
+    
+    const formData = {};
+    fieldsArray.forEach((field) => {
+      const mappedKey = fieldMap[field.key];
+      if (mappedKey && field.value) {
+        formData[mappedKey] = Array.isArray(field.value) ? field.value[0] : field.value;
+      }
+    });
+    console.log('✅ 파싱된 폼 데이터:', formData);
+
+    const applyDateFormatted = parseKoreanDate(formData.apply_date);
+    const genderUUID = formData.gender;
+    const gender = genderMap[genderUUID] || genderUUID;
+
+    const { error } = await supabase.from('responses').insert([
+      {
+        name: formData.name,
+        birth_year: parseInt(formData.birth_year, 10),
+        phone: formData.phone,
+        gender: gender,
+        apply_date: applyDateFormatted,
+        mbti: formData.mbti,
+        tmi: formData.tmi,
+      }
+    ]);
+
+    if (error) {
+      console.error('❌ Supabase insert error:', error);
+      return {
+        statusCode: 500,
+        body: JSON.stringify({ message: 'Error saving to Supabase', details: error.message }),
+      };
+    }
+
+    console.log('✅ 저장 성공');
+    return {
+      statusCode: 200,
+      body: JSON.stringify({ message: '✅ 저장 성공' }),
+    };
+
+  } catch (e) {
+    console.error('❌ Function Error:', e);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ message: 'Internal Server Error', details: e.toString() }),
+    };
+  }
+};
