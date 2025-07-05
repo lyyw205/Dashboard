@@ -1,0 +1,7 @@
+[build]
+  # 빌드 결과물이 저장되는 폴더 (없다면 이 라인은 생략 가능)
+  # publish = "public" 
+
+[functions]
+  # 함수 코드가 있는 폴더 지정
+  directory = "netlify/functions/"
