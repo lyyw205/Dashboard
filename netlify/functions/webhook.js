@@ -45,7 +45,7 @@ exports.handler = async function(event) {
 
   try {
     const raw = JSON.parse(event.body);
-    console.log('🔥 받은 데이터:', raw);
+    console.log('🔥 받은 데이터:', JSON.stringify(raw, null, 2));
 
     const fieldsArray = raw.data?.fields || [];
     
