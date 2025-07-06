@@ -1,5 +1,1 @@
-# /login 이라는 주소로 오면 login.html 파일의 내용을 보여준다 (URL은 /login 유지)
-/login    /login.html    200
-
-# 로그인 안 한 사용자가 어떤 페이지로 오든, /login 주소로 강제 이동시킨다
-/*        /login         302!   Role=!member
+/*    /login.html    302!    Role=!member
