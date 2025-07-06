@@ -1,5 +1,5 @@
-# 로그인 페이지 예외 처리
+# /login 이라는 주소로 오면 login.html 파일의 내용을 보여준다 (URL은 /login 유지)
 /login    /login.html    200
 
-# 메인 리다이렉트 규칙
-/*    /login.html    302!    Role=!member
+# 로그인 안 한 사용자가 어떤 페이지로 오든, /login 주소로 강제 이동시킨다
+/*        /login         302!   Role=!member
