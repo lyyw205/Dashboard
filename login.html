@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>관리자 로그인</title>
+  <style>
+    body { display: flex; justify-content: center; align-items: center; height: 100vh; font-family: sans-serif; }
+    .login-container { text-align: center; }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <h1>관리자 페이지 로그인</h1>
+    <p>계속하려면 로그인하세요.</p>
+    <!-- 이 버튼을 누르면 로그인 팝업이 뜹니다 -->
+    <div data-netlify-identity-button></div>
+  </div>
+
+  <!-- Netlify Identity 위젯 스크립트 -->
+  <script type="text/javascript" src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  
+  <script>
+    // 로그인에 성공하면, index.html로 페이지를 이동시킵니다.
+    netlifyIdentity.on('login', user => {
+      // location.replace를 사용하면 뒤로가기로 로그인 페이지에 다시 올 수 없습니다.
+      location.replace('/'); 
+    });
+
+    // 만약 이미 로그인된 상태에서 login.html에 접속했다면, 바로 index.html로 보냅니다.
+    if (netlifyIdentity.currentUser()) {
+      location.replace('/');
+    }
+  </script>
+</body>
+</html>

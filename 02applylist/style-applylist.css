@@ -60,78 +60,84 @@ th {
 
 th:nth-child(1),
 td:nth-child(1) {
-  width: 100px;
+  width: 50px;
   text-align: center;
 }
 
 th:nth-child(2),
 td:nth-child(2) {
-  width: 80px;
+  width: 100px;
   text-align: center;
 }
 
 th:nth-child(3),
 td:nth-child(3) {
-  width: 60px;
+  width: 80px;
   text-align: center;
 }
 
 th:nth-child(4),
 td:nth-child(4) {
-  width: 120px;
+  width: 60px;
   text-align: center;
 }
 
 th:nth-child(5),
 td:nth-child(5) {
-  width: 60px;
+  width: 120px;
   text-align: center;
 }
 
 th:nth-child(6),
 td:nth-child(6) {
-  width: 250px;
+  width: 60px;
   text-align: center;
 }
 
 th:nth-child(7),
 td:nth-child(7) {
-  width: 100px;
+  width: 250px;
   text-align: center;
 }
 
 th:nth-child(8),
 td:nth-child(8) {
-  width: 250px;
+  width: 100px;
   text-align: center;
 }
 
 th:nth-child(9),
 td:nth-child(9) {
-  width: 100px;
+  width: 250px;
   text-align: center;
 }
 
 th:nth-child(10),
 td:nth-child(10) {
-  width: 60px;
+  width: 100px;
   text-align: center;
 }
 
 th:nth-child(11),
 td:nth-child(11) {
-  width: 100px;
+  width: 60px;
   text-align: center;
 }
 
 th:nth-child(12),
 td:nth-child(12) {
-  width: 60px;
+  width: 100px;
   text-align: center;
 }
 
 th:nth-child(13),
 td:nth-child(13) {
+  width: 60px;
+  text-align: center;
+}
+
+th:nth-child(14),
+td:nth-child(14) {
   width: 300px;
   text-align: center;
 }
@@ -159,6 +165,17 @@ td:nth-child(13) {
   width: 18px;
   height: 18px;
 }
+
+.form-check-input.resend-checkbox {
+  width: 18px;
+  height: 18px;
+}
+
+.form-check-input.resend-checkbox:checked {
+  background-color: #6366f1;      /* 체크된 배경색 */
+  border-color: #6366f1;          /* 체크된 테두리색 */
+}
+
 
 .form-check-input.memo-checkbox:checked {
   background-color: #6366f1;      /* 체크된 배경색 */

@@ -1,0 +1,10 @@
+# 1. 예외 규칙: login.html 자체는 로그인 없이 접근할 수 있어야 합니다.
+# 이 규칙이 없으면 무한 리다이렉트에 빠집니다.
+/login    /login.html    200
+
+# 2. 예외 규칙: Identity 위젯이 사용하는 내부 경로도 허용해야 합니다.
+# 이 규칙이 없으면 로그인 처리가 실패할 수 있습니다.
+/.netlify/identity/*    /.netlify/identity/:splat    200
+
+# 3. 메인 규칙: 위 예외를 제외한 모든 페이지 접근은 로그인 페이지로 보냅니다.
+/*    /login.html    302!    Role=!member
