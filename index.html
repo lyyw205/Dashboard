@@ -376,7 +376,10 @@
       updateUI(currentUser);
 
       // 2. 'login' 이벤트가 발생하면 UI 업데이트
-      netlifyIdentity.on('login', (user) => updateUI(user));
+      netlifyIdentity.on('login', (user) => {
+        netlifyIdentity.close(); // 이 줄이 핵심입니다! 모달(안내창)을 닫습니다.
+        updateUI(user);        // 그리고 우리가 만든 UI 업데이트 함수를 실행합니다.
+      });
 
       // 3. 'logout' 이벤트가 발생하면 UI 업데이트
       netlifyIdentity.on('logout', () => updateUI(null));
