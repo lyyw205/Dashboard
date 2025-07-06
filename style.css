@@ -37,6 +37,15 @@ body {
     margin-top: 20px;
 }
 
+#login-prompt {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  text-align: center;
+}
+
 /* 반응형 */
 @media (max-width: 768px) {
   .dashboard-container {
