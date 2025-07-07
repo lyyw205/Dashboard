@@ -23,7 +23,7 @@ function parseKoreanDate(dateStr) {
 // 성별 UUID 맵
 const genderMap = {
   '2fef7478-255d-4fa2-8a46-0ab754993fa1': '남자',
-  '3cab93e0-4a1b-449b-895b-ecd659767364': '여자'
+  '5baa3a5a-c069-41c2-9449-d5e5942f9dce': '여자'
 };
 
 // Tally 필드 키 맵
