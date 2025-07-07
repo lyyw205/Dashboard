@@ -142,6 +142,13 @@ exports.handler = async (event) => {
       // 쿠폰 코드가 없는 경우 (기본: 유료 안내)
       console.log(`🎫 유효한 쿠폰 코드가 없어 유료 안내를 발송합니다.`);
       const formattedApplyDate = formatKoreanDate(newUser.apply_date);
+
+            // --- ▼▼▼ 디버깅용 로그 추가 ▼▼▼ ---
+      console.log('--- 날짜 변수 디버깅 ---');
+      console.log('DB에서 직접 가져온 apply_date:', newUser.apply_date);
+      console.log('함수로 변환된 formattedApplyDate:', formattedApplyDate);
+      console.log('-------------------------');
+      // --- ▲▲▲ 여기까지 ▲▲▲ ---
       await sendAlimtalk(
         newUser, 
         'KA01TP250707040105783M2fV90nBaNO', // 유료 안내 템플릿 ID (실제 ID로 변경)
