@@ -158,12 +158,14 @@ exports.handler = async (event) => {
     const userCouponCode = newUser.coupon ? newUser.coupon.trim().toUpperCase() : null;
     const matchedConfig = COUPON_CONFIG[userCouponCode];
 
+    const formattedApplyDate = formatKoreanDate(newUser.apply_date);
+
     // ▼▼▼ 디버깅용 로그 추가 ▼▼▼
     console.log('--- 쿠폰 코드 디버깅 ---');
-    console.log('DB에서 직접 가져온 coupon:', `"${newUser.coupon}"`);
-    console.log('공백제거+대문자변환 후 userCouponCode:', `"${userCouponCode}"`);
-    console.log('COUPON_CONFIG의 키 목록:', Object.keys(COUPON_CONFIG));
-    console.log('matchedConfig가 찾아졌는가?:', !!matchedConfig); // true 또는 false로 출력
+    // ... (기존 디버깅 로그는 그대로) ...
+    console.log('--- 날짜 변수 디버깅 (공통) ---');
+    console.log('DB에서 직접 가져온 apply_date:', newUser.apply_date);
+    console.log('함수로 변환된 formattedApplyDate:', formattedApplyDate);
     console.log('-------------------------');
     // ▲▲▲ 여기까지 ▲▲▲
 
