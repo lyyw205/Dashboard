@@ -296,29 +296,26 @@
           </select>
           <select id="filter-date" class="form-select form-select-sm" style="max-width: 100px;">
             <option value="">날짜</option>
-            <option value="2025-06-20">2025-06-20</option>
-            <option value="2025-06-21">2025-06-21</option>
-            <option value="2025-05-30">2025-05-30</option>
           </select>
           <button class="btn btn-dark btn-sm" onclick="loadResponses()">🔍 필터 적용</button>
-          <div class="btn-group" role="group" aria-label="메시지 발송 버튼 그룹">
-            <button type="button" class="btn btn-danger btn-sm message-sender" 
+        </div>
+        <div class="btn-group" role="group" aria-label="메시지 발송 버튼 그룹">
+            <button type="button" class="btn sendbtn1" 
                     data-message-type="resend_failed" 
                     data-confirm-text="선택한 사람들 중 '발송 실패' 상태인 경우에만 재발송합니다. 실행할까요?">
               🚨 입금안내 발송
             </button>
-            <button type="button" class="btn btn-info btn-sm message-sender" 
+            <button type="button" class="btn sendbtn2" 
                     data-message-type="location" 
                     data-confirm-text="선택한 사람들에게 '장소 안내' 문자를 발송할까요?">
               📍 장소안내 발송
             </button>
-            <button type="button" class="btn btn-success btn-sm message-sender" 
+            <button type="button" class="btn sendbtn3" 
                     data-message-type="reminder" 
                     data-confirm-text="선택한 사람들에게 '참여 독려' 문자를 발송할까요?">
               🔔 특수문자 발송
             </button>
-          </div> 
-        </div>
+        </div> 
       </div>
       <div class="table-responsive">
         <table class="table table-striped-custom table-table table-borderless table-hover align-middle text-nowrap">
@@ -354,6 +351,25 @@
     const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     // 2. 모든 함수 정의
+    async function populateDateFilter() {
+      // 1단계에서 만든 DB 함수(RPC)를 호출합니다.
+      const { data: dates, error } = await client.rpc('get_distinct_apply_dates');
+
+      if (error) {
+        console.error('❌ 날짜 필터 목록을 불러오는 데 실패했습니다:', error);
+        return;
+      }
+
+      const dateSelect = document.getElementById('filter-date');
+
+      // 받아온 날짜 목록으로 <option> 태그를 만들어 추가합니다.
+      dates.forEach(item => {
+        const option = document.createElement('option');
+        option.value = item.apply_date;
+        option.textContent = item.apply_date;
+        dateSelect.appendChild(option);
+      });
+    }
 
     // 데이터 로딩 및 테이블 렌더링 함수 (기존과 동일)
     async function loadResponses() {
@@ -396,9 +412,9 @@
           <td>${row.mbti || ''}</td>
           <td>${row.apply_date ? formatApplyDate(row.apply_date) : ''}</td>
           <td>${row.tmi || ''}</td>
-          <td><input type="text" class="memo-input" data-id="${row.id}" data-field="memo1" value="${row.memo1 || ''}" readonly></td>
+          <td><input type="text" class="memo-input" data-id="${row.id}" data-field="memo1" value="${row.memo1 || ''}"></td>
           <td><input type="checkbox" class="form-check-input memo-checkbox" data-id="${row.id}" data-field="memo2" ${row.memo2 === true ? 'checked' : ''}></td>
-          <td><input type="text" class="memo-input" data-id="${row.id}" data-field="memo3" value="${row.memo3 || ''}" readonly></td>
+          <td><input type="text" class="memo-input" data-id="${row.id}" data-field="memo3" value="${row.memo3 || ''}"></td>
           <td><input type="checkbox" class="form-check-input memo-checkbox" data-id="${row.id}" data-field="memo4" ${row.memo4 === true ? 'checked' : ''}></td>
           <td><input type="text" class="memo-input" data-id="${row.id}" data-field="memo5" value="${row.memo5 || ''}"></td>
         `;
@@ -538,7 +554,7 @@
           else console.log(`✅ ${field} 저장됨:`, value);
         }
       });
-
+      populateDateFilter();
       // '전체 선택' 체크박스 기능
       const checkAll = document.getElementById('check-all-resend');
       checkAll.addEventListener('change', (e) => {

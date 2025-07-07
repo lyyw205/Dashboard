@@ -165,7 +165,7 @@ exports.handler = async (event) => {
           '#{파티날짜}':    formattedApplyDate
         }
       );
-      await markAsSent(newUser.id, '✅유료안내_발송완료');
+      await markAsSent(newUser.id, '✅입금안내');
     }
 
     // --- (D) 모든 작업 완료 후 성공 응답 ---

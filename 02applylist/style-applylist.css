@@ -162,16 +162,16 @@ td:nth-child(14) {
 }
 
 .form-check-input.memo-checkbox {
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
 }
 
-.form-check-input.resend-checkbox {
-  width: 18px;
-  height: 18px;
+.form-check-input.row-checkbox {
+  width: 16px;
+  height: 16px;
 }
 
-.form-check-input.resend-checkbox:checked {
+.form-check-input.row-checkbox:checked {
   background-color: #6366f1;      /* 체크된 배경색 */
   border-color: #6366f1;          /* 체크된 테두리색 */
 }
@@ -181,3 +181,52 @@ td:nth-child(14) {
   background-color: #6366f1;      /* 체크된 배경색 */
   border-color: #6366f1;          /* 체크된 테두리색 */
 }
+
+.btn-group {
+  gap: 5px;
+  margin-top: 10px;
+  width: 450px;
+}
+
+.btn.sendbtn1 {
+  background-color: #ececec;
+  font-family: 'Pretendard Variable', sans-serif;
+  font-weight: 500;
+  padding: 3px 15px;
+  border-radius: 10px !important;
+}
+
+.btn.sendbtn1:hover {
+  background-color: #cacaca;
+  padding: 3px 15px;
+  border-radius: 10px !important;
+}
+
+.btn.sendbtn2 {
+  background-color: #ececec;
+  font-family: 'Pretendard Variable', sans-serif;
+  font-weight: 500;
+  padding: 3px 15px;
+  border-radius: 10px !important;
+}
+
+.btn.sendbtn2:hover {
+  background-color: #cacaca;
+  padding: 3px 15px;
+  border-radius: 10px !important;
+}
+
+.btn.sendbtn3 {
+  background-color: #ececec;
+  font-family: 'Pretendard Variable', sans-serif;
+  font-weight: 500;
+  padding: 3px 15px;
+  border-radius: 10px !important;
+}
+
+.btn.sendbtn3:hover {
+  background-color: #cacaca;
+  padding: 3px 15px;
+  border-radius: 10px !important;
+}
+

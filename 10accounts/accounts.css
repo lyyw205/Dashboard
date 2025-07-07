@@ -222,3 +222,34 @@ td:nth-child(5), th:nth-child(5) { min-width: 80px; }   /* 삭제 */
     height: 40px; /* 원하는 만큼 여백 */
   }
 }
+
+.grl-info-wrapper {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.grl-info {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 10px;
+  text-align: center;
+}
+
+.grl-info-box {
+  background-color: #f0f0f0;
+  padding: 10px 20px;
+  border-radius: 20px;
+}
+
+.grl-number-account-title {
+  font-family: 'Pretendard Variable', sans-serif;
+  font-weight: 600;
+}
+
+.grl-number-account-text {
+  font-family: 'Pretendard Variable', sans-serif;
+  font-weight: 400;
+}
