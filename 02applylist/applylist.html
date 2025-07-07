@@ -301,7 +301,23 @@
             <option value="2025-05-30">2025-05-30</option>
           </select>
           <button class="btn btn-dark btn-sm" onclick="loadResponses()">🔍 필터 적용</button>
-          <button id="resend-button" class="btn btn-warning btn-sm">✅ 선택 항목 재발송</button> 
+          <div class="btn-group" role="group" aria-label="메시지 발송 버튼 그룹">
+            <button type="button" class="btn btn-danger btn-sm message-sender" 
+                    data-message-type="resend_failed" 
+                    data-confirm-text="선택한 사람들 중 '발송 실패' 상태인 경우에만 재발송합니다. 실행할까요?">
+              🚨 입금안내 발송
+            </button>
+            <button type="button" class="btn btn-info btn-sm message-sender" 
+                    data-message-type="location" 
+                    data-confirm-text="선택한 사람들에게 '장소 안내' 문자를 발송할까요?">
+              📍 장소안내 발송
+            </button>
+            <button type="button" class="btn btn-success btn-sm message-sender" 
+                    data-message-type="reminder" 
+                    data-confirm-text="선택한 사람들에게 '참여 독려' 문자를 발송할까요?">
+              🔔 특수문자 발송
+            </button>
+          </div> 
         </div>
       </div>
       <div class="table-responsive">
@@ -332,162 +348,205 @@
     </div>
 
   <script>
-      // 1. 전역 변수 및 클라이언트 초기화
-      const SUPABASE_URL = 'https://wqxmvqqkbxiykiotbusd.supabase.co';
-      const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndxeG12cXFrYnhpeWtpb3RidXNkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg0NDcyOTYsImV4cCI6MjA2NDAyMzI5Nn0.RmB92YtjLPMx4tkQibuRVT_T4DL3_O8Pny3ZA9DU0tk';
-      const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  // 1. 전역 변수 및 클라이언트 초기화
+    const SUPABASE_URL = 'https://wqxmvqqkbxiykiotbusd.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndxeG12cXFrYnhpeWtpb3RidXNkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg0NDcyOTYsImV4cCI6MjA2NDAyMzI5Nn0.RmB92YtjLPMx4tkQibuRVT_T4DL3_O8Pny3ZA9DU0tk';
+    const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-      // 2. 모든 함수 정의
+    // 2. 모든 함수 정의
 
-      // 데이터 로딩 및 테이블 렌더링 함수
-      async function loadResponses() {
-        const nameFilter = document.getElementById('search-name').value.trim();
-        const genderFilter = document.getElementById('filter-gender').value;
-        const dateFilter = document.getElementById('filter-date').value;
+    // 데이터 로딩 및 테이블 렌더링 함수 (기존과 동일)
+    async function loadResponses() {
+      const nameFilter = document.getElementById('search-name').value.trim();
+      const genderFilter = document.getElementById('filter-gender').value;
+      const dateFilter = document.getElementById('filter-date').value;
 
-        let query = client.from('responses').select('*').order('created_at', { ascending: false });
+      let query = client.from('responses').select('*').order('created_at', { ascending: false });
 
-        if (genderFilter) query = query.eq('gender', genderFilter);
-        if (dateFilter) query = query.eq('apply_date', dateFilter);
+      if (nameFilter) query = query.ilike('name', `%${nameFilter}%`); // 이름 검색 최적화
+      if (genderFilter) query = query.eq('gender', genderFilter);
+      if (dateFilter) query = query.eq('apply_date', dateFilter);
 
-        const { data, error } = await query;
-        const tableBody = document.getElementById('response-table');
-        tableBody.innerHTML = '';
+      const { data, error } = await query;
+      const tableBody = document.getElementById('response-table');
+      tableBody.innerHTML = '';
 
-        if (error) {
-          console.error('❌ Supabase 오류:', error);
-          tableBody.innerHTML = `<tr><td colspan="13">데이터를 불러오지 못했습니다.</td></tr>`;
-          return;
-        }
-
-        const filtered = data.filter(row => !nameFilter || row.name?.includes(nameFilter));
-
-        if (!filtered.length) {
-          tableBody.innerHTML = `<tr><td colspan="13">해당 조건의 결과가 없습니다.</td></tr>`;
-          return;
-        }
-
-        filtered.forEach(row => {
-          const tr = document.createElement('tr');
-          // tr.innerHTML은 기존과 동일하므로 생략
-          tr.innerHTML = `
-            <td class="text-center">
-              <input type="checkbox" class="form-check-input resend-checkbox" data-id="${row.id}">
-            </td>
-            <td>${formatKoreanShortDate(row.created_at)}</td>
-            <td>${row.name || ''}</td>
-            <td>${row.birth_year || ''}</td>
-            <td>${row.phone || ''}</td>
-            <td>${row.gender || ''}</td>
-            <td>${row.mbti || ''}</td>
-            <td>${row.apply_date ? formatApplyDate(row.apply_date) : ''}</td>
-            <td>${row.tmi || ''}</td>
-            <td><input type="text" class="memo-input" data-id="${row.id}" data-field="memo1" value="${row.memo1 || ''}" readonly></td>
-            <td><input type="checkbox" class="form-check-input memo-checkbox" data-id="${row.id}" data-field="memo2" ${row.memo2 === true ? 'checked' : ''}></td>
-            <td><input type="text" class="memo-input" data-id="${row.id}" data-field="memo3" value="${row.memo3 || ''}" readonly></td>
-            <td><input type="checkbox" class="form-check-input memo-checkbox" data-id="${row.id}" data-field="memo4" ${row.memo4 === true ? 'checked' : ''}></td>
-            <td><input type="text" class="memo-input" data-id="${row.id}" data-field="memo5" value="${row.memo5 || ''}"></td>
-          `;
-          tableBody.appendChild(tr);
-        });
+      if (error) {
+        console.error('❌ Supabase 오류:', error);
+        tableBody.innerHTML = `<tr><td colspan="14">데이터를 불러오지 못했습니다.</td></tr>`;
+        return;
       }
 
-      // 재발송 처리 함수
-      async function handleResend() {
-        const resendButton = document.getElementById('resend-button');
-        if (!confirm('발송에 실패한 모든 사람에게 알림톡을 다시 보냅니다. 실행할까요?')) return;
-        
-        const RESEND_URL = 'https://grldashboard.netlify.app/.netlify/functions/resend';
-        
-        resendButton.disabled = true;
-        resendButton.textContent = '처리 중...';
-        
-        try {
-          const response = await fetch(RESEND_URL);
-          const resultText = await response.text();
-          if (!response.ok) throw new Error(`서버 오류: ${resultText}`);
-          alert(`재발송 완료!\n\n서버 응답: ${resultText}`);
-          loadResponses();
-        } catch (error) {
-          console.error('❌ 재발송 요청 실패:', error);
-          alert(`재발송 요청에 실패했습니다.\n\n오류: ${error.message}`);
-        } finally {
-          resendButton.disabled = false;
-          resendButton.textContent = '🚨 실패 건 전체 재발송';
-        }
+      if (!data.length) {
+        tableBody.innerHTML = `<tr><td colspan="14">해당 조건의 결과가 없습니다.</td></tr>`;
+        return;
       }
 
-      // 날짜 포맷팅 헬퍼 함수
-      function formatKoreanShortDate(dateString) {
-        if(!dateString) return '';
-        const date = new Date(dateString);
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-        const hour = String(date.getHours()).padStart(2, '0');
-        const min = String(date.getMinutes()).padStart(2, '0');
-        return `${month}. ${day}. ${hour}:${min}`;
+      data.forEach(row => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="text-center">
+            <input type="checkbox" class="form-check-input row-checkbox" data-id="${row.id}">
+          </td>
+          <td>${formatKoreanShortDate(row.created_at)}</td>
+          <td>${row.name || ''}</td>
+          <td>${row.birth_year || ''}</td>
+          <td>${row.phone || ''}</td>
+          <td>${row.gender || ''}</td>
+          <td>${row.mbti || ''}</td>
+          <td>${row.apply_date ? formatApplyDate(row.apply_date) : ''}</td>
+          <td>${row.tmi || ''}</td>
+          <td><input type="text" class="memo-input" data-id="${row.id}" data-field="memo1" value="${row.memo1 || ''}" readonly></td>
+          <td><input type="checkbox" class="form-check-input memo-checkbox" data-id="${row.id}" data-field="memo2" ${row.memo2 === true ? 'checked' : ''}></td>
+          <td><input type="text" class="memo-input" data-id="${row.id}" data-field="memo3" value="${row.memo3 || ''}" readonly></td>
+          <td><input type="checkbox" class="form-check-input memo-checkbox" data-id="${row.id}" data-field="memo4" ${row.memo4 === true ? 'checked' : ''}></td>
+          <td><input type="text" class="memo-input" data-id="${row.id}" data-field="memo5" value="${row.memo5 || ''}"></td>
+        `;
+        tableBody.appendChild(tr);
+      });
+    }
+
+    // ★★★ [신규] 선택된 항목에 메시지를 보내는 범용 함수 ★★★
+    async function handleSendMessage(event) {
+      const button = event.currentTarget;
+      const messageType = button.dataset.messageType;
+      const confirmText = button.dataset.confirmText;
+
+      const checkedBoxes = document.querySelectorAll('.row-checkbox:checked');
+      if (checkedBoxes.length === 0) {
+        alert('문자를 보낼 대상을 먼저 선택해주세요.');
+        return;
       }
+      
+      const checkedIds = Array.from(checkedBoxes).map(box => box.dataset.id);
+      if (!confirm(confirmText)) return;
+      
+      // 하나의 범용 서버리스 함수를 호출합니다.
+      const SEND_MESSAGE_URL = 'https://grldashboard.netlify.app/.netlify/functions/sendMessage';
+      
+      const originalButtonHTML = button.innerHTML;
+      button.disabled = true;
+      button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> 처리 중...';
 
-      function formatApplyDate(dateString) {
-        if(!dateString) return '';
-        const date = new Date(dateString);
-        const month = date.getMonth() + 1;
-        const day = date.getDate();
-        const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
-        const weekday = weekdays[date.getDay()];
-        return `${month}월 ${day}일 (${weekday})`;
-      }
-
-
-      // 3. 페이지 로딩 완료 후 실행될 메인 로직
-      document.addEventListener('DOMContentLoaded', () => {
-        // 재발송 버튼에 이벤트 연결
-        document.getElementById('resend-button').addEventListener('click', handleResend);
-
-        // (참고) 이벤트 위임을 사용한 메모 저장 로직 (더 효율적인 방식)
-        const tableWrapper = document.querySelector('.table-wrapper');
-        
-        // 텍스트 메모 저장
-        tableWrapper.addEventListener('blur', async (e) => {
-          if (e.target.classList.contains('memo-input')) {
-            if (e.target.readOnly) return; // 만약 이벤트가 발생한 input이 readonly 상태이면, 여기서 함수를 즉시 종료한다.
-
-            const id = e.target.dataset.id;
-            const field = e.target.dataset.field;
-            const value = e.target.value;
-            const { error } = await client.from('responses').update({ [field]: value }).eq('id', id);
-            if (error) console.error(`❌ ${field} 저장 실패:`, error);
-            else console.log(`✅ ${field} 저장됨:`, value);
-          }
-        }, true); // useCapture=true
-        
-        // 체크박스 메모 저장
-        tableWrapper.addEventListener('change', async (e) => {
-          if (e.target.classList.contains('memo-checkbox')) {
-            const id = e.target.dataset.id;
-            const field = e.target.dataset.field;
-            const value = e.target.checked;
-            const { error } = await client.from('responses').update({ [field]: value }).eq('id', id);
-            if (error) console.error(`❌ ${field} 저장 실패:`, error);
-            else console.log(`✅ ${field} 저장됨:`, value);
-          }
+      try {
+        const response = await fetch(SEND_MESSAGE_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ type: messageType, ids: checkedIds }),
         });
         
-        // 첫 페이지 데이터 로딩
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || '서버에서 오류가 발생했습니다.');
+        
+        alert(`요청 완료!\n\n${result.message}`);
         loadResponses();
+        document.getElementById('check-all-resend').checked = false; // 전체 선택 해제
+
+      } catch (error) {
+        console.error(`❌ 메시지 발송 요청 실패 (타입: ${messageType}):`, error);
+        alert(`요청에 실패했습니다.\n\n오류: ${error.message}`);
+      } finally {
+        button.disabled = false;
+        button.innerHTML = originalButtonHTML;
+      }
+    }
+
+    // 날짜 포맷팅 헬퍼 함수 (기존과 동일)
+    function formatKoreanShortDate(dateString) {
+      if(!dateString) return '';
+      const date = new Date(dateString);
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      const hour = String(date.getHours()).padStart(2, '0');
+      const min = String(date.getMinutes()).padStart(2, '0');
+      return `${month}. ${day}. ${hour}:${min}`;
+    }
+
+    function formatApplyDate(dateString) {
+      if(!dateString) return '';
+      const date = new Date(dateString);
+      const month = date.getMonth() + 1;
+      const day = date.getDate();
+      const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
+      const weekday = weekdays[date.getDay()];
+      return `${month}월 ${day}일 (${weekday})`;
+    }
+
+
+    // 3. 페이지 로딩 완료 후 실행될 메인 로직
+    document.addEventListener('DOMContentLoaded', () => {
+
+      // ★★★ [수정] 이벤트 리스너 통합 및 추가 ★★★
+
+      // 필터 및 메시지 발송 버튼 영역에 이벤트 위임 적용
+      const filtersDiv = document.getElementById('filters');
+      filtersDiv.addEventListener('click', (e) => {
+        // '필터 적용' 버튼 클릭 시
+        if (e.target.matches('button.btn-dark')) {
+          loadResponses();
+        }
+        // '메시지 발송' 버튼 그룹의 버튼 클릭 시
+        if (e.target.matches('.message-sender')) {
+          handleSendMessage(e);
+        }
+      });
+
+      // Enter 키로 이름 검색 필터 적용
+      document.getElementById('search-name').addEventListener('keypress', (e) => {
+          if (e.key === 'Enter') {
+              loadResponses();
+          }
+      });
+
+      // 테이블 영역에 이벤트 위임 적용 (메모 저장 및 개별 체크박스)
+      const tableWrapper = document.querySelector('.table-wrapper');
+      
+      // 텍스트 메모 저장
+      tableWrapper.addEventListener('blur', async (e) => {
+        if (e.target.classList.contains('memo-input') && !e.target.readOnly) {
+          const id = e.target.dataset.id;
+          const field = e.target.dataset.field;
+          const value = e.target.value;
+          const { error } = await client.from('responses').update({ [field]: value }).eq('id', id);
+          if (error) console.error(`❌ ${field} 저장 실패:`, error);
+          else console.log(`✅ ${field} 저장됨:`, value);
+        }
+      }, true);
+      
+      // 체크박스 메모 저장
+      tableWrapper.addEventListener('change', async (e) => {
+        if (e.target.classList.contains('memo-checkbox')) {
+          const id = e.target.dataset.id;
+          const field = e.target.dataset.field;
+          const value = e.target.checked;
+          const { error } = await client.from('responses').update({ [field]: value }).eq('id', id);
+          if (error) console.error(`❌ ${field} 저장 실패:`, error);
+          else console.log(`✅ ${field} 저장됨:`, value);
+        }
+      });
+
+      // '전체 선택' 체크박스 기능
+      const checkAll = document.getElementById('check-all-resend');
+      checkAll.addEventListener('change', (e) => {
+          const checkboxes = document.querySelectorAll('.row-checkbox');
+          checkboxes.forEach(checkbox => {
+              checkbox.checked = e.target.checked;
+          });
       });
       
-
-      // 4. 실시간 구독 로직
-      client.channel('realtime:responses')
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'responses' }, 
-          payload => {
-            console.log('📡 Realtime 변경 감지됨:', payload);
-            loadResponses(); // INSERT, UPDATE, DELETE 모든 변경에 대해 테이블 다시 불러옴
-          }
-        )
-        .subscribe();
-
+      // 첫 페이지 데이터 로딩
+      loadResponses();
+    });
+    
+    // 4. 실시간 구독 로직 (기존과 동일)
+    client.channel('realtime:responses')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'responses' }, 
+        payload => {
+          console.log('📡 Realtime 변경 감지됨:', payload);
+          loadResponses(); // INSERT, UPDATE, DELETE 모든 변경에 대해 테이블 다시 불러옴
+        }
+      )
+      .subscribe();
   </script>
   <script src="/common/sidebar.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q" crossorigin="anonymous"></script>

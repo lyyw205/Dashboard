@@ -19,9 +19,10 @@
     <!-- 1. 로그인 프롬프트 (새로 추가) -->
   <!-- 로그인하지 않은 사용자에게 이 부분이 보입니다. -->
   <div id="login-prompt">
-    <img src="/assets/logo.png" alt="로고" style="height: 40px; margin-bottom: 2rem;">
-    <h1>관리자 페이지</h1>
-    <p class="lead text-muted">계속하려면 로그인하세요.</p>
+    <a href="index.html" class="sidebar-head-logo">
+      <span class="login-Gue">Gue</span><span class="login-rrilla">rrilla</span>
+    </a>
+    <h2>DASHBOARD</h2>
     <!-- Netlify Identity 로그인 버튼이 생성될 위치 -->
     <div data-netlify-identity-button></div>
   </div>
@@ -363,12 +364,12 @@
       const updateUI = (user) => {
         if (user) {
           // 사용자가 로그인한 경우:
-          loginPrompt.style.display = 'none';    // 로그인 프롬프트 숨기기
-          appContent.style.display = 'block';  // 실제 콘텐츠 보여주기
+          loginPrompt.style.display = 'none';
+          appContent.style.display = 'block';
         } else {
           // 사용자가 로그아웃한 경우:
-          loginPrompt.style.display = 'block';   // 로그인 프롬프트 보여주기
-          appContent.style.display = 'none';     // 실제 콘텐츠 숨기기
+          loginPrompt.style.display = 'flex'; // 'block'을 'flex'로 수정!
+          appContent.style.display = 'none';
         }
       };
 

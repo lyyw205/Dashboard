@@ -1,101 +1,113 @@
-// 이 파일은 netlify/functions/resend-selected.js 입니다.
-
+// 파일 상단
+require('dotenv').config();
 const { createClient } = require('@supabase/supabase-js');
-// 여기에 실제 알림톡 발송에 필요한 라이브러리들을 가져오세요.
-// 예: const axios = require('axios');
+// const axios = require('axios'); // 실제 알림톡 API 라이브러리
 
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
+// Supabase 클라이언트 생성
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_KEY
+);
 
-// --- 실제 알림톡 발송 함수들 (이 부분을 실제 로직으로 채워주세요) ---
-async function sendFreeInviteAlimtalk(user) {
-  console.log(`🚀 [무료/재발송] 알림톡 발송 시도: ${user.name} (${user.phone})`);
-  // TODO: 실제 무료 초대 알림톡 API 호출 로직 구현
-  // 예: await axios.post(...)
-}
-
-async function sendPaymentInfoAlimtalk(user) {
-  console.log(`🚀 [유료/재발송] 알림톡 발송 시도: ${user.name} (${user.phone})`);
-  // TODO: 실제 유료 안내 알림톡 API 호출 로직 구현
-  // 예: await axios.post(...)
-}
-
-async function markAsSent(id, status) {
-  const { error } = await supabase.from('responses').update({ memo1: status }).eq('id', id);
-  if (error) {
-    console.error(`❌ memo1 업데이트 실패 (id=${id}):`, error.message);
-  } else {
-    console.log(`📝 memo1 업데이트 완료 (id=${id}, status=${status})`);
+// --- 메시지 타입별 설정을 한 곳에서 관리 ---
+const MESSAGE_CONFIG = {
+  'resend_failed': {
+    template: (user) => user.coupon_code === 'FREEPARTY24' ? 'FREE_INVITE_TEMPLATE_V1' : 'PAYMENT_INFO_TEMPLATE',
+    memoField: 'memo1',
+    successMessage: (user) => user.coupon_code === 'FREEPARTY24' ? '✅무료초대_재발송완료' : '✅유료안내_재발송완료',
+    variables: (user) => ({ '고객명': user.name })
+  },
+  'location': {
+    template: 'LOCATION_GUIDE_TEMPLATE',
+    memoField: 'memo3',
+    successMessage: '✅장소안내_발송완료',
+    variables: (user) => ({ '고객명': user.name, '장소': '강남역 1번 출구 앞 카페' })
+  },
+  'reminder': {
+    template: 'PARTICIPATION_REMINDER_TEMPLATE',
+    memoField: 'memo5',
+    successMessage: '✅특수문자_발송완료',
+    variables: (user) => ({ '고객명': user.name, '날짜': '내일 저녁 7시' })
   }
-}
+};
 
 // Netlify Function의 핸들러
-exports.handler = async function(event) {
-  // POST 요청만 허용
+exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') {
-    return { statusCode: 405, body: 'Method Not Allowed' };
+    return { statusCode: 405, body: JSON.stringify({ error: 'Method Not Allowed' }) };
   }
 
   try {
-    // 1. 요청 본문(body)에서 ID 목록 추출
-    const { ids } = JSON.parse(event.body);
+    const { type, ids } = JSON.parse(event.body);
+    const config = MESSAGE_CONFIG[type];
 
-    if (!ids || !Array.isArray(ids) || ids.length === 0) {
-      return { statusCode: 400, body: '재발송할 ID 목록이 없습니다.' };
+    if (!config) {
+      return { statusCode: 400, body: JSON.stringify({ error: `알 수 없는 메시지 타입입니다: ${type}` }) };
     }
 
-    console.log(`🚀 선택 재발송 프로세스 시작. 요청 ID: ${ids.join(', ')}`);
+    // --- ★★★★★ 핵심 변경점: 쿼리 로직 통합 ★★★★★ ---
+    const memoFieldToCheck = config.memoField;
+    const failMessage = `❌${type}_발송실패`; // 각 타입에 맞는 실패 메시지 생성 (예: '❌location_발송실패')
 
-    // 2. 전달받은 ID에 해당하는 최신 데이터만 DB에서 조회
-    const { data: targets, error } = await supabase
-      .from('responses')
+    // 모든 타입에 대해 "실패했거나, 비어있는 경우"를 찾는 조건으로 통일
+    let query = supabase.from('responses')
       .select('*')
-      .in('id', ids);
+      .in('id', ids)
+      .or(`${memoFieldToCheck}.eq.${failMessage},${memoFieldToCheck}.is.null,${memoFieldToCheck}.eq.`);
+    // --- ★★★★★ 여기까지가 핵심 변경점입니다 ★★★★★ ---
 
-    if (error) {
-      throw new Error(`DB 조회 실패: ${error.message}`);
+    const { data: users, error: dbError } = await query;
+
+    if (dbError) throw new Error(`DB 조회 실패: ${dbError.message}`);
+    if (!users || users.length === 0) {
+      return { statusCode: 200, body: JSON.stringify({ message: '조건에 맞는 발송 대상이 없습니다. (이미 발송되었거나, 실패 상태가 아닐 수 있습니다)' }) };
     }
 
+    // --- ★★★★★ 핵심 변경점: 발송 및 후처리 로직 수정 ★★★★★ ---
     let successCount = 0;
-    let skippedCount = 0; // 건너뛴 항목 수를 세기 위한 변수 추가
+    const sendPromises = users.map(async (user) => {
+      const templateCode = typeof config.template === 'function' ? config.template(user) : config.template;
+      const variables = config.variables(user);
+      const successMsg = typeof config.successMessage === 'function' ? config.successMessage(user) : config.successMessage;
 
-    // 3. 각 대상에 대해 재발송 로직 실행
-    for (const user of targets) {
-      // ▼▼▼▼▼▼▼▼▼▼ 여기가 핵심 변경사항입니다 ▼▼▼▼▼▼▼▼▼▼
-      // DB에서 가져온 최신 memo1 상태를 확인합니다.
-      // '발송실패' 상태이거나, 관리자가 강제 재발송을 위해 memo1을 비워둔 경우를 모두 처리합니다.
-      if (user.memo1 === '❌발송실패' || user.memo1 === null || user.memo1 === '') {
-        // 재발송 대상이 맞으면, 발송 로직 실행
-        try {
-          // 실제 사용하는 쿠폰 코드를 여기에 입력하세요.
-          const VVIP_COUPON_CODE = 'FREEPARTY24'; 
-          
-          if (user.coupon_code === VVIP_COUPON_CODE) {
-            await sendFreeInviteAlimtalk(user);
-            await markAsSent(user.id, '✅무료초대_재발송완료');
-          } else {
-            await sendPaymentInfoAlimtalk(user);
-            await markAsSent(user.id, '✅유료안내_재발송완료');
-          }
-          successCount++;
-        } catch (e) {
-          console.error(`❌ ID ${user.id} 재발송 중 개별 실패:`, e);
-          // 개별 발송 실패 시에는 '발송실패' 상태를 유지하기 위해 아무것도 하지 않음
-        }
+      // TODO: 여기에 실제 알림톡 발송 API 호출 로직을 넣으세요.
+      // 이 함수는 성공 시 true, 실패 시 false를 반환해야 합니다.
+      const isSentSuccessfully = await sendAlimtalk(user, templateCode, variables); 
+      
+      if (isSentSuccessfully) {
+        successCount++;
+        // 발송 성공 시: 성공 메시지로 덮어쓰기
+        await supabase.from('responses').update({ [config.memoField]: successMsg }).eq('id', user.id);
       } else {
-        // 재발송 대상이 아닌 경우 (이미 성공했거나 다른 상태)
-        console.log(`🟡 ID ${user.id} 건너뛰기: 현재 상태(${user.memo1})가 재발송 대상이 아님`);
-        skippedCount++;
+        // 발송 실패 시: 실패 메시지로 덮어쓰기
+        await supabase.from('responses').update({ [config.memoField]: failMessage }).eq('id', user.id);
       }
-      // ▲▲▲▲▲▲▲▲▲▲ 여기까지가 핵심 변경사항입니다 ▲▲▲▲▲▲▲▲▲▲
-    }
+    });
+    // --- ★★★★★ 여기까지가 핵심 변경점입니다 ★★★★★ ---
 
-    // 4. 최종 결과 메시지 생성
-    const resultMessage = `재발송 처리 완료: 총 요청 ${ids.length}건 | 성공 ${successCount}건 | 건너뜀 ${skippedCount}건`;
-    console.log(resultMessage);
-    return { statusCode: 200, body: resultMessage };
+    await Promise.all(sendPromises);
 
-  } catch (e) {
-    console.error('❌ 선택 재발송 프로세스 전체 오류:', e);
-    return { statusCode: 500, body: `서버 오류가 발생했습니다: ${e.message}` };
+    return {
+      statusCode: 200,
+      body: JSON.stringify({ message: `요청 처리 완료: 총 ${users.length}건 중 ${successCount}건에 대해 발송 성공했습니다.` }),
+    };
+
+  } catch (error) {
+    console.error('💥 서버리스 함수 처리 중 오류:', error);
+    return { statusCode: 500, body: JSON.stringify({ error: error.message }) };
   }
 };
+
+
+// (참고) sendAlimtalk 함수는 아래와 같이 성공/실패를 반환하도록 구현하는 것이 좋습니다.
+async function sendAlimtalk(user, templateCode, variables) {
+  try {
+    console.log(`🚀 [${templateCode}] 알림톡 발송 시도: ${user.name}(${user.phone})`);
+    // const response = await axios.post('API_URL', ...);
+    // if (!response.data.isSuccess) { throw new Error('API 응답 실패'); }
+    return true; // 성공 시 true 반환
+  } catch (error) {
+    console.error(`❌ [${templateCode}] 알림톡 발송 실패: ${user.name}`, error.message);
+    return false; // 실패 시 false 반환
+  }
+}
