@@ -9,6 +9,12 @@ const supabase = createClient(
   process.env.SUPABASE_KEY
 );
 
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'Content-Type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+};
+
 // --- 메시지 타입별 설정을 한 곳에서 관리 ---
 const MESSAGE_CONFIG = {
   'resend_failed': {
@@ -33,6 +39,9 @@ const MESSAGE_CONFIG = {
 
 // Netlify Function의 핸들러
 exports.handler = async (event) => {
+  if (event.httpMethod === 'OPTIONS') {
+    return { statusCode: 200, headers: corsHeaders };
+  }
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: JSON.stringify({ error: 'Method Not Allowed' }) };
   }
@@ -47,7 +56,7 @@ exports.handler = async (event) => {
 
     // --- ★★★★★ 핵심 변경점: 쿼리 로직 통합 ★★★★★ ---
     const memoFieldToCheck = config.memoField;
-    const failMessage = `❌${type}_발송실패`; // 각 타입에 맞는 실패 메시지 생성 (예: '❌location_발송실패')
+    const failMessage = config.failMessage || `❌${type}_발송실패`; // 각 타입에 맞는 실패 메시지 생성 (예: '❌location_발송실패')
 
     // 모든 타입에 대해 "실패했거나, 비어있는 경우"를 찾는 조건으로 통일
     let query = supabase.from('responses')
@@ -66,6 +75,10 @@ exports.handler = async (event) => {
     // --- ★★★★★ 핵심 변경점: 발송 및 후처리 로직 수정 ★★★★★ ---
     let successCount = 0;
     const sendPromises = users.map(async (user) => {
+      if (!user.phone || user.phone.trim() === '') {
+        console.error(`Skipping user ${user.name} (ID: ${user.id}) - Missing phone number.`);
+        return; // 현재 user에 대한 작업만 건너뛰고 다음으로 넘어갑니다.
+      }
       const templateCode = typeof config.template === 'function' ? config.template(user) : config.template;
       const variables = config.variables(user);
       const successMsg = typeof config.successMessage === 'function' ? config.successMessage(user) : config.successMessage;
@@ -89,6 +102,7 @@ exports.handler = async (event) => {
 
     return {
       statusCode: 200,
+      headers: corsHeaders,
       body: JSON.stringify({ message: `요청 처리 완료: 총 ${users.length}건 중 ${successCount}건에 대해 발송 성공했습니다.` }),
     };
 
