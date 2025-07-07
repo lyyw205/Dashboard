@@ -63,7 +63,9 @@ const COUPON_CONFIG = {
     template: 'KA01TP250705163644669ytqNtJ0gaZl',
     successMessage: '✅무료초대',
     variables: (user) => ({ 
-      '#{고객명}': user.name 
+      '#{고객명}': user.name, 
+      '#{파티명}': '게릴라 파티', 
+      '#{date}': formattedDate
     }),
   },
   'SPECIALGIFT25': {
