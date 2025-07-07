@@ -1,6 +1,7 @@
 // 파일 상단
 require('dotenv').config();
 const { createClient } = require('@supabase/supabase-js');
+const SolapiMessageService = require('coolsms-node-sdk').default;
 // const axios = require('axios'); // 실제 알림톡 API 라이브러리
 
 // Supabase 클라이언트 생성
@@ -115,13 +116,36 @@ exports.handler = async (event) => {
 
 // (참고) sendAlimtalk 함수는 아래와 같이 성공/실패를 반환하도록 구현하는 것이 좋습니다.
 async function sendAlimtalk(user, templateCode, variables) {
+  const messageService = new SolapiMessageService(
+    process.env.COOLSMS_API_KEY,
+    process.env.COOLSMS_API_SECRET
+  );
+  
+  const payload = {
+    to: user.phone.replace(/-/g, ''),
+    kakaoOptions: {
+      pfId: process.env.COOLSMS_PFID,
+      templateId: templateCode,
+      variables: variables
+    }
+  };
+
+  console.log(`[REQUEST] 🚀 CoolSMS 요청 페이로드:`, JSON.stringify(payload, null, 2));
+
   try {
-    console.log(`🚀 [${templateCode}] 알림톡 발송 시도: ${user.name}(${user.phone})`);
-    // const response = await axios.post('API_URL', ...);
-    // if (!response.data.isSuccess) { throw new Error('API 응답 실패'); }
-    return true; // 성공 시 true 반환
+    const response = await messageService.sendOne(payload);
+    
+    console.log(`[RESPONSE] ✅ CoolSMS API 응답 수신:`, JSON.stringify(response, null, 2));
+
+    // statusCode가 '2000'일 때만 명백한 성공으로 간주합니다.
+    if (response.statusCode === '2000') {
+      return true;
+    } else {
+      console.error(`[FAILURE] 👎 CoolSMS 발송 실패: ${response.statusMessage} (Code: ${response.statusCode})`);
+      return false;
+    }
   } catch (error) {
-    console.error(`❌ [${templateCode}] 알림톡 발송 실패: ${user.name}`, error.message);
-    return false; // 실패 시 false 반환
+    console.error(`[ERROR] ❌ CoolSMS API 통신 중 심각한 오류 발생:`, error);
+    return false;
   }
 }
