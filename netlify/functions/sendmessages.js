@@ -62,7 +62,7 @@ const COUPON_CONFIG = {
   'WEINVITEYOU': {
     template: 'KA01TP250705163644669ytqNtJ0gaZl',
     successMessage: '✅무료초대',
-    variables: (user) => ({ 
+    variables: (user, formattedDate) => ({ 
       '#{고객명}': user.name, 
       '#{파티명}': '게릴라 파티', 
       '#{date}': formattedDate
