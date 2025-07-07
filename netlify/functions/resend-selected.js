@@ -16,6 +16,24 @@ const corsHeaders = {
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
 
+function formatKoreanDate(isoDateString) {
+  if (!isoDateString) {
+    return '날짜 미정'; // 날짜 값이 없을 경우 대비
+  }
+
+  const date = new Date(isoDateString);
+  
+  // 날짜가 유효한지 확인
+  if (isNaN(date.getTime())) {
+      return isoDateString; // 유효하지 않으면 원래 문자열 반환
+  }
+
+  const month = date.getMonth() + 1; // getMonth()는 0부터 시작하므로 +1
+  const day = date.getDate();
+
+  return `${month}월 ${day}일`;
+}
+
 // --- 메시지 타입별 설정을 한 곳에서 관리 ---
 const MESSAGE_CONFIG = {
   'resend_failed': {
@@ -25,10 +43,22 @@ const MESSAGE_CONFIG = {
     variables: (user) => ({ '고객명': user.name })
   },
   'location': {
-    template: 'LOCATION_GUIDE_TEMPLATE',
+    template: 'KA01TP250705163644669ytqNtJ0gaZl',
     memoField: 'memo3',
-    successMessage: '✅장소안내_발송완료',
-    variables: (user) => ({ '고객명': user.name, '장소': '강남역 1번 출구 앞 카페' })
+    successMessage: '✅확정문자',
+    failMessage: '❌확정문자_실패', // 실패 메시지도 추가해주는 것이 좋습니다.
+    // variables를 함수로 만들어서 user 객체를 인자로 받음
+    variables: (user) => {
+      // 함수 안에서 formatKoreanDate를 호출하여 날짜를 변환
+      const formattedDate = formatKoreanDate(user.apply_date); 
+      
+      // 변환된 날짜를 포함한 객체를 반환
+      return { 
+        '#{고객명}': user.name, 
+        '#{파티명}': '게릴라 파티', 
+        '#{date}': formattedDate // CoolSMS 템플릿의 변수명과 일치시켜야 함
+      };
+    }
   },
   'reminder': {
     template: 'PARTICIPATION_REMINDER_TEMPLATE',
