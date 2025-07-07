@@ -77,8 +77,28 @@ const COUPON_CONFIG = {
   },
 };
 
+// 날짜 형식 변환 함수 (YYYY-MM-DD -> M월 D일)
+function formatKoreanDate(isoDateString) {
+  if (!isoDateString) {
+    return '날짜 미정'; // 날짜 값이 없을 경우 대비
+  }
+
+  const date = new Date(isoDateString);
+  
+  // 날짜가 유효한지 확인
+  if (isNaN(date.getTime())) {
+      return isoDateString; // 유효하지 않으면 원래 문자열 반환
+  }
+
+  const month = date.getMonth() + 1; // getMonth()는 0부터 시작하므로 +1
+  const day = date.getDate();
+
+  return `${month}월 ${day}일`;
+}
+
 // --- 4. Netlify Function의 메인 핸들러 (모든 로직의 시작점) ---
 exports.handler = async (event) => {
+  console.log('▶️ 알림톡 함수 진입 (HTTP', event.httpMethod, ')');
   // Supabase Webhook은 POST 요청으로만 데이터를 보냅니다.
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: 'Method Not Allowed' };
@@ -121,13 +141,14 @@ exports.handler = async (event) => {
     } else {
       // 쿠폰 코드가 없는 경우 (기본: 유료 안내)
       console.log(`🎫 유효한 쿠폰 코드가 없어 유료 안내를 발송합니다.`);
+      const formattedApplyDate = formatKoreanDate(newUser.apply_date);
       await sendAlimtalk(
         newUser, 
-        'KA01TP250705163644669ytqNtJ0gaZl', // 유료 안내 템플릿 ID (실제 ID로 변경)
+        'KA01TP250707040105783M2fV90nBaNO', // 유료 안내 템플릿 ID (실제 ID로 변경)
         { 
           '#{고객명}': newUser.name,
           '#{파티명}': '스타벅스 쿠폰',
-          '#{date}': '7월 12일'
+          '#{date}': formattedApplyDate
         }
       );
       await markAsSent(newUser.id, '✅유료안내_발송완료');
