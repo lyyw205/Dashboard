@@ -18,27 +18,20 @@ async function sendAlimtalk(user, templateCode, variables) {
     process.env.COOLSMS_API_SECRET
   );
 
-+  // ── 디버깅: 실제 sendOne() 호출 옵션을 찍어봅니다.
-+  const sendOptions = {
-+    to: user.phone.replace(/-/g, ''),
-+    kakaoOptions: {
-+      pfId: process.env.COOLSMS_PFID,
-+      templateId: templateCode,
-+      variables: variables
-+    }
-+  };
-+  console.log('🛠 [DEBUG] sendOne 옵션:', JSON.stringify(sendOptions, null, 2));
-+  // ───────────────────────────────────────────────────
+  // ── 디버깅: 실제 sendOne() 호출 옵션을 찍어봅니다. ──
+  const sendOptions = {
+    to: user.phone.replace(/-/g, ''),
+    kakaoOptions: {
+      pfId: process.env.COOLSMS_PFID,
+      templateId: templateCode,
+      variables: variables
+    }
+  };
+  console.log('🛠 [DEBUG] sendOne 옵션:', JSON.stringify(sendOptions, null, 2));
+  // ───────────────────────────────────────────────────
 
   try {
-    // const response = await messageService.sendOne({
-    //   to: user.phone.replace(/-/g, ''), // 하이픈(-) 제거
-    //   kakaoOptions: {
-    //     pfId: process.env.COOLSMS_PFID,
-    //     templateId: templateCode,
-    //     variables: variables,
-    //   },
-    // });
+    // 디버깅 옵션을 실제 호출에도 사용
     const response = await messageService.sendOne(sendOptions);
     console.log(`✅ CoolSMS 알림톡 API 요청 성공: ${user.name}`, response);
     return response;
