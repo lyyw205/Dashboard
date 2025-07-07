@@ -175,13 +175,12 @@ exports.handler = async (event) => {
       await sendAlimtalk(
         newUser,
         matchedConfig.template,
-        matchedConfig.variables(newUser)
+        matchedConfig.variables(newUser, formattedApplyDate)
       );
       await markAsSent(newUser.id, matchedConfig.successMessage);
     } else {
       // 쿠폰 코드가 없는 경우 (기본: 유료 안내)
       console.log(`🎫 유효한 쿠폰 코드가 없어 유료 안내를 발송합니다.`);
-      const formattedApplyDate = formatKoreanDate(newUser.apply_date);
 
             // --- ▼▼▼ 디버깅용 로그 추가 ▼▼▼ ---
       console.log('--- 날짜 변수 디버깅 ---');
