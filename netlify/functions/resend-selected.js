@@ -46,7 +46,7 @@ const MESSAGE_CONFIG = {
     template: 'KA01TP250705163644669ytqNtJ0gaZl',
     memoField: 'memo3',
     successMessage: '✅확정문자',
-    failMessage: '❌확정문자_실패', // 실패 메시지도 추가해주는 것이 좋습니다.
+    failMessage: '❌확정문자', // 실패 메시지도 추가해주는 것이 좋습니다.
     // variables를 함수로 만들어서 user 객체를 인자로 받음
     variables: (user) => {
       // 함수 안에서 formatKoreanDate를 호출하여 날짜를 변환
@@ -87,7 +87,7 @@ exports.handler = async (event) => {
 
     // --- ★★★★★ 핵심 변경점: 쿼리 로직 통합 ★★★★★ ---
     const memoFieldToCheck = config.memoField;
-    const failMessage = config.failMessage || `❌${type}_발송실패`; // 각 타입에 맞는 실패 메시지 생성 (예: '❌location_발송실패')
+    const failMessage = config.failMessage || `❌${type}`; // 각 타입에 맞는 실패 메시지 생성 (예: '❌location')
 
     // 모든 타입에 대해 "실패했거나, 비어있는 경우"를 찾는 조건으로 통일
     let query = supabase.from('responses')
