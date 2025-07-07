@@ -153,12 +153,12 @@ exports.handler = async (event) => {
     //대문자수정
     // --- (C) 알림톡 발송 분기 처리 (기존 핵심 로직) ---
     // 1. 공백 제거(.trim()) 후 2. 대문자 변환(.toUpperCase())
-    const userCouponCode = newUser.coupon_code ? newUser.coupon_code.trim().toUpperCase() : null;
+    const userCouponCode = newUser.coupon ? newUser.coupon.trim().toUpperCase() : null;
     const matchedConfig = COUPON_CONFIG[userCouponCode];
 
     // ▼▼▼ 디버깅용 로그 추가 ▼▼▼
     console.log('--- 쿠폰 코드 디버깅 ---');
-    console.log('DB에서 직접 가져온 coupon_code:', `"${newUser.coupon_code}"`);
+    console.log('DB에서 직접 가져온 coupon:', `"${newUser.coupon}"`);
     console.log('공백제거+대문자변환 후 userCouponCode:', `"${userCouponCode}"`);
     console.log('COUPON_CONFIG의 키 목록:', Object.keys(COUPON_CONFIG));
     console.log('matchedConfig가 찾아졌는가?:', !!matchedConfig); // true 또는 false로 출력
