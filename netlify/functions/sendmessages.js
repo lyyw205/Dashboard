@@ -59,9 +59,9 @@ async function markAsSent(id, status) {
 // ★★★★★ 핵심 개선점: 쿠폰 코드 설정 맵 ★★★★★
 // ========================================================================
 const COUPON_CONFIG = {
-  'FREEPARTY24': {
+  'WEINVITEYOU': {
     template: 'KA01TP250705163644669ytqNtJ0gaZl',
-    successMessage: '✅무료초대(파티)_발송완료',
+    successMessage: '✅무료초대',
     variables: (user) => ({ 
       '#{고객명}': user.name 
     }),
@@ -131,7 +131,7 @@ exports.handler = async (event) => {
       return { statusCode: 200, body: 'Already processed, skipped.' };
     }
 
-
+    //대문자수정
     // --- (C) 알림톡 발송 분기 처리 (기존 핵심 로직) ---
     const userCouponCode = newUser.coupon_code;
     const matchedConfig = COUPON_CONFIG[userCouponCode];
