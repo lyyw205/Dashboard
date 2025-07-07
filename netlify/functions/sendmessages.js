@@ -116,11 +116,30 @@ exports.handler = async (event) => {
     const payload = JSON.parse(event.body);
     console.log('📥 Supabase Webhook 페이로드 수신:', payload);
 
-    // Supabase Webhook은 payload.record에 새로 INSERT된 데이터를 담아 보냅니다.
-    const newUser = payload.record;
+    const newRecordId = payload.record.id;
+
+    if (!newRecordId) {
+      console.warn('⚠️ 페이로드에 record.id가 없어 처리를 중단합니다.');
+      return { statusCode: 200, body: 'Skipped: No record ID in payload.' };
+    }
+    console.log(`🔍 ID ${newRecordId}에 대한 전체 데이터 조회 시도...`);
+    const { data: fetchedUser, error: fetchError } = await supabase
+      .from('responses')
+      .select('*')
+      .eq('id', newRecordId)
+      .single(); // 단 하나의 결과만 가져옴
+      
+
+    if (fetchError || !fetchedUser) {
+      throw new Error(`DB에서 ID ${newRecordId} 조회 실패: ${fetchError?.message || 'User not found'}`);
+    }
+    
+    // 이제부터는 신뢰할 수 있는 'fetchedUser' 객체를 사용합니다.
+    const newUser = fetchedUser;
+    console.log('✅ 전체 데이터 조회 성공:', newUser);
 
     // --- (B) 유효성 검사 ---
-    if (!newUser || !newUser.phone) {
+    if (!newUser.phone) {
       console.warn('⚠️ 전화번호가 없거나 유효하지 않은 데이터라 건너뜁니다.');
       return { statusCode: 200, body: 'No phone number, skipped.' };
     }
