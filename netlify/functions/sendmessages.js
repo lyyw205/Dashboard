@@ -154,8 +154,8 @@ exports.handler = async (event) => {
         'KA01TP250707040105783M2fV90nBaNO', // 유료 안내 템플릿 ID (실제 ID로 변경)
         { 
           '#{고객명}': newUser.name,
-          '#{파티명}': '스타벅스 쿠폰',
-          '#{date}': formattedApplyDate
+          '#{브랜드이름}': '게릴라 파티',
+          '#{파티날짜}': formattedApplyDate
         }
       );
       await markAsSent(newUser.id, '✅유료안내_발송완료');
