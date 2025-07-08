@@ -34,7 +34,6 @@ const fieldMap = {
   question_da7LOd: 'gender',
   question_Y02E1W: 'mbti',
   question_zylEMM: 'apply_date',
-  question_lepoxN: 'tmi',
   question_RoV6Oj: 'selfy',
   question_oRkaJx: 'coupon'
 };
@@ -72,7 +71,6 @@ exports.handler = async function(event) {
         gender: gender,
         apply_date: applyDateFormatted,
         mbti: formData.mbti,
-        tmi: formData.tmi,
         selfy: formData.selfy?.url, // ?.url 로 안전하게 URL 추출
         coupon: formData.coupon,   // 쿠폰 코드 추가
       }

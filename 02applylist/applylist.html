@@ -329,7 +329,7 @@
               <th class="submit-gender">성별</th>
               <th class="submit-mbti">MBTI</th>
               <th class="submit-date">참여 날짜</th>
-              <th class="submit-tmi">TMI</th>
+              <th class="submit-tmi">쿠폰</th>
               <th class="automessage-deposit">입금문자</th>
               <th class="checkbox-deposit">입금확인</th>
               <th class="automessage-location">장소문자</th>
@@ -411,7 +411,7 @@
           <td>${row.gender || ''}</td>
           <td>${row.mbti || ''}</td>
           <td>${row.apply_date ? formatApplyDate(row.apply_date) : ''}</td>
-          <td>${row.tmi || ''}</td>
+          <td>${row.coupon || ''}</td>
           <td><input type="text" class="memo-input" data-id="${row.id}" data-field="memo1" value="${row.memo1 || ''}"></td>
           <td><input type="checkbox" class="form-check-input memo-checkbox" data-id="${row.id}" data-field="memo2" ${row.memo2 === true ? 'checked' : ''}></td>
           <td><input type="text" class="memo-input" data-id="${row.id}" data-field="memo3" value="${row.memo3 || ''}"></td>
