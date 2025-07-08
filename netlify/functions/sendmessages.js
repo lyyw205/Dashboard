@@ -190,7 +190,7 @@ exports.handler = async (event) => {
       // --- ▲▲▲ 여기까지 ▲▲▲ ---
       await sendAlimtalk(
         newUser, 
-        'KA01TP250707040105783M2fV90nBaNO', // 유료 안내 템플릿 ID (실제 ID로 변경)
+        'KA01TP250707173844176ndkmNlwondi', // 유료 안내 템플릿 ID (실제 ID로 변경)
         { 
           '#{고객명}':      newUser.name,
           '#{브랜드이름}':  '게릴라 파티',
