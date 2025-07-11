@@ -60,7 +60,7 @@ async function markAsSent(id, status) {
 // ========================================================================
 const COUPON_CONFIG = {
   'WEINVITEYOU': {
-    template: 'KA01TP250705163644669ytqNtJ0gaZl',
+    template: 'KA01TP250709145734382Qm8j2DgohNp',
     successMessage: '✅무료초대',
     variables: (user, formattedDate) => ({ 
       '#{고객명}': user.name, 
