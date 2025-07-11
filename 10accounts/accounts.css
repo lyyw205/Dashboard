@@ -225,15 +225,13 @@ td:nth-child(5), th:nth-child(5) { min-width: 80px; }   /* 삭제 */
 
 .grl-info-wrapper {
   display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: flex-end;
+  flex-direction: column;
 }
 
 .grl-info {
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
+  justify-content: left;
   gap: 10px;
   text-align: center;
 }

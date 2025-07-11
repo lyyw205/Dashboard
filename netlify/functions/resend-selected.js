@@ -43,7 +43,7 @@ const MESSAGE_CONFIG = {
     variables: (user) => ({ '고객명': user.name })
   },
   'location': {
-    template: 'KA01TP250705163644669ytqNtJ0gaZl',
+    template: 'KA01TP250709145734382Qm8j2DgohNp',
     memoField: 'memo3',
     successMessage: '✅확정문자',
     failMessage: '❌확정문자', // 실패 메시지도 추가해주는 것이 좋습니다.
