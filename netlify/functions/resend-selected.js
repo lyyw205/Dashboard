@@ -93,7 +93,7 @@ exports.handler = async (event) => {
     let query = supabase.from('responses')
       .select('*')
       .in('id', ids)
-      .or(`${memoFieldToCheck}.eq.${failMessage},${memoFieldToCheck}.is.null,${memoFieldToCheck}.eq.`);
+      .or(`${memoFieldToCheck}.eq.${failMessage},${memoFieldToCheck}.is.null,${memoFieldToCheck}.eq.""`);
     // --- ★★★★★ 여기까지가 핵심 변경점입니다 ★★★★★ ---
 
     const { data: users, error: dbError } = await query;
