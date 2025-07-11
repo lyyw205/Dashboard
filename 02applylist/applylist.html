@@ -300,17 +300,17 @@
           <button class="btn btn-dark btn-sm" onclick="loadResponses()">🔍 필터 적용</button>
         </div>
         <div class="btn-group" role="group" aria-label="메시지 발송 버튼 그룹">
-            <button type="button" class="btn sendbtn1" 
+            <button type="button" class="btn sendbtn1 message-sender" 
                     data-message-type="resend_failed" 
                     data-confirm-text="선택한 사람들 중 '발송 실패' 상태인 경우에만 재발송합니다. 실행할까요?">
               🚨 입금안내 발송
             </button>
-            <button type="button" class="btn sendbtn2" 
+            <button type="button" class="btn sendbtn2 message-sender" 
                     data-message-type="location" 
                     data-confirm-text="선택한 사람들에게 '장소 안내' 문자를 발송할까요?">
               📍 장소안내 발송
             </button>
-            <button type="button" class="btn sendbtn3" 
+            <button type="button" class="btn sendbtn3 message-sender" 
                     data-message-type="reminder" 
                     data-confirm-text="선택한 사람들에게 '참여 독려' 문자를 발송할까요?">
               🔔 특수문자 발송
@@ -489,83 +489,77 @@
 
 
     // 3. 페이지 로딩 완료 후 실행될 메인 로직
+    // 3. 페이지 로딩 완료 후 실행될 메인 로직
     document.addEventListener('DOMContentLoaded', () => {
+        // ★★★ 이벤트 리스너 수정 ★★★
+        const tableHeader = document.querySelector('.table-header');
 
-      // ★★★ [수정] 이벤트 리스너 통합 및 추가 ★★★
-
-      // 필터 및 메시지 발송 버튼 영역에 이벤트 위임 적용
-      const filtersDiv = document.getElementById('filters');
-      filtersDiv.addEventListener('click', (e) => {
-        // '필터 적용' 버튼 클릭 시
-        if (e.target.matches('button.btn-dark')) {
-          loadResponses();
-        }
-        // '메시지 발송' 버튼 그룹의 버튼 클릭 시
-        if (e.target.matches('.message-sender')) {
-          handleSendMessage(e.target);
-        }
-      });
-
-      // Enter 키로 이름 검색 필터 적용
-      document.getElementById('search-name').addEventListener('keypress', (e) => {
-          if (e.key === 'Enter') {
-              loadResponses();
-          }
-      });
-      const tableContainer = document.querySelector('.table-responsive');
-
-      if (tableContainer) {
-        tableContainer.addEventListener('wheel', (event) => {
-          // shift 키를 누르지 않았고, 가로로 스크롤할 내용이 있을 때만 작동
-          if (!event.shiftKey && tableContainer.scrollWidth > tableContainer.clientWidth) {
-            // 기본 이벤트(페이지의 세로 스크롤)를 막습니다.
-            event.preventDefault();
-            
-            // 마우스 휠의 세로 움직임(event.deltaY)을 
-            // 컨테이너의 가로 스크롤(scrollLeft)에 더해줍니다.
-            tableContainer.scrollLeft += event.deltaY;
-          }
+        // table-header 영역 내에서 발생하는 클릭 이벤트를 감지 (이벤트 위임)
+        tableHeader.addEventListener('click', (e) => {
+            // '필터 적용' 버튼을 클릭한 경우
+            if (e.target.matches('#filters button')) {
+                loadResponses();
+            }
+            // '메시지 발송' 버튼(공통 클래스 .message-sender)을 클릭한 경우
+            if (e.target.matches('.message-sender')) {
+                handleSendMessage(e.target);
+            }
         });
-      }
 
-      // 테이블 영역에 이벤트 위임 적용 (메모 저장 및 개별 체크박스)
-      const tableWrapper = document.querySelector('.table-wrapper');
-      
-      // 텍스트 메모 저장
-      tableWrapper.addEventListener('blur', async (e) => {
-        if (e.target.classList.contains('memo-input') && !e.target.readOnly) {
-          const id = e.target.dataset.id;
-          const field = e.target.dataset.field;
-          const value = e.target.value;
-          const { error } = await client.from('responses').update({ [field]: value }).eq('id', id);
-          if (error) console.error(`❌ ${field} 저장 실패:`, error);
-          else console.log(`✅ ${field} 저장됨:`, value);
+        // Enter 키로 이름 검색 필터 적용
+        document.getElementById('search-name').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                loadResponses();
+            }
+        });
+
+        const tableContainer = document.querySelector('.table-responsive');
+        if (tableContainer) {
+            tableContainer.addEventListener('wheel', (event) => {
+                if (!event.shiftKey && tableContainer.scrollWidth > tableContainer.clientWidth) {
+                    event.preventDefault();
+                    tableContainer.scrollLeft += event.deltaY;
+                }
+            });
         }
-      }, true);
-      
-      // 체크박스 메모 저장
-      tableWrapper.addEventListener('change', async (e) => {
-        if (e.target.classList.contains('memo-checkbox')) {
-          const id = e.target.dataset.id;
-          const field = e.target.dataset.field;
-          const value = e.target.checked;
-          const { error } = await client.from('responses').update({ [field]: value }).eq('id', id);
-          if (error) console.error(`❌ ${field} 저장 실패:`, error);
-          else console.log(`✅ ${field} 저장됨:`, value);
-        }
-      });
-      populateDateFilter();
-      // '전체 선택' 체크박스 기능
-      const checkAll = document.getElementById('check-all-resend');
-      checkAll.addEventListener('change', (e) => {
-          const checkboxes = document.querySelectorAll('.row-checkbox');
-          checkboxes.forEach(checkbox => {
-              checkbox.checked = e.target.checked;
-          });
-      });
-      
-      // 첫 페이지 데이터 로딩
-      loadResponses();
+
+        const tableWrapper = document.querySelector('.table-wrapper');
+        // 텍스트 메모 저장
+        tableWrapper.addEventListener('blur', async (e) => {
+            if (e.target.classList.contains('memo-input') && !e.target.readOnly) {
+                const id = e.target.dataset.id;
+                const field = e.target.dataset.field;
+                const value = e.target.value;
+                const { error } = await client.from('responses').update({ [field]: value }).eq('id', id);
+                if (error) console.error(`❌ ${field} 저장 실패:`, error);
+                else console.log(`✅ ${field} 저장됨:`, value);
+            }
+        }, true);
+          
+        // 체크박스 메모 저장
+        tableWrapper.addEventListener('change', async (e) => {
+            if (e.target.classList.contains('memo-checkbox')) {
+                const id = e.target.dataset.id;
+                const field = e.target.dataset.field;
+                const value = e.target.checked;
+                const { error } = await client.from('responses').update({ [field]: value }).eq('id', id);
+                if (error) console.error(`❌ ${field} 저장 실패:`, error);
+                else console.log(`✅ ${field} 저장됨:`, value);
+            }
+        });
+        
+        // '전체 선택' 체크박스 기능
+        const checkAll = document.getElementById('check-all-resend');
+        checkAll.addEventListener('change', (e) => {
+            const checkboxes = document.querySelectorAll('.row-checkbox');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = e.target.checked;
+            });
+        });
+          
+        // 초기 데이터 로딩
+        populateDateFilter();
+        loadResponses();
     });
     
     // 4. 실시간 구독 로직 (기존과 동일)
