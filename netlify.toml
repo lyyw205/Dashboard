@@ -5,10 +5,3 @@
 [functions]
   # 함수 코드가 있는 폴더 지정
   directory = "netlify/functions/"
-
-[[edge_functions]]
-  # "/" 로 시작하는 모든 경로의 요청을 vote-broadcaster 함수가 먼저 처리하게 됩니다.
-  # 함수 내부 로직에서 /ws, /tally-hook, /reset 경로만 처리하고 나머지는 무시하므로
-  # 기존 /applylist.html 같은 페이지 접근에는 영향을 주지 않습니다.
-  path = "/*"
-  function = "vote-broadcaster"
