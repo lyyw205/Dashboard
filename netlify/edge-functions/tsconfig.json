@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "lib": [
+      "ES2021",
+      "DOM",
+      "DOM.Iterable",
+      "deno.ns"  // <-- 이 부분이 Deno 전역 객체를 인식하게 해줍니다.
+    ],
+    "types": [
+      "@netlify/functions" // <-- 이 부분이 Context 타입을 인식하게 해줍니다.
+    ],
+    "esModuleInterop": true,
+    "strict": true,
+    "skipLibCheck": true
+  }
+}
