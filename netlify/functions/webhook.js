@@ -32,10 +32,12 @@ const fieldMap = {
   question_zyVpkM: 'birth_year',
   question_Y08D1v: 'phone',
   question_da7LOd: 'gender',
-  question_Y02E1W: 'mbti',
+  question_Y02E1W: 'job',
   question_zylEMM: 'apply_date',
   question_RoV6Oj: 'selfy',
-  question_oRkaJx: 'coupon'
+  question_oRkaJx: 'coupon',
+  question_y4RMXg: 'mbti',
+  question_XokL5g: 'ideal'
 };
 
 // Netlify Function의 시작점인 exports.handler
@@ -73,6 +75,8 @@ exports.handler = async function(event) {
         mbti: formData.mbti,
         selfy: formData.selfy?.url, // ?.url 로 안전하게 URL 추출
         coupon: formData.coupon,   // 쿠폰 코드 추가
+        ideal: formData.ideal,
+        job: formData.job,
       }
     ]);
 
