@@ -123,6 +123,9 @@ td:nth-child(5), th:nth-child(5) { min-width: 80px; }   /* 삭제 */
   background-color: #f5f7fd !important;  /* 강제 적용 */
 }
 
+.button-wrapper {
+  margin-bottom: 30px;
+}
 
 
 /* 미디어쿼리 768px 미만 */
@@ -268,3 +271,5 @@ td:nth-child(5), th:nth-child(5) { min-width: 80px; }   /* 삭제 */
   font-family: 'Pretendard Variable', sans-serif;
   font-weight: 400;
 }
+
+
