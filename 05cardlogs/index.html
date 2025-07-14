@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="../common/sidebar.css"/>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
   <div class="cardlogs-main">
@@ -149,7 +150,7 @@
       </ul>
     </div>
     <!-- 데스크탑 사이드바 -->
-    <div class="sidebar d-none d-md-flex flex-column bg-white shadow" style="height: 100vh;">
+    <div class="sidebar d-none d-md-flex flex-column bg-white shadow">
       <div class="sidebar-head d-flex align-items-center border-bottom py-2">
         <button id="sidebar-toggle">
           <img class="hamburger-icon" src="../assets/hamburger.png">
@@ -285,8 +286,89 @@
       </ul>
     </div>
     <div class="reservation container-fluid px-4 mt-5">
-      <div class="table-wrapper d-flex flex-column mt-5 mt-md-0 mb-3">
+            <!-- NEW! 필터 및 차트 영역 -->
+      <div class="filter-wrapper mt-5 mb-4">
+        <h2 class="mb-3">📊 필터링 데이터 추출</h2>
+        <div class="filter-section mb-3">
+          <div class="row g-3 align-items-end">
+            <!-- 날짜 범위 선택 -->
+            <div class="col-md-2">
+              <label for="startDate" class="form-label"><b>시작일</b></label>
+              <input type="date" id="startDate" class="form-control">
+            </div>
+            <div class="col-md-2">
+              <label for="endDate" class="form-label"><b>종료일</b></label>
+              <input type="date" id="endDate" class="form-control">
+            </div>
+            <!-- 종류 선택 버튼 (입금/출금) -->
+            <div class="col-md-2 w-auto">
+              <label class="form-label d-block"><b>입/출금</b></label>
+              <div id="type-buttons-container" class="d-flex flex-wrap gap-2">
+                  <button class="btn type-btn active" data-type="출금">출금</button>
+                  <button class="btn type-btn" data-type="입금">입금</button>
+              </div>
+            </div>
+            <!-- 메모 인풋 -->
+            <div class="memo-filter-wrapper col-md-4">
+              <label for="memo-search-input" class="form-label"><strong>📝 메모 내용을 포함하는 항목 검색</strong></label>
+              <input type="text" id="memo-search-input" class="form-control" placeholder="검색할 메모 내용을 입력하세요...">
+            </div>
+          </div>
+          <!-- 카테고리 선택 버튼 -->
+          <div class="mt-3">
+            <label class="form-label d-block"><b>카테고리 (중복 선택 가능)</b></label>
+            <div id="category-buttons-container" class="d-flex flex-wrap gap-2">
+              <!-- JS로 버튼 동적 생성 -->
+            </div>
+          </div>
+                    <!-- 조회 버튼 -->
+          <div class="col-md-3 mt-3">
+            <button id="filter-btn" class="btn btn-search w-100">조회하기</button>
+          </div>
+        </div>
+        
+        <!-- 차트가 그려질 영역 -->
+        <div id="chart-container">
+          <canvas id="category-chart"></canvas>
+        </div>
+      </div>
+      <div class="table-wrapper d-flex flex-column mt-5 mb-3">
         <h2 class="mb-3 mb-md-3">💳카드 결제 내역</h2>
+        <div class="p-3 mb-3 border rounded bg-light">
+          <div class="row g-3">
+            <!-- 날짜 필터 -->
+            <div class="col-md-2">
+              <label for="table-start-date" class="form-label"><strong>시작일</strong></label>
+              <input type="date" id="table-start-date" class="form-control">
+            </div>
+            <div class="col-md-2">
+              <label for="table-end-date" class="form-label"><strong>종료일</strong></label>
+              <input type="date" id="table-end-date" class="form-control">
+            </div>
+            <!-- 카테고리 필터 -->
+            <div class="mb-3 col-md-2">
+              <label for="table-category-filter" class="form-label"><strong>카테고리</strong></label>
+              <select id="table-category-filter" class="form-select">
+                <option value="all">-- 전체 보기 --</option>
+                <!-- 카테고리는 JavaScript로 채워집니다 -->
+              </select>
+            </div>
+                <!-- 종류 필터 -->
+            <div class="col-md-2">
+              <label for="table-type-filter" class="form-label"><strong>종류</strong></label>
+              <select id="table-type-filter" class="form-select">
+                <option value="all">-- 전체 --</option>
+                <option value="출금">출금</option>
+                <option value="입금">입금</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label for="table-memo-search" class="form-label"><strong>메모 검색</strong></label>
+              <input type="text" id="table-memo-search" class="form-control" placeholder="메모 내용 검색...">
+            </div>
+          </div>
+        </div>
+        
         <div class="table-responsive">
           <table id="log-table" class="log-table table table-borderless table-hover align-middle text-center table-striped-custom">
             <thead class="table-dark">
@@ -316,8 +398,288 @@
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndxeG12cXFrYnhpeWtpb3RidXNkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg0NDcyOTYsImV4cCI6MjA2NDAyMzI5Nn0.RmB92YtjLPMx4tkQibuRVT_T4DL3_O8Pny3ZA9DU0tk'
     );
 
-    const categories = ['광고', '장소 대관', '안주/주류', '비품', '업무추진비', '공과금', '파티비', '대관', '기타'];
+    const categories = ['광고', '장소 대관', '안주/주류', '비품', '업무추진비', '공과금', '파티비', '현장판매', '대관', '기타'];
 
+    //=======================================================
+    // 차트 및 필터링 관련 로직
+    //=======================================================
+    const typeButtonsContainer = document.getElementById('type-buttons-container');
+    const categoryButtonsContainer = document.getElementById('category-buttons-container');
+    const filterBtn = document.getElementById('filter-btn');
+    const startDateInput = document.getElementById('startDate');
+    const endDateInput = document.getElementById('endDate');
+    let categoryChart = null; 
+    const memoSearchInput = document.getElementById('memo-search-input');
+    const tableStartDate = document.getElementById('table-start-date');
+    const tableEndDate = document.getElementById('table-end-date');
+    const tableTypeFilter = document.getElementById('table-type-filter');
+    const tableCategoryFilter = document.getElementById('table-category-filter');
+    const tableMemoSearch = document.getElementById('table-memo-search');
+
+    // [신규] Date 객체를 'YYYY-MM-DD' 형식으로 변환하는 함수
+    function formatDateForInput(date) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+
+    // [신규] 기본 날짜 범위(오늘 ~ 2주 전)를 설정하는 함수
+    function setDefaultDateRange() {
+      const today = new Date();
+      const twoWeeksAgo = new Date();
+      twoWeeksAgo.setDate(today.getDate() - 14);
+
+      endDateInput.value = formatDateForInput(today);
+      startDateInput.value = formatDateForInput(twoWeeksAgo);
+    }
+
+    function createCategoryButtons() {
+      categories.forEach(cat => {
+        const button = document.createElement('button');
+        button.className = 'btn btn-category category-btn'; // Use secondary for non-active
+        button.textContent = cat;
+        button.dataset.category = cat;
+        categoryButtonsContainer.appendChild(button);
+      });
+    }
+    
+    typeButtonsContainer.addEventListener('click', (e) => {
+      if (e.target.classList.contains('type-btn')) {
+        // 클릭된 버튼의 active 클래스를 단순히 토글(toggle)만 합니다.
+        e.target.classList.toggle('active');
+      }
+    });
+
+    categoryButtonsContainer.addEventListener('click', (e) => {
+      // 버튼이 'category-btn' 클래스를 가지고 있는지 확인
+      if (e.target.classList.contains('category-btn')) {
+        // 'active' 클래스를 붙였다 떼는(토글) 역할만 수행
+        e.target.classList.toggle('active');
+      }
+    });
+
+    filterBtn.addEventListener('click', async () => {
+        const startDateValue = startDateInput.value;
+        const endDateValue = endDateInput.value;
+
+        if (!startDateValue || !endDateValue) {
+            alert('시작일과 종료일을 모두 선택해주세요.');
+            return;
+        }
+
+        const startDateKST = new Date(startDateValue + 'T00:00:00');
+        const endDateKST = new Date(endDateValue + 'T23:59:59');
+        const startDateUTC = startDateKST.toISOString();
+        const endDateUTC = endDateKST.toISOString();
+
+        const selectedChartTypes = Array.from(typeButtonsContainer.querySelectorAll('.type-btn.active')).map(btn => btn.dataset.type);
+        const chartTypesToQuery = [...selectedChartTypes];
+        if (selectedChartTypes.includes('출금') && !chartTypesToQuery.includes('출금취소')) {
+            chartTypesToQuery.push('출금취소');
+        }
+
+        if (chartTypesToQuery.length === 0) {
+            alert('하나 이상의 종류(입금/출금)를 선택해주세요.');
+            return;
+        }
+
+        const selectedChartCategories = Array.from(categoryButtonsContainer.querySelectorAll('.category-btn.active')).map(btn => btn.dataset.category);
+        if (selectedChartCategories.length === 0) {
+            alert('하나 이상의 카테고리를 선택해주세요.');
+            return;
+        }
+
+        const chartMemoText = memoSearchInput.value.trim();
+        
+        // 변수 이름을 명확하게 하여 함수 호출
+        await fetchAndRenderChart(startDateUTC, endDateUTC, selectedChartCategories, chartTypesToQuery, chartMemoText);
+    });
+
+    // [신규] 테이블 필터링 통합 함수
+    function applyTableFilters() {
+      // 1. 모든 필터 값 가져오기
+      const startDate = tableStartDate.value;
+      const endDate = tableEndDate.value;
+      const selectedType = tableTypeFilter.value;
+      const selectedCategory = tableCategoryFilter.value;
+      const searchText = tableMemoSearch.value.toLowerCase().trim();
+
+      const tableRows = document.querySelectorAll('#log-table tbody tr');
+
+      // 2. 각 행을 순회하며 필터 조건 확인
+      tableRows.forEach(row => {
+        const rowTimeline = row.dataset.timeline;
+        const rowDateStr = rowTimeline ? rowTimeline.slice(0, 10) : ''; // YYYY-MM-DD 형식 추출
+        const rowType = row.querySelector('.type-select')?.value;
+        const rowCategory = row.querySelector('.category-select')?.value;
+        const memoText = row.querySelector('.memo-input')?.value.toLowerCase();
+
+        // 3. 모든 조건이 맞는지 확인
+        let typeMatch = true; // 기본값은 true
+        if (selectedType === '출금') {
+            typeMatch = (rowType === '출금' || rowType === '출금취소');
+        } else if (selectedType !== 'all') {
+            typeMatch = (rowType === selectedType);
+        }
+        const dateMatch = (!startDate || rowDateStr >= startDate) && (!endDate || rowDateStr <= endDate);
+        const categoryMatch = selectedCategory === 'all' || rowCategory === selectedCategory;
+        const memoMatch = memoText.includes(searchText);
+
+        // 4. 모든 조건이 참일 때만 행을 보여줌
+        if (dateMatch && typeMatch && categoryMatch && memoMatch) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+    }
+    
+    async function fetchAndRenderChart(startDate, endDate, categories, typesToQuery, memoText) {
+        // 불필요한 typesToFetch 계산 로직을 제거하고 typesToQuery를 직접 사용합니다.
+        let query = supa
+            .from('card_logs')
+            .select('category, amount, type')
+            .in('type', typesToQuery)
+            .gte('timeline', startDate)
+            .lte('timeline', endDate)
+            .in('category', categories);
+
+        if (memoText) {
+            query = query.ilike('memo', `%${memoText}%`);
+        }
+
+        const { data: chartData, error } = await query;
+
+        if (error) {
+            console.error('차트 데이터 조회 오류:', error);
+            alert('데이터를 가져오는 데 실패했습니다.');
+            return;
+        }
+
+        const categoryTotals = {};
+        categories.forEach(cat => categoryTotals[cat] = 0);
+        chartData.forEach(item => {
+            if (categoryTotals.hasOwnProperty(item.category)) {
+                if (item.type === '출금취소') {
+                    categoryTotals[item.category] -= item.amount;
+                } else {
+                    categoryTotals[item.category] += item.amount;
+                }
+            }
+        });
+
+        // 차트 제목을 위한 로직
+        const originalSelectedTypes = typesToQuery.filter(t => t !== '출금취소');
+        const chartTypeTitle = originalSelectedTypes.join(' & ');
+        renderBarChart(categoryTotals, chartTypeTitle);
+    }
+    
+    function renderBarChart(data, type) {
+      const ctx = document.getElementById('category-chart').getContext('2d');
+      const labels = Object.keys(data);
+      const values = Object.values(data);
+      
+      if (categoryChart) {
+        categoryChart.destroy();
+      }
+
+      const chartTitle = `선택된 기간 및 카테고리별 ${type} 현황`;
+      const datasetLabel = `카테고리별 총 ${type} 금액 (원)`;
+
+      const chartColor = type === '입금' ? 'rgba(75, 192, 192, 0.6)' : 'rgba(255, 99, 132, 0.6)';
+      const chartBorderColor = type === '입금' ? 'rgba(75, 192, 192, 1)' : 'rgba(255, 99, 132, 1)';
+      
+      categoryChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: datasetLabel,
+            data: values,
+            backgroundColor: chartColor,
+            borderColor: chartBorderColor,
+            borderWidth: 1,
+            maxBarThickness: 100
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            title: {
+              display: true,
+              text: chartTitle,
+              font: {
+                size: 16
+              }
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  let label = context.dataset.label || '';
+                  if (label) {
+                    label += ': ';
+                  }
+                  if (context.parsed.y !== null) {
+                    label += new Intl.NumberFormat('ko-KR').format(context.parsed.y) + ' 원';
+                  }
+                  return label;
+                }
+              }
+            },
+            legend: {
+          // 범례를 클릭했을 때의 기본 동작(데이터 숨기기)을 비활성화합니다.
+              onClick: null 
+            }
+          },
+          scales: {
+            x: {
+              ticks: {
+                // 각 라벨을 어떻게 그릴지 정의하는 콜백함수
+                callback: function(value, index, ticks) {
+                  const categoryName = labels[index]; // 현재 인덱스의 카테고리명
+                  const categoryValue = values[index]; // 현재 인덱스의 금액
+                  
+                  // 금액이 0이 아니면 포맷팅, 0이면 빈 문자열
+                  const formattedValue = categoryValue !== 0 
+                    ? new Intl.NumberFormat('ko-KR').format(categoryValue)
+                    : '';
+
+                  // 배열로 반환하면 자동으로 여러 줄 라벨이 됩니다.
+                  return [categoryName, formattedValue];
+                },
+                font: {
+                  size: 12 // 폰트 크기 조절
+                }
+              }
+            },
+            y: {
+              beginAtZero: true,
+              ticks: {
+                callback: function(value, index, values) {
+                  return new Intl.NumberFormat('ko-KR').format(value);
+                },
+              grace: '5%'
+              }
+            }
+          }
+        }
+      });
+      // [신규] 차트가 성공적으로 그려진 후, 숨겨진 컨테이너를 보이게 만듭니다.
+      document.getElementById('chart-container').style.display = 'block';
+    }
+
+    // [수정] 모든 필터 이벤트가 통합 함수를 호출하도록 연결
+    tableStartDate.addEventListener('change', applyTableFilters);
+    tableEndDate.addEventListener('change', applyTableFilters);
+    tableTypeFilter.addEventListener('change', applyTableFilters); // 새로 추가된 드롭다운의 이벤트
+    tableCategoryFilter.addEventListener('change', applyTableFilters);
+    tableMemoSearch.addEventListener('input', applyTableFilters);
+
+    //=======================================================
+    // 기존 테이블 관련 로직
+    //=======================================================
     async function loadInitialLogs() {
       const { data, error } = await supa
         .from('card_logs')
@@ -330,13 +692,11 @@
       }
 
       const tbody = document.querySelector('#log-table tbody');
-      tbody.innerHTML = ''; // 초기 로딩 시 전체 채우기
+      tbody.innerHTML = '';
 
       data.reverse().forEach(row => {
         appendRow(row);
       });
-      console.log('불러온 timeline 순서 확인 ↓');
-      data.forEach(row => console.log(row.timeline));
     }
 
     function formatNumber(num) {
@@ -353,50 +713,72 @@
     }
 
 
-
     function appendRow(row) {
-      const tbody = document.querySelector('#log-table tbody');
-      const tr = document.createElement('tr');
+        const tbody = document.querySelector('#log-table tbody');
+        const tr = document.createElement('tr');
+        tr.dataset.timeline = row.timeline;
 
-            // 카테고리 드롭다운
-      const categoryOptions = categories.map(cat =>
-        `<option value="${cat}" ${row.category === cat ? 'selected' : ''}>${cat}</option>`
-      ).join('');
-            //출금 타입 드롭다운
-      const typeOptions = ['출금', '입금', '출금취소', '기타'].map(type =>
-        `<option value="${type}" ${row.type === type ? 'selected' : ''}>${type}</option>`
-      ).join('');
+        const categoryOptions = categories.map(cat =>
+            `<option value="${cat}" ${row.category === cat ? 'selected' : ''}>${cat}</option>`
+        ).join('');
+        const typeOptions = ['출금', '입금', '출금취소', '기타'].map(type =>
+            `<option value="${type}" ${row.type === type ? 'selected' : ''}>${type}</option>`
+        ).join('');
+        let typeClass = '';
+        if (row.type === '입금') typeClass = 'deposit';
+        else if (row.type === '출금') typeClass = 'withdrawal';
+        else if (row.type === '출금취소') typeClass = 'cancel';
+        else typeClass = 'other';
 
-      let typeClass = '';
-      if (row.type === '입금') typeClass = 'deposit';
-      else if (row.type === '출금') typeClass = 'withdrawal';
-      else if (row.type === '출금취소') typeClass = 'cancel';
-      else typeClass = 'other';
+        tr.innerHTML = `
+            <td>${formatDateCompact(row.timeline)}</td>
+            <td>
+              <select class="form-select form-select-sm category-select" data-id="${row.id}" onchange="updateCategory(this)">
+                <option value="" disabled>선택</option>
+                ${categoryOptions}
+              </select>
+            </td>
+            <td>${formatNumber(row.amount)}</td>
+            <td>${row.card}</td>
+            <td>  
+              <select class="form-select form-select-sm type-select ${typeClass}" data-id="${row.id}" onchange="updateType(this)">
+                <option value="" disabled>선택</option>
+                ${typeOptions}
+              </select>
+            </td>
+            <td>${formatNumber(row.balance)}</td>
+            <td>${row.store}</td>
+            <td>
+              <input type="text" class="form-control form-control-sm memo-input" value="${row.memo || ''}" 
+                data-id="${row.id}" onblur="updateMemo(this)" />
+            </td>
+        `;
 
-      tr.innerHTML = `
-        <td>${formatDateCompact(row.timeline)}</td>
-        <td>
-          <select class="category-select" data-id="${row.id}" onchange="updateCategory(this)">
-            <option value="" hidden></option>
-            ${categoryOptions}
-          </select>
-        </td>
-        <td>${formatNumber(row.amount)}</td>
-        <td>${row.card}</td>
-        <td>  
-          <select class="type-select ${typeClass}" data-id="${row.id}" onchange="updateType(this)">
-            <option value="" hidden></option>
-            ${typeOptions}
-          </select>
-        </td>
-        <td>${formatNumber(row.balance)}</td>
-        <td>${row.store}</td>
-        <td>
-          <input type="text" class="memo-input" value="${row.memo || ''}" 
-            data-id="${row.id}" onblur="updateMemo(this)" />
-        </td>
-      `;
-      tbody.prepend(tr); // 🆕 맨 위에 추가!
+        // 테이블 필터링 로직
+        const startDate = tableStartDate.value;
+        const endDate = tableEndDate.value;
+        const selectedType = tableTypeFilter.value; // selectedTypes -> selectedType
+        const selectedCategory = tableCategoryFilter.value;
+        const searchText = tableMemoSearch.value.toLowerCase().trim();
+        
+        const rowDateStr = row.timeline.slice(0, 10);
+
+        let typeMatch = true;
+        if (selectedType === '출금') {
+            typeMatch = (row.type === '출금' || row.type === '출금취소');
+        } else if (selectedType !== 'all') {
+            typeMatch = (row.type === selectedType);
+        }
+
+        const dateMatch = (!startDate || rowDateStr >= startDate) && (!endDate || rowDateStr <= endDate);
+        const categoryMatch = selectedCategory === 'all' || row.category === selectedCategory;
+        const memoMatch = (row.memo || '').toLowerCase().includes(searchText);
+
+        if (!(dateMatch && typeMatch && categoryMatch && memoMatch)) {
+            tr.style.display = 'none';
+        }
+        
+        tbody.prepend(tr);
     }
 
     async function updateCategory(selectEl) {
@@ -450,8 +832,19 @@
       }
     }
 
+    function populateTableFilter() {
+      categories.forEach(cat => {
+        const option = document.createElement('option');
+        option.value = cat;
+        option.textContent = cat;
+        tableCategoryFilter.appendChild(option);
+      });
+    }
 
     // ✅ 최초 전체 로딩
+    setDefaultDateRange();
+    createCategoryButtons();
+    populateTableFilter();
     loadInitialLogs();
 
     // ✅ 실시간 삽입만 감지
@@ -462,7 +855,7 @@
         { event: 'INSERT', schema: 'public', table: 'card_logs' },
         payload => {
           console.log('🆕 새 데이터 감지됨:', payload.new);
-          appendRow(payload.new); // ✅ 새로운 행만 추가
+          appendRow(payload.new); 
         }
       )
       .subscribe();

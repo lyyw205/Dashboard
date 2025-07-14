@@ -185,8 +185,13 @@ td:nth-child(14) {
 .btn-group {
   gap: 5px;
   margin-top: 10px;
-  width: 450px;
 }
+
+.btn-group, 
+.btn-group-vertical {
+  display: flex;
+}
+
 
 .btn.sendbtn1 {
   background-color: #ececec;
@@ -194,12 +199,14 @@ td:nth-child(14) {
   font-weight: 500;
   padding: 3px 15px;
   border-radius: 10px !important;
+  flex: initial;
 }
 
 .btn.sendbtn1:hover {
   background-color: #cacaca;
   padding: 3px 15px;
   border-radius: 10px !important;
+  flex: initial;
 }
 
 .btn.sendbtn2 {
@@ -208,12 +215,14 @@ td:nth-child(14) {
   font-weight: 500;
   padding: 3px 15px;
   border-radius: 10px !important;
+  flex: initial;
 }
 
 .btn.sendbtn2:hover {
   background-color: #cacaca;
   padding: 3px 15px;
   border-radius: 10px !important;
+  flex: initial;
 }
 
 .btn.sendbtn3 {
@@ -222,11 +231,13 @@ td:nth-child(14) {
   font-weight: 500;
   padding: 3px 15px;
   border-radius: 10px !important;
+  flex: initial;
 }
 
 .btn.sendbtn3:hover {
   background-color: #cacaca;
   padding: 3px 15px;
   border-radius: 10px !important;
+  flex: initial;
 }
 

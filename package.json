@@ -26,8 +26,8 @@
     "googleapis": "^150.0.1",
     "open": "^10.1.2"
   },
-  "description": "",
   "devDependencies": {
     "@netlify/functions": "^4.1.10"
-  }
+  },
+  "description": ""
 }

@@ -45,6 +45,7 @@ const MESSAGE_CONFIG = {
   'location': {
     template: 'KA01TP250709145734382Qm8j2DgohNp',
     memoField: 'memo3',
+    keyword: '확정문자',
     successMessage: '✅확정문자',
     failMessage: '❌확정문자', // 실패 메시지도 추가해주는 것이 좋습니다.
     // variables를 함수로 만들어서 user 객체를 인자로 받음
@@ -62,11 +63,46 @@ const MESSAGE_CONFIG = {
   },
   'reminder': {
     template: 'PARTICIPATION_REMINDER_TEMPLATE',
-    memoField: 'memo5',
-    successMessage: '✅특수문자_발송완료',
-    variables: (user) => ({ '고객명': user.name, '날짜': '내일 저녁 7시' })
+    memoField: 'memo3',
+    keyword: '특수문자',
+    successMessage: '✅특수문자',
+    failMessage: '❌확정문자',
+    variables: (user) => ({ 
+      '고객명': user.name, 
+      '날짜': '내일 저녁 7시' 
+    })
+  },
+    // 예시 1: 파티 확정 안내 메시지
+  'confirm_party': {
+    template: 'PARTY_CONFIRMATION_TEMPLATE_ID', // 1. CoolSMS에서 발급받은 실제 템플릿 ID
+    memoField: 'memo3',                        // 2. 이 메시지의 상태를 기록할 DB 컬럼명 (예: memo4)
+    keyword: '파티확정',
+    successMessage: '✅파티확정',        // 3. 발송 성공 시 DB에 기록될 텍스트
+    failMessage: '❌파티확정',          // 4. 발송 실패 시 DB에 기록될 텍스트
+    variables: (user) => {                     // 5. 템플릿에 들어갈 변수 설정
+      const formattedDate = formatKoreanDate(user.apply_date);
+      return {
+        '#{고객명}': user.name,
+        '#{파티날짜}': formattedDate,
+        '#{확정인원}': user.confirmed_participants || 1 // 예시: 확정인원 변수
+      };
+    }
+  },
+
+  // 예시 2: 만족도 조사 요청 메시지
+  'survey_request': {
+    template: 'SURVEY_REQUEST_TEMPLATE_ID',    // 1. 실제 템플릿 ID
+    memoField: 'memo3',                       // 2. DB 컬럼명 (예: memo6)
+    keyword: '만족도조사',
+    successMessage: '✅만족도조사',     // 3. 성공 메시지
+    failMessage: '❌만족도조사',       // 4. 실패 메시지
+    variables: (user) => ({                   // 5. 변수 설정
+      '#{고객명}': user.name,
+      '#{설문조사링크}': 'https://example.com/survey' // 예시: 설문조사 링크 변수
+    })
   }
 };
+
 
 // Netlify Function의 핸들러
 exports.handler = async (event) => {
@@ -85,49 +121,83 @@ exports.handler = async (event) => {
       return { statusCode: 400, body: JSON.stringify({ error: `알 수 없는 메시지 타입입니다: ${type}` }) };
     }
 
-    // --- ★★★★★ 핵심 변경점: 쿼리 로직 통합 ★★★★★ ---
-    const memoFieldToCheck = config.memoField;
-    const failMessage = config.failMessage || `❌${type}`; // 각 타입에 맞는 실패 메시지 생성 (예: '❌location')
+    let users; // 발송 대상 사용자 목록을 담을 변수
+    let dbError; // DB 조회 에러를 담을 변수
 
-    // 모든 타입에 대해 "실패했거나, 비어있는 경우"를 찾는 조건으로 통일
-    let query = supabase.from('responses')
-      .select('*')
-      .in('id', ids)
-      .or(`${memoFieldToCheck}.eq.${failMessage},${memoFieldToCheck}.is.null,${memoFieldToCheck}.eq.""`);
-    // --- ★★★★★ 여기까지가 핵심 변경점입니다 ★★★★★ ---
+    // ===================================================================
+    // ★★★★★ 로직 분기: 'resend_failed' 타입과 나머지 타입 처리 분리 ★★★★★
+    // ===================================================================
+    if (type === 'resend_failed') {
+      console.log("▶️ 'resend_failed' 타입 특별 처리 시작");
+      // 'resend_failed'는 memo1 필드에서 '발송실패' 상태인 것만 찾습니다.
+      const { data, error } = await supabase
+        .from('responses')
+        .select('*')
+        .in('id', ids)
+        .or('memo1.like.%❌%,memo1.like.%발송실패%'); // 실패 키워드가 포함된 경우
+      
+      users = data;
+      dbError = error;
 
-    const { data: users, error: dbError } = await query;
+    } else { // ★ else 블록으로 나머지 로직을 감싸줍니다.
+      console.log(`▶️ '${type}' 타입 일반 처리 시작 (키워드 기반)`);
+      
+      const memoFieldToCheck = config.memoField;
+      const keywordToCheck = config.keyword;
+
+      if (!keywordToCheck) {
+        throw new Error(`'${type}' 메시지 타입에 'keyword' 설정이 없습니다. 'resend_failed'가 아닌 타입은 keyword가 필수입니다.`);
+      }
+
+      const { data, error } = await supabase
+        .from('responses')
+        .select('*')
+        .in('id', ids)
+        .or(`${memoFieldToCheck}.not.like.%${keywordToCheck}%,${memoFieldToCheck}.like.%❌${keywordToCheck}%`);
+
+      users = data;
+      dbError = error;
+    }
 
     if (dbError) throw new Error(`DB 조회 실패: ${dbError.message}`);
     if (!users || users.length === 0) {
-      return { statusCode: 200, body: JSON.stringify({ message: '조건에 맞는 발송 대상이 없습니다. (이미 발송되었거나, 실패 상태가 아닐 수 있습니다)' }) };
+      return { statusCode: 200, headers: corsHeaders, body: JSON.stringify({ message: '조건에 맞는 발송 대상이 없습니다.' }) };
     }
 
-    // --- ★★★★★ 핵심 변경점: 발송 및 후처리 로직 수정 ★★★★★ ---
     let successCount = 0;
     const sendPromises = users.map(async (user) => {
       if (!user.phone || user.phone.trim() === '') {
         console.error(`Skipping user ${user.name} (ID: ${user.id}) - Missing phone number.`);
-        return; // 현재 user에 대한 작업만 건너뛰고 다음으로 넘어갑니다.
+        return;
       }
       const templateCode = typeof config.template === 'function' ? config.template(user) : config.template;
       const variables = config.variables(user);
       const successMsg = typeof config.successMessage === 'function' ? config.successMessage(user) : config.successMessage;
-
-      // TODO: 여기에 실제 알림톡 발송 API 호출 로직을 넣으세요.
-      // 이 함수는 성공 시 true, 실패 시 false를 반환해야 합니다.
+      const failMsg = config.failMessage || `❌${type}`; // failMessage가 없으면 기본값 사용
+      
       const isSentSuccessfully = await sendAlimtalk(user, templateCode, variables); 
       
+      // DB 업데이트 로직 분기
+      if (type === 'resend_failed') {
+        const messageToUpdate = isSentSuccessfully ? successMsg : failMsg;
+        await supabase.from('responses')
+          .update({ [config.memoField]: messageToUpdate })
+          .eq('id', user.id);
+      } else {
+        const messageToAppend = isSentSuccessfully ? successMsg : failMsg;
+        const existingMemo = user[config.memoField] || '';
+        const newMemo = existingMemo ? `${existingMemo} ${messageToAppend}` : messageToAppend;
+        await supabase.from('responses')
+          .update({ [config.memoField]: newMemo })
+          .eq('id', user.id);
+      }
+
+      // ★★★★★ 2. successCount++ 위치 수정 ★★★★★
+      // 성공 카운트는 타입에 관계없이 집계되어야 하므로 if/else 바깥으로 이동
       if (isSentSuccessfully) {
         successCount++;
-        // 발송 성공 시: 성공 메시지로 덮어쓰기
-        await supabase.from('responses').update({ [config.memoField]: successMsg }).eq('id', user.id);
-      } else {
-        // 발송 실패 시: 실패 메시지로 덮어쓰기
-        await supabase.from('responses').update({ [config.memoField]: failMessage }).eq('id', user.id);
       }
     });
-    // --- ★★★★★ 여기까지가 핵심 변경점입니다 ★★★★★ ---
 
     await Promise.all(sendPromises);
 
@@ -139,7 +209,7 @@ exports.handler = async (event) => {
 
   } catch (error) {
     console.error('💥 서버리스 함수 처리 중 오류:', error);
-    return { statusCode: 500, body: JSON.stringify({ error: error.message }) };
+    return { statusCode: 500, headers: corsHeaders, body: JSON.stringify({ error: error.message }) };
   }
 };
 

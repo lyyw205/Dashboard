@@ -58,32 +58,88 @@ async function markAsSent(id, status) {
 // ========================================================================
 // ★★★★★ 핵심 개선점: 쿠폰 코드 설정 맵 ★★★★★
 // ========================================================================
-const COUPON_CONFIG = {
-  'WEINVITEYOU': {
-    template: 'KA01TP250709145734382Qm8j2DgohNp',
-    successMessage: '✅무료초대',
-    variables: (user, formattedDate) => ({ 
-      '#{고객명}': user.name, 
-      '#{파티명}': '게릴라 파티', 
-      '#{date}': formattedDate
-    }),
+const ALIMTALK_CONFIG = {
+  // --- 남자 사용자 설정 ---
+  '남자': {
+    // 남자가 쿠폰 없이 제출했을 때의 기본값
+    DEFAULT: {
+      template: 'KA01TP250707173844176ndkmNlwondi', // 유료 안내 (남자 버전, 필요시 수정)
+      successMessage: '✅입금안내_남',
+      variables: (user, formattedDate) => ({
+        '#{고객명}': user.name,
+        '#{브랜드이름}': '게릴라 파티',
+        '#{파티날짜}': formattedDate,
+      }),
+    },
+    // 남자 사용자 전용 쿠폰 설정
+    COUPONS: {
+      'WEINVITEYOU': {
+        template: 'KA01TP250709145734382Qm8j2DgohNp', // 무료 초대 (내용이 같다면 그대로 사용)
+        successMessage: '✅무료초대_남',
+        variables: (user, formattedDate) => ({
+          '#{고객명}': user.name,
+          '#{파티명}': '게릴라 파티',
+          '#{date}': formattedDate
+        }),
+      },
+      'SPECIALGIFT25': {
+        template: 'KA01TP250705163644669ytqNtJ0gaZl', // 특별 선물 (내용이 같다면 그대로 사용)
+        successMessage: '✅특별선물_남',
+        variables: (user) => ({
+          '#{고객명}': user.name,
+          '#{선물명}': '스타벅스 쿠폰'
+        }),
+      },
+    }
   },
-  'SPECIALGIFT25': {
-    template: 'KA01TP250705163644669ytqNtJ0gaZl',
-    successMessage: '✅특별선물안내_발송완료',
-    variables: (user) => ({
-      '#{고객명}': user.name,
-      '#{선물명}': '스타벅스 쿠폰'
-    }),
+  // --- 여자 사용자 설정 ---
+  '여자': {
+    // 여자가 쿠폰 없이 제출했을 때의 기본값
+    DEFAULT: {
+      template: 'KA01TP250707173844176ndkmNlwondi', // 예: 여자용 유료 안내 템플릿 ID
+      successMessage: '✅입금안내_여',
+      variables: (user, formattedDate) => ({
+        '#{고객명}': user.name,
+        '#{브랜드이름}': '게릴라 파티',
+        '#{파티날짜}': formattedDate,
+      }),
+    },
+    // 여자 사용자 전용 쿠폰 설정
+    COUPONS: {
+      'WEINVITEYOU': {
+        template: 'KA01TP250709145734382Qm8j2DgohNp', // 예: 여자용 무료 초대 템플릿 ID
+        successMessage: '✅무료초대_여',
+        variables: (user, formattedDate) => ({
+          '#{고객명}': user.name,
+          '#{파티명}': '게릴라 파티',
+          '#{date}': formattedDate
+        }),
+      },
+      'SPECIALGIFT25': {
+        template: 'TEMPLATE_ID_FOR_FEMALE_GIFT', // 예: 여자용 특별 선물 템플릿 ID
+        successMessage: '✅특별선물_여',
+        variables: (user) => ({
+          '#{고객명}': user.name,
+          '#{선물명}': '프리미엄 디저트 세트' // 예시: 여자에게는 다른 선물
+        }),
+      },
+    }
   },
-  'EARLYBIRD10': {
-    template: 'KA01TP250705163644669ytqNtJ0gaZl',
-    successMessage: '✅얼리버드할인_발송완료',
-    variables: (user) => ({
-      '#{고객명}': user.name,
-      '#{할인율}': '10%'
-    }),
-  },
+  // --- 성별 정보가 없거나 기타 경우를 위한 공통 설정 (Fallback) ---
+  '공통': {
+    DEFAULT: {
+      template: 'KA01TP250707173844176ndkmNlwondi', // 기존 유료 안내
+      successMessage: '✅입금안내_공통',
+      variables: (user, formattedDate) => ({
+        '#{고객명}': user.name,
+        '#{브랜드이름}': '게릴라 파티',
+        '#{파티날짜}': formattedDate,
+      }),
+    },
+    COUPONS: {
+        // 공통으로 처리할 쿠폰이 있다면 여기에 정의
+    }
+  }
 };
 
 // 날짜 형식 변환 함수 (YYYY-MM-DD -> M월 D일)
@@ -119,12 +175,10 @@ exports.handler = async (event) => {
     console.log('📥 Supabase Webhook 페이로드 수신:', payload);
 
     const newRecordId = payload.record.id;
-
     if (!newRecordId) {
       console.warn('⚠️ 페이로드에 record.id가 없어 처리를 중단합니다.');
       return { statusCode: 200, body: 'Skipped: No record ID in payload.' };
     }
-    console.log(`🔍 ID ${newRecordId}에 대한 전체 데이터 조회 시도...`);
     const { data: fetchedUser, error: fetchError } = await supabase
       .from('responses')
       .select('*')
@@ -155,50 +209,33 @@ exports.handler = async (event) => {
     //대문자수정
     // --- (C) 알림톡 발송 분기 처리 (기존 핵심 로직) ---
     // 1. 공백 제거(.trim()) 후 2. 대문자 변환(.toUpperCase())
+    const userGender = newUser.gender || '공통'; // DB에 gender 값이 없으면 '공통'으로 처리
     const userCouponCode = newUser.coupon ? newUser.coupon.trim().toUpperCase() : null;
-    const matchedConfig = COUPON_CONFIG[userCouponCode];
-
     const formattedApplyDate = formatKoreanDate(newUser.apply_date);
 
-    // ▼▼▼ 디버깅용 로그 추가 ▼▼▼
-    console.log('--- 쿠폰 코드 디버깅 ---');
-    // ... (기존 디버깅 로그는 그대로) ...
-    console.log('--- 날짜 변수 디버깅 (공통) ---');
-    console.log('DB에서 직접 가져온 apply_date:', newUser.apply_date);
-    console.log('함수로 변환된 formattedApplyDate:', formattedApplyDate);
-    console.log('-------------------------');
-    // ▲▲▲ 여기까지 ▲▲▲
-
-    if (matchedConfig) {
-      // 쿠폰 코드가 있는 경우
-      console.log(`✨ 쿠폰 코드 "${userCouponCode}"에 대한 설정을 찾았습니다.`);
-      await sendAlimtalk(
-        newUser,
-        matchedConfig.template,
-        matchedConfig.variables(newUser, formattedApplyDate)
-      );
-      await markAsSent(newUser.id, matchedConfig.successMessage);
+    // 2. 성별에 맞는 설정 블록 선택
+    const genderConfig = ALIMTALK_CONFIG[userGender] || ALIMTALK_CONFIG['공통'];
+    
+    let configToSend; // 최종적으로 발송할 설정을 담을 변수
+    
+    // 3. 쿠폰 코드 유무에 따라 최종 설정 결정
+    if (userCouponCode && genderConfig.COUPONS[userCouponCode]) {
+      // 쿠폰 코드가 있고, 해당 성별 설정에 쿠폰이 정의되어 있다면 그것을 사용
+      console.log(`✨ 성별(${userGender}), 쿠폰(${userCouponCode})에 맞는 설정을 찾았습니다.`);
+      configToSend = genderConfig.COUPONS[userCouponCode];
     } else {
-      // 쿠폰 코드가 없는 경우 (기본: 유료 안내)
-      console.log(`🎫 유효한 쿠폰 코드가 없어 유료 안내를 발송합니다.`);
-
-            // --- ▼▼▼ 디버깅용 로그 추가 ▼▼▼ ---
-      console.log('--- 날짜 변수 디버깅 ---');
-      console.log('DB에서 직접 가져온 apply_date:', newUser.apply_date);
-      console.log('함수로 변환된 formattedApplyDate:', formattedApplyDate);
-      console.log('-------------------------');
-      // --- ▲▲▲ 여기까지 ▲▲▲ ---
-      await sendAlimtalk(
-        newUser, 
-        'KA01TP250707173844176ndkmNlwondi', // 유료 안내 템플릿 ID (실제 ID로 변경)
-        { 
-          '#{고객명}':      newUser.name,
-          '#{브랜드이름}':  '게릴라 파티',
-          '#{파티날짜}':    formattedApplyDate
-        }
-      );
-      await markAsSent(newUser.id, '✅입금안내');
+      // 쿠폰이 없거나, 유효하지 않으면 해당 성별의 기본(DEFAULT) 설정을 사용
+      console.log(`🎫 유효한 쿠폰이 없어 ${userGender} 기본 안내를 발송합니다.`);
+      configToSend = genderConfig.DEFAULT;
     }
+
+    // 4. 결정된 설정으로 알림톡 발송 및 DB 업데이트
+    await sendAlimtalk(
+      newUser,
+      configToSend.template,
+      configToSend.variables(newUser, formattedApplyDate)
+    );
+    await markAsSent(newUser.id, configToSend.successMessage);
 
     // --- (D) 모든 작업 완료 후 성공 응답 ---
     return {

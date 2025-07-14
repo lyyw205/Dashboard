@@ -3,6 +3,7 @@
 .accounts-wrapper {
   display: flex;
   flex-direction: row;
+  min-height: 100vh;
 }
 .accounts-main {
   display: flex;
@@ -140,6 +141,7 @@ td:nth-child(5), th:nth-child(5) { min-width: 80px; }   /* 삭제 */
   }
   
   
+  
   .account-table td[data-label="사이트"],
   .account-table td[data-label="아이디"],
   .account-table td[data-label="비밀번호"],
@@ -220,6 +222,21 @@ td:nth-child(5), th:nth-child(5) { min-width: 80px; }   /* 삭제 */
     content: "";
     display: block;
     height: 40px; /* 원하는 만큼 여백 */
+  }
+
+  .grl-info {
+    flex-direction: column !important;
+  }
+
+  .grl-info-box {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+  }
+
+  .grl-number-account-title {
+    width: 120px;
+    text-align: start;
   }
 }
 

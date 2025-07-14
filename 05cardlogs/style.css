@@ -16,6 +16,10 @@
   overflow: auto;
 }
 
+.table-responsive {
+  min-height: 500px;
+}
+
 #log-table {
   border-collapse: separate;
   border-spacing: 0 5px;
@@ -171,3 +175,65 @@ select.type-select {
   background-color: #f3f3f3;
 }
 
+
+
+.filter-section {
+  background-color: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  border: 1px solid #dee2e6;
+}
+.category-btn, .type-btn {
+  border: solid 1px #b7c9ff;
+  color: #4d82c7;
+  background-color: white;
+  transition: all 0.2s ease-in-out;
+}
+.category-btn.active, .type-btn.active {
+  background-color: #83a0ff;
+  color: #2c3b6d;
+  font-weight: bold;
+  border: 1px solid #5671c9;
+}
+#chart-container {
+  padding: 1.5rem;
+  background-color: #ffffff;
+  border-radius: 0.5rem;
+  border: 1px solid #dee2e6;
+  min-height: 400px;
+}
+
+.btn-search {
+  background-color: #d4deff;
+
+}
+
+.btn-search:hover {
+  background-color: #5875d6;
+  color: #fff;
+}
+
+
+/* [여기에 추가] 내가 직접 만드는 버튼 스타일 */
+.my-button-style {
+  background-color: #8A2BE2; /* 예: 블루 바이올렛 색상 */
+  color: white;             /* 글자색: 흰색 */
+  border: 1px solid #4B0082; /* 테두리: 진한 보라색 */
+  transition: background-color 0.2s; /* 부드러운 색상 변경 효과 */
+}
+
+/* 마우스를 올렸을 때의 스타일 */
+.my-button-style:hover {
+  background-color: #9932CC; /* 예: 미디엄 오키드 색상 (조금 더 밝게) */
+}
+
+/* '선택됨' 상태의 스타일 (활성화) */
+.my-button-style.active {
+  background-color: #4B0082; /* 예: 인디고 (더 진하게) */
+  font-weight: bold;
+  box-shadow: 0 0 5px rgba(0,0,0,0.5); /* 선택 시 그림자 효과 (선택사항) */
+}
+
+#chart-container {
+  display: none;
+}
