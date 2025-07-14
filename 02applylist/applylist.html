@@ -337,7 +337,9 @@
               <th class="submit-birth">출생년도</th>
               <th class="submit-phone">전화번호</th>
               <th class="submit-gender">성별</th>
+              <th class="submit-job">job</th>
               <th class="submit-mbti">MBTI</th>
+              <th class="submit-ideal">ideal</th>
               <th class="submit-date">참여 날짜</th>
               <th class="submit-tmi">쿠폰</th>
               <th class="automessage-deposit">입금문자</th>
@@ -419,7 +421,9 @@
           <td>${row.birth_year || ''}</td>
           <td>${row.phone || ''}</td>
           <td>${row.gender || ''}</td>
+          <td>${row.job || ''}</td>
           <td>${row.mbti || ''}</td>
+          <td>${row.ideal || ''}</td>
           <td>${row.apply_date ? formatApplyDate(row.apply_date) : ''}</td>
           <td>${row.coupon || ''}</td>
           <td><input type="text" class="memo-input" data-id="${row.id}" data-field="memo1" value="${row.memo1 || ''}"></td>
