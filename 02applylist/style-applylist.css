@@ -96,20 +96,20 @@ td:nth-child(6) {
 
 th:nth-child(7),
 td:nth-child(7) {
-  width: 60px;
+  width: 80px;
   text-align: center;
 }
 
 
 th:nth-child(8),
 td:nth-child(8) {
-  width: 60px;
+  width: 80px;
   text-align: center;
 }
 
 th:nth-child(9),
 td:nth-child(9) {
-  width: 60px;
+  width: 120px;
   text-align: center;
 }
 
