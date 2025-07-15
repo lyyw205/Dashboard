@@ -171,9 +171,9 @@ let groupedData = {};
 async function fetchData() {
   const { data, error } = await supabase
     .from('responses')
-    .select('id, name, phone, gender, mbti, apply_date, memo3, memo4, memo5, nickname, incheck')
+    .select('id, name, phone, gender, mbti, apply_date, memo3, memo4, memo5, nickname, incheck, created_at')
     .eq('memo2', true)
-    .order('apply_date', { ascending: true });
+    .order('created_at', { ascending: false });
 
   if (error) {
     console.error('❌ 데이터 로딩 오류:', error.message);

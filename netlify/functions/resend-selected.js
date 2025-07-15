@@ -70,7 +70,7 @@ const MESSAGE_CONFIG = {
   },
     // 예시 1: 파티 확정 안내 메시지
   'confirm_party': {
-    template: 'KA01TP250714165453952qTLdU5fXUH8', // 1. CoolSMS에서 발급받은 실제 템플릿 ID
+    template: 'KA01TP250715090235325oUMiDjsbRaU', // 1. CoolSMS에서 발급받은 실제 템플릿 ID
     memoField: 'memo3',                        // 2. 이 메시지의 상태를 기록할 DB 컬럼명 (예: memo4)
     keyword: '입장재촉',
     successMessage: '✅입장재촉',        // 3. 발송 성공 시 DB에 기록될 텍스트
@@ -80,9 +80,9 @@ const MESSAGE_CONFIG = {
   'survey_request': {
     template: 'SURVEY_REQUEST_TEMPLATE_ID',    // 1. 실제 템플릿 ID
     memoField: 'memo3',                       // 2. DB 컬럼명 (예: memo6)
-    keyword: '만족도조사',
-    successMessage: '✅만족도조사',     // 3. 성공 메시지
-    failMessage: '❌만족도조사',       // 4. 실패 메시지
+    keyword: '후기',
+    successMessage: '✅후기',     // 3. 성공 메시지
+    failMessage: '❌후기',       // 4. 실패 메시지
     variables: (user) => ({                   // 5. 변수 설정
       '#{고객명}': user.name,
       '#{설문조사링크}': 'https://example.com/survey' // 예시: 설문조사 링크 변수
