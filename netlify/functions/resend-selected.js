@@ -62,7 +62,7 @@ const MESSAGE_CONFIG = {
     }
   },
   'reminder': {
-    template: 'KA01TP250714165929761jrcGSIB2wOm',
+    template: 'KA01TP250715052324608TTX6PYORFi3',
     memoField: 'memo3',
     keyword: '입금재촉',
     successMessage: '✅입금재촉',
