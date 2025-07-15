@@ -63,7 +63,7 @@ const ALIMTALK_CONFIG = {
   '남자': {
     // 남자가 쿠폰 없이 제출했을 때의 기본값
     DEFAULT: {
-      template: 'KA01TP250707173844176ndkmNlwondi', // 유료 안내 (남자 버전, 필요시 수정)
+      template: 'KA01TP250714105020167Ict4QHWaFYN', // 유료 안내 (남자 버전, 필요시 수정)
       successMessage: '✅입금안내_남',
       variables: (user, formattedDate) => ({
         '#{고객명}': user.name,
