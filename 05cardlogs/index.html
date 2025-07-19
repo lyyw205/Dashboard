@@ -468,17 +468,8 @@
             return;
         }
 
-        // 시작일은 그대로 '한국 시간 기준 해당 날짜의 시작'으로 설정합니다.
-        const startDateKST = new Date(startDateValue + 'T00:00:00');
-        const startDateUTC = startDateKST.toISOString();
-
-        // 종료일은 '선택한 날짜의 다음 날'로 설정해서 '경계선'을 만듭니다.
-        // 이렇게 하면 시간대 계산의 함정을 완벽히 피할 수 있습니다.
-        const tempEndDate = new Date(endDateValue);
-        tempEndDate.setDate(tempEndDate.getDate() + 1); // 선택한 날짜에 +1일
-
-        // '다음 날'의 시작(00:00:00)을 UTC로 변환합니다.
-        const endDateUTC = new Date(tempEndDate.getFullYear(), tempEndDate.getMonth(), tempEndDate.getDate()).toISOString();
+        const startDateForDB = `${startDateValue} 00:00:00+09:00`;
+        const endDateForDB = `${endDateValue} 23:59:59+09:00`;
 
         const selectedChartTypes = Array.from(typeButtonsContainer.querySelectorAll('.type-btn.active')).map(btn => btn.dataset.type);
         const chartTypesToQuery = [...selectedChartTypes];
@@ -500,7 +491,7 @@
         const chartMemoText = memoSearchInput.value.trim();
         
         // 변수 이름을 명확하게 하여 함수 호출
-        await fetchAndRenderChart(startDateUTC, endDateUTC, selectedChartCategories, chartTypesToQuery, chartMemoText);
+        await fetchAndRenderChart(startDateForDB, endDateForDB, selectedChartCategories, chartTypesToQuery, chartMemoText);
     });
 
     // [신규] 테이블 필터링 통합 함수
@@ -517,7 +508,12 @@
       // 2. 각 행을 순회하며 필터 조건 확인
       tableRows.forEach(row => {
         const rowTimeline = row.dataset.timeline;
-        const rowDateStr = rowTimeline ? rowTimeline.slice(0, 10) : ''; // YYYY-MM-DD 형식 추출
+        const rowDateStr = rowTimeline ? new Date(rowTimeline).toLocaleDateString('ko-KR', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            timeZone: 'Asia/Seoul'
+        }).replace(/\. /g, '-').replace('.', '') : '';
         const rowType = row.querySelector('.type-select')?.value;
         const rowCategory = row.querySelector('.category-select')?.value;
         const memoText = row.querySelector('.memo-input')?.value.toLowerCase();
@@ -549,7 +545,7 @@
             .select('category, amount, type')
             .in('type', typesToQuery)
             .gte('timeline', startDate)
-            .lt('timeline', endDate)
+            .lte('timeline', endDate)
             .in('category', categories);
 
         if (memoText) {
@@ -716,7 +712,14 @@
       const DD = String(date.getUTCDate()).padStart(2, '0');
       const hh = String(date.getUTCHours()).padStart(2, '0');
       const mm = String(date.getUTCMinutes()).padStart(2, '0');
-      return `${MM}/${DD} ${hh}:${mm}`;
+      return date.toLocaleString('ko-KR', {
+          month: '2-digit',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: false,
+          timeZone: 'Asia/Seoul'
+      }).replace(/\. /g, '/').replace(' ', ' ');
     }
 
 
@@ -768,7 +771,12 @@
         const selectedCategory = tableCategoryFilter.value;
         const searchText = tableMemoSearch.value.toLowerCase().trim();
         
-        const rowDateStr = row.timeline.slice(0, 10);
+        const rowDateStr = rowTimeline ? new Date(rowTimeline).toLocaleDateString('ko-KR', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            timeZone: 'Asia/Seoul'
+        }).replace(/\. /g, '-').replace('.', '') : '';
 
         let typeMatch = true;
         if (selectedType === '출금') {
@@ -777,7 +785,7 @@
             typeMatch = (row.type === selectedType);
         }
 
-        const dateMatch = (!startDate || rowDateStr >= startDate) && (!endDate || rowDateStr <= endDate);
+        const dateMatch = isDateInRange(rowDateStr, startDate, endDate);
         const categoryMatch = selectedCategory === 'all' || row.category === selectedCategory;
         const memoMatch = (row.memo || '').toLowerCase().includes(searchText);
 
@@ -786,6 +794,13 @@
         }
         
         tbody.prepend(tr);
+    }
+
+    function isDateInRange(rowDateStr, startDate, endDate) {
+        if (!startDate && !endDate) return true;
+        if (startDate && !endDate) return rowDateStr >= startDate;
+        if (!startDate && endDate) return rowDateStr <= endDate;
+        return rowDateStr >= startDate && rowDateStr <= endDate;
     }
 
     async function updateCategory(selectEl) {
