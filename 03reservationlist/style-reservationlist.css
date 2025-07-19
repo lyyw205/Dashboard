@@ -76,8 +76,8 @@ td:nth-child(1) {
 
 th:nth-child(2),
 td:nth-child(2) {
-  width: 10%;
-  min-width: 100px;
+  width: 6%;
+  min-width: 60px;
 }
 
 th:nth-child(3),
