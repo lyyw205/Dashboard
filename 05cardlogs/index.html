@@ -529,6 +529,14 @@
         const categoryMatch = selectedCategory === 'all' || rowCategory === selectedCategory;
         const memoMatch = memoText.includes(searchText);
 
+        console.log('[테이블 필터링 체크]', {
+            "원본(UTC)": rowTimeline,
+            "변환된날짜(KST)": rowDateStr,
+            "필터시작일": startDate,
+            "필터종료일": endDate,
+            "날짜매칭결과": dateMatch
+        });
+
         // 4. 모든 조건이 참일 때만 행을 보여줌
         if (dateMatch && typeMatch && categoryMatch && memoMatch) {
           row.style.display = '';
