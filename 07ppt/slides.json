@@ -2,6 +2,6 @@
   "game": ["01.png", "02.png", "03.png","04.png"],
   "notice": ["01.png", "02.png", "03.png", "04.png", "05.png", "06.png", "07.png"],
   "stick-game": ["01.png","red.png","red1.png","orange.png","orange1.png","yellow.png","yellow1.png","green.png","green1.png","blue.png","blue1.png","navy.png","navy1.png","purple.png","purple1.png"],
-  "balance-game": ["01.png","02.png","03.png","04.png","05.png","06.png","07.png","08.png","09.png"],
+  "balance-game": ["1-1.png","1-2.png","1-3.png","2-1.png","2-2.png","2-3.png","2-4.png","3-1.png","3-2.png","3-3.png","3-4.png","3-5.png","3-6.png","3-7.png"],
   "seat-change": ["01.png"]
 }
