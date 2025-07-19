@@ -468,10 +468,9 @@
             return;
         }
 
-        const startDateKST = new Date(startDateValue + 'T00:00:00');
-        const endDateKST = new Date(endDateValue + 'T23:59:59');
-        const startDateUTC = startDateKST.toISOString();
-        const endDateUTC = endDateKST.toISOString();
+        // ✅ 수정된 부분: 날짜 문자열에 직접 KST 시간대(+09:00) 정보를 추가합니다.
+        const startDateForDB = `${startDateValue} 00:00:00+09:00`;
+        const endDateForDB = `${endDateValue} 23:59:59+09:00`;
 
         const selectedChartTypes = Array.from(typeButtonsContainer.querySelectorAll('.type-btn.active')).map(btn => btn.dataset.type);
         const chartTypesToQuery = [...selectedChartTypes];
@@ -492,47 +491,50 @@
 
         const chartMemoText = memoSearchInput.value.trim();
         
-        // 변수 이름을 명확하게 하여 함수 호출
-        await fetchAndRenderChart(startDateUTC, endDateUTC, selectedChartCategories, chartTypesToQuery, chartMemoText);
+        // ✅ 수정된 부분: KST 시간대 정보가 포함된 문자열을 직접 전달합니다.
+        await fetchAndRenderChart(startDateForDB, endDateForDB, selectedChartCategories, chartTypesToQuery, chartMemoText);
     });
 
-    // [신규] 테이블 필터링 통합 함수
     function applyTableFilters() {
-      // 1. 모든 필터 값 가져오기
-      const startDate = tableStartDate.value;
-      const endDate = tableEndDate.value;
-      const selectedType = tableTypeFilter.value;
-      const selectedCategory = tableCategoryFilter.value;
-      const searchText = tableMemoSearch.value.toLowerCase().trim();
+        const startDate = tableStartDate.value;
+        const endDate = tableEndDate.value;
+        const selectedType = tableTypeFilter.value;
+        const selectedCategory = tableCategoryFilter.value;
+        const searchText = tableMemoSearch.value.toLowerCase().trim();
 
-      const tableRows = document.querySelectorAll('#log-table tbody tr');
+        const tableRows = document.querySelectorAll('#log-table tbody tr');
 
-      // 2. 각 행을 순회하며 필터 조건 확인
-      tableRows.forEach(row => {
-        const rowTimeline = row.dataset.timeline;
-        const rowDateStr = rowTimeline ? rowTimeline.slice(0, 10) : ''; // YYYY-MM-DD 형식 추출
-        const rowType = row.querySelector('.type-select')?.value;
-        const rowCategory = row.querySelector('.category-select')?.value;
-        const memoText = row.querySelector('.memo-input')?.value.toLowerCase();
+        tableRows.forEach(row => {
+            // ✅ 수정된 부분: UTC 시간을 Date 객체로 변환하여 KST 날짜를 정확히 추출
+            const rowTimelineUTC = row.dataset.timeline;
+            let rowKSTDateStr = '';
+            if (rowTimelineUTC) {
+                const dateObj = new Date(rowTimelineUTC);
+                rowKSTDateStr = formatDateForInput(dateObj); // 'YYYY-MM-DD' 형식으로 변환
+            }
+            
+            const rowType = row.querySelector('.type-select')?.value;
+            const rowCategory = row.querySelector('.category-select')?.value;
+            const memoText = row.querySelector('.memo-input')?.value.toLowerCase();
 
-        // 3. 모든 조건이 맞는지 확인
-        let typeMatch = true; // 기본값은 true
-        if (selectedType === '출금') {
-            typeMatch = (rowType === '출금' || rowType === '출금취소');
-        } else if (selectedType !== 'all') {
-            typeMatch = (rowType === selectedType);
-        }
-        const dateMatch = (!startDate || rowDateStr >= startDate) && (!endDate || rowDateStr <= endDate);
-        const categoryMatch = selectedCategory === 'all' || rowCategory === selectedCategory;
-        const memoMatch = memoText.includes(searchText);
+            let typeMatch = true;
+            if (selectedType === '출금') {
+                typeMatch = (rowType === '출금' || rowType === '출금취소');
+            } else if (selectedType !== 'all') {
+                typeMatch = (rowType === 'selectedType');
+            }
 
-        // 4. 모든 조건이 참일 때만 행을 보여줌
-        if (dateMatch && typeMatch && categoryMatch && memoMatch) {
-          row.style.display = '';
-        } else {
-          row.style.display = 'none';
-        }
-      });
+            // ✅ 수정된 부분: KST 기준으로 변환된 날짜로 비교
+            const dateMatch = (!startDate || rowKSTDateStr >= startDate) && (!endDate || rowKSTDateStr <= endDate);
+            const categoryMatch = selectedCategory === 'all' || rowCategory === selectedCategory;
+            const memoMatch = memoText.includes(searchText);
+
+            if (dateMatch && typeMatch && categoryMatch && memoMatch) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
     }
     
     async function fetchAndRenderChart(startDate, endDate, categories, typesToQuery, memoText) {
