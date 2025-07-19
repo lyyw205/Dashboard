@@ -140,7 +140,14 @@ exports.handler = async (event) => {
         .from('responses')
         .select('*')
         .in('id', ids)
-        .or(`${memoFieldToCheck}.not.like.%${keywordToCheck}%,${memoFieldToCheck}.like.%❌${keywordToCheck}%`);
+        .or(
+          // 1. 키워드가 포함되어 있지 않거나
+          `${memoFieldToCheck}.not.like.%${keywordToCheck}%,` + 
+          // 2. 실패 키워드가 포함되어 있거나
+          `${memoFieldToCheck}.like.%❌${keywordToCheck}%,` +
+          // 3. 또는 필드 값이 아예 NULL인 경우 (가장 중요!)
+          `${memoFieldToCheck}.is.null` 
+        );
 
       users = data;
       dbError = error;
