@@ -472,6 +472,14 @@
         const startDateForDB = `${startDateValue} 00:00:00+09:00`;
         const endDateForDB = `${endDateValue} 23:59:59+09:00`;
 
+            // ✅ 로그 추가: DB 조회에 사용될 최종 날짜/시간 값을 콘솔에 출력합니다.
+        console.log("📊 차트 필터링 조회 시작", {
+            "사용자 선택 시작일": startDateValue,
+            "사용자 선택 종료일": endDateValue,
+            "DB 조회 시작일시 (KST)": startDateForDB,
+            "DB 조회 종료일시 (KST)": endDateForDB
+        });
+
         const selectedChartTypes = Array.from(typeButtonsContainer.querySelectorAll('.type-btn.active')).map(btn => btn.dataset.type);
         const chartTypesToQuery = [...selectedChartTypes];
         if (selectedChartTypes.includes('출금') && !chartTypesToQuery.includes('출금취소')) {
