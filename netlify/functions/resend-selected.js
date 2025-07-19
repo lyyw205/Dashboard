@@ -144,7 +144,7 @@ exports.handler = async (event) => {
           // 1. 키워드가 포함되어 있지 않거나
           `${memoFieldToCheck}.not.like.%${keywordToCheck}%,` + 
           // 2. 실패 키워드가 포함되어 있거나
-          `${memoFieldToCheck}.like.%❌${keywordToCheck}%,` +
+          `${memoFieldToCheck}.like.%❌${keywordToCheck}%,` +g
           // 3. 또는 필드 값이 아예 NULL인 경우 (가장 중요!)
           `${memoFieldToCheck}.is.null` 
         );

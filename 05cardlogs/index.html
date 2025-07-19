@@ -468,10 +468,17 @@
             return;
         }
 
+        // 시작일은 그대로 '한국 시간 기준 해당 날짜의 시작'으로 설정합니다.
         const startDateKST = new Date(startDateValue + 'T00:00:00');
-        const endDateKST = new Date(endDateValue + 'T23:59:59');
         const startDateUTC = startDateKST.toISOString();
-        const endDateUTC = endDateKST.toISOString();
+
+        // 종료일은 '선택한 날짜의 다음 날'로 설정해서 '경계선'을 만듭니다.
+        // 이렇게 하면 시간대 계산의 함정을 완벽히 피할 수 있습니다.
+        const tempEndDate = new Date(endDateValue);
+        tempEndDate.setDate(tempEndDate.getDate() + 1); // 선택한 날짜에 +1일
+
+        // '다음 날'의 시작(00:00:00)을 UTC로 변환합니다.
+        const endDateUTC = new Date(tempEndDate.getFullYear(), tempEndDate.getMonth(), tempEndDate.getDate()).toISOString();
 
         const selectedChartTypes = Array.from(typeButtonsContainer.querySelectorAll('.type-btn.active')).map(btn => btn.dataset.type);
         const chartTypesToQuery = [...selectedChartTypes];
@@ -542,7 +549,7 @@
             .select('category, amount, type')
             .in('type', typesToQuery)
             .gte('timeline', startDate)
-            .lte('timeline', endDate)
+            .lt('timeline', endDate)
             .in('category', categories);
 
         if (memoText) {
