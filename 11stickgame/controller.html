@@ -292,69 +292,142 @@
     </div>
   </div>
   <script>
+    // ✅ 1. 나중에 행 개수를 바꾸려면 여기 숫자만 바꾸세요 (예: 10)
+    const numberOfRows = 8;
+    const defaultColors = ['#ff4747', '#fda83f', '#feee39', '#58e83b', '#2937a3', '#000000', '#844ca9', '#ececec'];
+    const defaultTextsA = ['#빨강', '#주황', '#노랑', '#초록', '#남색', '#검정', '#보라', '#선택'];
+    // --- 설정 영역 끝 ---
+
     const inputContainer = document.getElementById("input-container");
 
-    // 10개까지 입력 필드 생성
-    for (let i = 0; i < 8; i++) {
+    // --- UI 생성 ---
+    for (let i = 0; i < numberOfRows; i++) {
       const group = document.createElement("div");
       group.className = "set-group";
+      const currentColor = defaultColors[i] || '#ececec';
+      const currentTextA = defaultTextsA[i] || '';
 
+      // ✅ UI 변경: '고정' 텍스트를 숫자 입력칸으로 교체
       group.innerHTML = `
-        <input type="color" class="color-picker" value="#ececec" />
-        <input type="text" class="color-code" value="#ececec" placeholder="#컬러코드" />
-        <input type="text" class="textA-input" placeholder="색상 (ex. #빨강)" />
+        <label class="lock-label">
+          <input type="checkbox" class="lock-checkbox">
+          <!-- 숫자 입력칸 추가. 처음엔 비활성화 상태 -->
+          <input type="number" class="position-input" min="1" max="${numberOfRows}" disabled>
+        </label>
+        <input type="color" class="color-picker" value="${currentColor}" />
+        <input type="text" class="color-code" value="${currentColor}" placeholder="#컬러코드" />
+        <input type="text" class="textA-input" value="${currentTextA}" placeholder="색상 (ex. #빨강)" />
         <input type="text" class="textB-input" placeholder="키워드 (ex. #궁합)" />
       `;
+      
+      const checkbox = group.querySelector('.lock-checkbox');
+      const positionInput = group.querySelector('.position-input');
 
-      // 동기화: 스포이드 선택 → 텍스트 코드 반영
-      const colorPicker = group.querySelector(".color-picker");
-      const colorCode = group.querySelector(".color-code");
-
-      colorPicker.addEventListener("input", () => {
-        colorCode.value = colorPicker.value;
-      });
-
-      // 동기화: 텍스트 입력 → 스포이드 색 반영
-      colorCode.addEventListener("input", () => {
-        if (/^#([0-9A-Fa-f]{6})$/.test(colorCode.value)) {
-          colorPicker.value = colorCode.value;
+      // ✅ 이벤트 추가: 체크박스를 누를 때마다 숫자 입력칸을 활성화/비활성화
+      checkbox.addEventListener('change', () => {
+        positionInput.disabled = !checkbox.checked;
+        if (!checkbox.checked) {
+          positionInput.value = ''; // 체크 해제 시 입력값 초기화
         }
       });
 
+      const colorPicker = group.querySelector(".color-picker");
+      const colorCode = group.querySelector(".color-code");
+      colorPicker.addEventListener("input", () => { colorCode.value = colorPicker.value; });
+      colorCode.addEventListener("input", () => { if (/^#([0-9A-Fa-f]{6})$/.test(colorCode.value)) { colorPicker.value = colorCode.value; } });
+      
       inputContainer.appendChild(group);
     }
 
+    // ✅ startPPT 함수 로직을 완전히 새로 작성합니다.
     function startPPT() {
+      // 1. 모든 입력값 (색상, 텍스트, 체크상태, 순서)을 가져옵니다.
       const colors = [...document.querySelectorAll(".color-code")].map(input => input.value);
       const textsA = [...document.querySelectorAll(".textA-input")].map(input => input.value);
       const textsB = [...document.querySelectorAll(".textB-input")].map(input => input.value);
+      const lockStates = [...document.querySelectorAll(".lock-checkbox")].map(input => input.checked);
+      const positions = [...document.querySelectorAll(".position-input")].map(input => parseInt(input.value, 10));
 
-      const slideSets = [];
-
-      for (let i = 0; i < colors.length; i++) {
-        if (textsA[i].trim() && textsB[i].trim()) {
-          slideSets.push([
-            { bg: colors[i], text: textsA[i] },
-            { bg: colors[i], text: textsB[i] }
-          ]);
+      const totalRows = numberOfRows;
+      const finalSets = new Array(totalRows).fill(null);
+      const unlockedSets = [];
+      
+      // 2. [매우 중요] 순서 유효성 검사 (중복 및 범위 확인)
+      const claimedPositions = new Set();
+      for (let i = 0; i < totalRows; i++) {
+        if (lockStates[i]) { // 고정 체크된 항목만 검사
+          const pos = positions[i];
+          if (isNaN(pos) || pos < 1 || pos > totalRows) {
+            alert(`오류: ${i + 1}번째 행의 순서는 1과 ${totalRows} 사이의 숫자여야 합니다.`);
+            return;
+          }
+          if (claimedPositions.has(pos)) {
+            alert(`오류: 순서 ${pos}번이 중복으로 지정되었습니다. 하나의 순서에는 하나의 행만 고정할 수 있습니다.`);
+            return;
+          }
+          claimedPositions.add(pos);
         }
       }
 
-      if (!slideSets.length) {
+      // 3. 유효성 검사 통과 후, 슬라이드 배치 시작
+      for (let i = 0; i < totalRows; i++) {
+        if (textsA[i].trim() && textsB[i].trim()) {
+          const slideSet = [
+            { bg: colors[i], text: textsA[i] },
+            { bg: colors[i], text: textsB[i] }
+          ];
+
+          if (lockStates[i]) {
+            // 사용자가 입력한 순서(1-based)를 배열 인덱스(0-based)로 변환
+            const targetIndex = positions[i] - 1;
+            finalSets[targetIndex] = slideSet;
+          } else {
+            unlockedSets.push(slideSet);
+          }
+        }
+      }
+
+      // 4. 나머지 로직은 이전과 동일 (랜덤 세트 섞고, 빈자리에 채우기)
+      const shuffledUnlocked = unlockedSets.sort(() => Math.random() - 0.5);
+      
+      let unlockedIndex = 0;
+      for (let i = 0; i < finalSets.length; i++) {
+        if (finalSets[i] === null) {
+          if (unlockedIndex < shuffledUnlocked.length) {
+            finalSets[i] = shuffledUnlocked[unlockedIndex];
+            unlockedIndex++;
+          }
+        }
+      }
+
+      // ✅ --- 이 부분이 핵심 수정사항입니다 --- ✅
+
+      // 5. 유효한 세트(null이 아닌 것)만 먼저 필터링합니다.
+      const validSets = finalSets.filter(set => set !== null);
+
+      // 6. 각 세트 사이에 검은색 슬라이드를 추가하여 최종 슬라이드 목록을 만듭니다.
+      const slidesToSend = validSets.flatMap((set, index) => {
+        // 검은색 빈 슬라이드 객체 정의
+        const blackSlide = { bg: '#000000', text: '' };
+
+        // 현재 세트가 마지막 세트가 아니라면, 세트 뒤에 검은 슬라이드를 추가합니다.
+        if (index < validSets.length - 1) {
+          return [...set, blackSlide]; // ex: [색상슬라이드, 키워드슬라이드, 검은슬라이드]
+        } else {
+          // 마지막 세트라면, 검은 슬라이드를 추가하지 않습니다.
+          return set;
+        }
+      });
+      // --- ✅ 수정 끝 --- ✅
+      
+      if (slidesToSend.length === 0) {
         alert("유효한 슬라이드 조합이 없습니다.");
         return;
       }
 
-      // 슬라이드 세트 랜덤 섞기
-      const shuffled = slideSets
-        .map(set => ({ set, sort: Math.random() }))
-        .sort((a, b) => a.sort - b.sort)
-        .flatMap(item => item.set); // 세트 내 순서는 유지하면서 펼치기
-
-      // 디스플레이 페이지 오픈 및 데이터 전송
       const displayWindow = window.open("display.html", "display", "width=1000,height=700");
       setTimeout(() => {
-        displayWindow.postMessage({ type: "colorppt", slides: shuffled }, "*");
+        displayWindow.postMessage({ type: "colorppt", slides: slidesToSend }, "*");
       }, 500);
     }
   </script>

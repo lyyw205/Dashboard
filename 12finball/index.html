@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>룰렛 게임</title>
+  <!-- 룰렛 전용 CSS 파일 링크 -->
+  <link rel="stylesheet" href="roulette.css" /> 
+  <!-- 공통 사이드바 CSS 파일 링크 -->
+  <link rel="stylesheet" href="../common/sidebar.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
+</head>
+<body>
+  <div id="sidebar-placeholder"></div>
+
+      <!-- ✅ 메인 컨텐츠 영역 -->
+  <div class="main-content container-fluid px-4 mt-5">
+    <div class="roulette-wrapper d-flex flex-column mt-5 mt-md-0 mb-3">
+      <!-- ✅ 이 부분을 수정합니다 -->
+      <div class="header-with-button">
+        <h2 class="mb-0">🎡 룰렛 게임</h2>
+          <button id="fullscreen-btn" class="btn btn-primary">
+            <span id="fullscreen-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrows-fullscreen" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M5.828 10.172a.5.5 0 0 0-.707 0l-4.096 4.096V11.5a.5.5 0 0 0-1 0v3.975a.5.5 0 0 0 .5.5H4.5a.5.5 0 0 0 0-1H1.732l4.096-4.096a.5.5 0 0 0 0-.707m4.344 0a.5.5 0 0 1 .707 0l4.096 4.096V11.5a.5.5 0 0 1 1 0v3.975a.5.5 0 0 1-.5.5H11.5a.5.5 0 0 1 0-1h2.768l-4.096-4.096a.5.5 0 0 1 0-.707m0-4.344a.5.5 0 0 0 .707 0l4.096-4.096V4.5a.5.5 0 1 0 1 0V.525a.5.5 0 0 0-.5-.5H11.5a.5.5 0 0 0 0 1h2.768l-4.096 4.096a.5.5 0 0 0 0 .707m-4.344 0a.5.5 0 0 1-.707 0L1.025 1.732V4.5a.5.5 0 0 1-1 0V.525a.5.5 0 0 1 .5-.5H4.5a.5.5 0 0 1 0 1H1.732l4.096 4.096a.5.5 0 0 1 0 .707"/>
+              </svg>
+            </span>
+            <span id="fullscreen-text">전체 화면</span>
+          </button>
+      </div>
+      
+      <div class="iframe-container">
+        <iframe 
+          src="https://lazygyu.github.io/roulette/"
+          class="roulette-iframe"
+          id="roulette-iframe" 
+          title="룰렛 게임 실행 화면">
+        </iframe>
+      </div>
+      <!-- ✅ 로고를 iframe-container 바깥으로 옮깁니다. -->
+      <div id="logo-overlay">
+        <img src="../assets/가리개.png" alt="로고">
+        <button id="close-logo-btn">×</button>
+      </div>
+
+    </div>
+  </div>
+  <!-- 공통 스크립트 (기존과 동일) -->
+  <script src="../common/sidebar.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q" crossorigin="anonymous"></script>
+  <script>
+    const fullscreenBtn = document.getElementById('fullscreen-btn');
+    const iframeContainer = document.querySelector('.iframe-container');
+    const body = document.body;
+    
+    const fullscreenIcon = document.getElementById('fullscreen-icon');
+    const fullscreenText = document.getElementById('fullscreen-text');
+
+    const logoOverlay = document.getElementById('logo-overlay');
+    const closeLogoBtn = document.getElementById('close-logo-btn');
+
+    const enterFullscreenIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrows-fullscreen" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M5.828 10.172a.5.5 0 0 0-.707 0l-4.096 4.096V11.5a.5.5 0 0 0-1 0v3.975a.5.5 0 0 0 .5.5H4.5a.5.5 0 0 0 0-1H1.732l4.096-4.096a.5.5 0 0 0 0-.707m4.344 0a.5.5 0 0 1 .707 0l4.096 4.096V11.5a.5.5 0 0 1 1 0v3.975a.5.5 0 0 1-.5.5H11.5a.5.5 0 0 1 0-1h2.768l-4.096-4.096a.5.5 0 0 1 0-.707m0-4.344a.5.5 0 0 0 .707 0l4.096-4.096V4.5a.5.5 0 1 0 1 0V.525a.5.5 0 0 0-.5-.5H11.5a.5.5 0 0 0 0 1h2.768l-4.096 4.096a.5.5 0 0 0 0 .707m-4.344 0a.5.5 0 0 1-.707 0L1.025 1.732V4.5a.5.5 0 0 1-1 0V.525a.5.5 0 0 1 .5-.5H4.5a.5.5 0 0 1 0 1H1.732l4.096 4.096a.5.5 0 0 1 0 .707"/></svg>`;
+    const exitFullscreenIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-fullscreen-exit" viewBox="0 0 16 16"><path d="M5.5 0a.5.5 0 0 1 .5.5v4A.5.5 0 0 1 5 5h-4a.5.5 0 0 1 0-1h3.5V.5a.5.5 0 0 1 .5-.5m-5 10a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1H1.5v3.5a.5.5 0 0 1-1 0zM10 .5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0V1.5h-3.5a.5.5 0 0 1-.5-.5M10.5 10a.5.5 0 0 1 .5.5v3.5h3.5a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5v-4a.5.5 0 0 1 .5-.5"/></svg>`;
+
+    fullscreenBtn.addEventListener('click', () => {
+      iframeContainer.classList.toggle('fullscreen-mode');
+      body.classList.toggle('fullscreen-active');
+      
+      if (iframeContainer.classList.contains('fullscreen-mode')) {
+        fullscreenIcon.innerHTML = exitFullscreenIcon;
+        fullscreenText.textContent = '전체 화면 종료';
+        // 전체 화면 진입 시, 이전에 X로 껐더라도 다시 보이게 함
+        logoOverlay.classList.remove('hidden');
+      } else {
+        fullscreenIcon.innerHTML = enterFullscreenIcon;
+        fullscreenText.textContent = '전체 화면';
+      }
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && iframeContainer.classList.contains('fullscreen-mode')) {
+        fullscreenBtn.click();
+      }
+    });
+
+        // Esc 키를 눌렀을 때도 버튼을 클릭한 것처럼 동작하여 모드를 종료합니다.
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && iframeContainer.classList.contains('fullscreen-mode')) {
+        fullscreenBtn.click();
+      }
+    });
+
+    closeLogoBtn.addEventListener('click', (event) => {
+      event.stopPropagation();
+      logoOverlay.classList.add('hidden');
+    });
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q" crossorigin="anonymous"></script>
+</body>
+</html>

@@ -4,6 +4,11 @@ body {
   margin: 0;
 }
 
+h3 {
+    font-family: 'Pretendard', sans-serif;
+    font-size: 14px;
+}
+
 .ppt-main {
   display: flex;
   flex-direction: row;
@@ -68,28 +73,33 @@ body {
   color: #333;
   background: none;
   font-weight: bold;
+  font-size: 14px;
+  font-family: 'Pretendard', sans-serif;
 }
 
 #selected-slides {
-  display: flex;
-  flex-direction: row;
-  height: 200px;
-  gap: 20px;
-  max-width: 90%;            /* ✅ 전체 화면 폭까지 사용 */
-  overflow-x: auto;           /* ✅ 가로 스크롤 활성화 */
+  /* --- 외형 스타일 --- */
+  background-color: #f8f9fa;  /* 연한 회색 배경 */
+  border: 1px solid #e9ecef;     /* 얇은 테두리 */
+  border-radius: 12px;         /* 둥근 모서리 */
+  min-height: 150px;           /* 내용이 없어도 최소 높이 유지 */
+  padding: 1rem;
+  margin-bottom: 2rem;
+
+  /* --- 내부 썸네일 정렬 스타일 --- */
+  display: flex;        /* 내부 아이템을 가로로 정렬 */
+  flex-wrap: wrap;      /* 아이템이 많아지면 줄바꿈 */
+  gap: 12px;            /* 썸네일 사이의 간격 */
+  align-content: flex-start; /* 아이템이 적을 때 위쪽으로 정렬 */
+
+  /* --- 가로 스크롤 관련 (이전과 동일) --- */
+  overflow-x: auto;
   overflow-y: hidden;
-  white-space: nowrap;        /* ✅ 줄바꿈 방지 */
-  padding: 30px 20px 10px 20px;
-  background-color: #f3f3f3;
-  border: 1px solid #ececec;
-  border-radius: 20px;
-  margin-bottom: 30px;
 }
 
 #all-sets {
-  width: 90%;               /* 🔒 뷰포트 기준으로 고정 */
-  overflow-x: hidden;         /* 🔒 내부는 스크롤 안 생기게 */
-  box-sizing: border-box;
+  /* 이전에 여기에 border, background-color 등이 있었다면 모두 제거합니다. */
+  width: 90%; /* 화면 너비에 맞춤 */
 }
 
 .slide-thumb {
@@ -123,20 +133,44 @@ body {
 /* 🧼 WebKit 기반 브라우저용 (Chrome, Edge, Safari 등) */
 #selected-slides::-webkit-scrollbar {
   height: 8px;
-  margin-top: 6px;              /* ✅ 직접 안 먹히므로 padding으로 대신 처리 */
 }
-
 #selected-slides::-webkit-scrollbar-track {
   background: transparent;
-  margin: 0 12px;              /* ✅ 좌우 양 끝 좁히기 */
+  margin: 0 12px;
 }
-
 #selected-slides::-webkit-scrollbar-thumb {
   background-color: #aaa;
   border-radius: 10px;
-  margin-top: 6px;
 }
-
 #selected-slides::-webkit-scrollbar-thumb:hover {
   background-color: #666;
+}
+
+.slide-thumb {
+  cursor: grab;
+  transition: opacity 0.2s ease-in-out;
+  position: relative; /* 자식 요소의 절대 위치 기준이 됨 */
+}
+
+/* 드래그 중인 항목의 스타일 */
+.slide-thumb.dragging {
+  opacity: 0.4;
+  cursor: grabbing;
+}
+
+/* 
+  ✅ 'drag-over' 관련 클래스들은 더 이상 필요 없으므로 삭제해도 됩니다.
+  (.slide-thumb.drag-over-top, .slide-thumb.drag-over-bottom)
+*/
+
+/* ✅ 파란색 세로 라인 인디케이터의 스타일 */
+#drop-indicator {
+  position: absolute;
+  width: 4px; /* 라인 두께 */
+  background-color: #0d6efd; /* 파란색 */
+  border-radius: 2px;
+  display: none; /* 평소에는 숨겨 둠 */
+  pointer-events: none; /* [매우 중요] 인디케이터가 마우스 이벤트를 방해하지 않도록 함 */
+  z-index: 10;
+  transition: all 0.1s ease; /* 부드러운 이동 효과 */
 }

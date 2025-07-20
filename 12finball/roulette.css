@@ -1,0 +1,116 @@
+/* roulette.css 파일 전체를 아래 코드로 교체해주세요. */
+
+body {
+  font-family: 'Pretendard', sans-serif;
+  background-color: #f9f9fb;
+  margin: 0;
+}
+
+.sidebar-wrapper, /* 이 클래스는 HTML에 없으므로 roulette-main으로 대체합니다 */
+.roulette-main {
+  display: flex;
+  flex-direction: row;
+  min-height: 100vh;
+}
+
+.main-content { /* 이 클래스를 추가하여 메인 영역을 지정합니다. */
+  width: 100%;
+}
+
+.roulette-wrapper {
+  width: 100%;
+}
+
+.header-with-button {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.iframe-container {
+  position: relative;
+  width: 100%;
+  padding-top: 75%; 
+  height: 0;
+  overflow: hidden;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease-in-out;
+}
+
+.roulette-iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+/* --- 가짜 전체 화면 모드 스타일 --- */
+
+.iframe-container.fullscreen-mode {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  padding-top: 0;
+  z-index: 1000;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+body.fullscreen-active .sidebar,
+body.fullscreen-active .mobile-navbar {
+  display: none !important;
+}
+
+/* --- 로고 오버레이 최종 수정 코드 --- */
+
+#logo-overlay {
+  /* 1. 평소에는 숨겨 둠 */
+  display: none;
+  
+  /* 2. ✅ position을 'fixed'로 변경하여 화면에 고정 */
+  position: fixed;
+  bottom: 184px;
+  left: 16px;
+  z-index: 2000; /* 모든 요소 중 가장 위에 표시 */
+}
+
+/* 3. ✅ body의 클래스를 기준으로 로고를 보여주도록 선택자 변경 */
+body.fullscreen-active #logo-overlay {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* X버튼으로 숨기기 위한 규칙 */
+#logo-overlay.hidden {
+  display: none !important;
+}
+
+/* 로고 이미지 및 닫기 버튼 스타일 */
+#logo-overlay img {
+  height: 60px;
+  width: auto;
+}
+
+#close-logo-btn {
+  background: rgba(0, 0, 0, 0.4);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  font-size: 20px;
+  font-weight: bold;
+  line-height: 22px;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

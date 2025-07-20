@@ -1,38 +1,40 @@
-  body {
-    font-family: 'Pretendard', sans-serif;
-    background: #f9f9fb;
-    margin: 0;
-  }
+body {
+  font-family: 'Pretendard', sans-serif;
+  background: #f9f9fb;
+  margin: 0;
+}
 
-  .stickgame-wrapper {
-    display: flex;
-    flex-direction: row;
-    min-height: 100vh;
+.stickgame-wrapper {
+  display: flex;
+  flex-direction: row;
+  min-height: 100vh;
 
-  }
+}
 
-  .game-wrapper {
-    display: flex;
-    flex-direction: column;
-  }
+.game-wrapper {
+  display: flex;
+  flex-direction: column;
+}
 
-  .ppt-start-button {
-    width: 200px;
-    font-weight: bold;
-  }
+.ppt-start-button {
+  width: 200px;
+  font-weight: bold;
+}
 
-  h2 {
-    margin-bottom: 30px;
-    font-size: 22px;
-    color: #333;
-    white-space: nowrap;
-  }
+h2 {
+  margin-bottom: 30px;
+  font-size: 22px;
+  color: #333;
+  white-space: nowrap;
+}
 
-  #input-container {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
+#input-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+
 
 .set-group {
   display: flex;

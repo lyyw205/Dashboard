@@ -289,24 +289,51 @@
         <h2 class="mb-3 mb-md-3">📑 PPT 슬라이드 컨트롤러</h2>
         <button onclick="startPPT()" class="ppt-start-button"><span class="ppt-start-text">PPT 시작하기</span></button>
         <h3>✅ 선택된 슬라이드</h3>
-        <div id="selected-slides"></div>
+        <div id="selected-slides">
+          <div id="drop-indicator"></div>
+        </div>
         <div class="slide-list" id="all-sets"></div>
       </div>
     </div>
   </div>
 
   <script>
+    // ✅ 1. displayWindow는 전역 변수로 유지합니다.
     let displayWindow = null;
     const selectedSlides = [];
     const slideItemsMap = {};
 
+    // ✅ 2. startPPT 함수를 수정합니다.
     function startPPT() {
       if (!selectedSlides.length) return alert("선택된 슬라이드가 없습니다.");
-      displayWindow = window.open("display.html", "display", "width=1000,height=700");
-      setTimeout(() => {
+
+      // 이미 창이 열려있고 닫히지 않았다면,
+      if (displayWindow && !displayWindow.closed) {
+        displayWindow.focus(); // 창을 앞으로 가져오고
+        // 이미 준비된 창이므로 데이터를 즉시 보냅니다.
         displayWindow.postMessage({ type: "slides", slides: selectedSlides }, "*");
-      }, 500);
+      } else {
+        // 새 창을 엽니다. 데이터는 아직 보내지 않습니다.
+        displayWindow = window.open("display.html", "display", "width=1000,height=700");
+      }
+      // 기존의 setTimeout 로직은 제거됩니다.
     }
+    
+    // ✅ 3. 'display_ready' 메시지를 수신하는 이벤트 리스너를 추가합니다.
+    window.addEventListener('message', function(event) {
+      // display.html로부터 "준비 완료" 신호가 왔는지 확인
+      if (event.data && event.data.type === 'display_ready') {
+        console.log("Display 페이지 준비 완료! 슬라이드 데이터를 전송합니다.");
+        
+        // displayWindow가 유효하고, 보낼 데이터가 있을 때만 전송
+        if (displayWindow && !displayWindow.closed && selectedSlides.length > 0) {
+          displayWindow.postMessage({ type: "slides", slides: selectedSlides }, "*");
+        }
+      }
+    });
+
+
+    // --- 아래의 다른 함수들은 수정할 필요가 없습니다 ---
 
     function makeSlideItem(src, labelText) {
       const li = document.createElement("li");
@@ -322,75 +349,121 @@
       li.appendChild(img);
       li.appendChild(label);
 
-      // 🧠 선택된 이미지 토글 가능하게
       li.onclick = () => {
         const index = selectedSlides.indexOf(src);
         if (index !== -1) {
           selectedSlides.splice(index, 1);
           li.classList.remove("selected");
-          renderSelectedSlides();
         } else {
           selectedSlides.push(src);
           li.classList.add("selected");
-          renderSelectedSlides();
         }
+        renderSelectedSlides();
       };
 
-      slideItemsMap[src] = li; // 슬라이드 항목 추적용
-
+      slideItemsMap[src] = li;
       return li;
     }
 
     function addToSelected(src) {
       if (!selectedSlides.includes(src)) {
         selectedSlides.push(src);
-        slideItemsMap[src]?.classList.add("selected"); // ✅ 선택 표시 추가
+        slideItemsMap[src]?.classList.add("selected");
         renderSelectedSlides();
       }
     }
 
     function renderSelectedSlides() {
       const container = document.getElementById("selected-slides");
-      container.innerHTML = "";
+      // ✅ 인디케이터를 제외한 기존 썸네일들만 먼저 삭제
+      container.querySelectorAll('.slide-thumb').forEach(thumb => thumb.remove());
+
+      const dropIndicator = document.getElementById('drop-indicator');
+
       selectedSlides.forEach((src, index) => {
         const div = document.createElement("div");
         div.className = "slide-thumb";
         div.draggable = true;
 
+        // ... img, btn 생성 및 추가 로직 (이전과 동일) ...
         const img = document.createElement("img");
         img.src = src;
-
         const btn = document.createElement("button");
         btn.textContent = "x";
         btn.className = "remove-btn";
         btn.onclick = (e) => {
           e.stopPropagation();
           selectedSlides.splice(index, 1);
-
-          // ✅ slide-list에 있는 해당 항목의 선택 표시 제거
           if (slideItemsMap[src]) {
             slideItemsMap[src].classList.remove("selected");
           }
-
           renderSelectedSlides();
         };
-
         div.appendChild(img);
         div.appendChild(btn);
-
+        // ... img, btn 로직 끝 ...
+        
+        // --- ✅ 드래그 앤 드롭 이벤트 핸들러 전체 수정 ---
         div.ondragstart = (e) => {
           e.dataTransfer.setData("index", index);
+          setTimeout(() => div.classList.add("dragging"), 0);
         };
 
-        div.ondragover = (e) => e.preventDefault();
+        div.ondragend = () => {
+          div.classList.remove("dragging");
+          // 드래그가 끝나면 인디케이터를 무조건 숨김
+          dropIndicator.style.display = 'none';
+        };
+
+        div.ondragover = (e) => {
+          e.preventDefault();
+          // 인디케이터를 보여줌
+          dropIndicator.style.display = 'block';
+
+          // 마우스 위치 계산
+          const rect = div.getBoundingClientRect();
+          const midX = rect.left + rect.width / 2;
+
+          // 인디케이터의 높이와 세로 위치 설정
+          dropIndicator.style.height = `${div.offsetHeight}px`;
+          dropIndicator.style.top = `${div.offsetTop}px`;
+          
+          // 마우스가 왼쪽 절반에 있으면 요소의 왼쪽에, 아니면 오른쪽에 라인 표시
+          if (e.clientX < midX) {
+            dropIndicator.style.left = `${div.offsetLeft - 2}px`; // -2는 라인 두께의 절반
+          } else {
+            dropIndicator.style.left = `${div.offsetLeft + div.offsetWidth - 2}px`;
+          }
+        };
+
         div.ondrop = (e) => {
-          const from = e.dataTransfer.getData("index");
-          const to = index;
-          const moved = selectedSlides.splice(from, 1)[0];
-          selectedSlides.splice(to, 0, moved);
+          e.preventDefault();
+          // 드롭 후 인디케이터 숨김
+          dropIndicator.style.display = 'none';
+
+          const fromIndex = parseInt(e.dataTransfer.getData("index"), 10);
+          let toIndex = index;
+
+          // 마우스 위치를 다시 계산하여 최종 드롭 위치 결정
+          const rect = div.getBoundingClientRect();
+          const midX = rect.left + rect.width / 2;
+          
+          // 마우스가 오른쪽 절반에 드롭되었다면, 삽입 위치는 해당 요소의 '다음'
+          if (e.clientX > midX) {
+            toIndex++;
+          }
+          
+          if (fromIndex === toIndex) return;
+
+          const movedItem = selectedSlides.splice(fromIndex, 1)[0];
+          if (fromIndex < toIndex) {
+            toIndex--;
+          }
+          selectedSlides.splice(toIndex, 0, movedItem);
           renderSelectedSlides();
         };
 
+        // container에 자식으로 추가할 때, 인디케이터보다 앞에 추가
         container.appendChild(div);
       });
     }
@@ -412,6 +485,7 @@
           container.appendChild(ul);
         });
       });
+    
   </script>
   <script src="/common/sidebar.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q" crossorigin="anonymous"></script>
