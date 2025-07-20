@@ -195,7 +195,7 @@ async function fetchData() {
     const aIsPast = aDate < today ? 1 : 0;
     const bIsPast = bDate < today ? 1 : 0;
     
-    return aIsPast - bIsPast || aDate - bDate;
+    return aIsPast - bIsPast || bDate - aDate;
   });
 
   renderTabs(sortedDates);

@@ -34,7 +34,27 @@ h2 {
   gap: 12px;
 }
 
+.use-manual {
+  background-color: #eeeeee;
+  border-radius: 30px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
 
+.use-manual-title,
+.use-manual-text {
+  font-family: 'Pretendard', sans-serif;
+}
+
+.use-manual-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 5px;
+}
+
+.use-manual-text {
+  font-size: 15px;
+}
 
 .set-group {
   display: flex;
