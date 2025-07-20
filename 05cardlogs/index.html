@@ -416,12 +416,25 @@
     const tableCategoryFilter = document.getElementById('table-category-filter');
     const tableMemoSearch = document.getElementById('table-memo-search');
 
-    // [신규] Date 객체를 'YYYY-MM-DD' 형식으로 변환하는 함수
-    function formatDateForInput(date) {
-      const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, '0');
-      const day = String(date.getDate()).padStart(2, '0');
-      return `${year}-${month}-${day}`;
+    function formatDateForInput(input) {
+      // 1. 입력값이 없는 경우, 에러 방지를 위해 빈 문자열 반환
+      if (!input) return '';
+
+      // 2. 입력값이 Date 객체인 경우 (setDefaultDateRange에서 호출될 때)
+      if (input instanceof Date) {
+        // toISOString()을 사용하면 'YYYY-MM-DDTHH:...' 형식이 되므로,
+        // 앞 10자리를 잘라 'YYYY-MM-DD'를 반환합니다. 이 방법이 가장 안전합니다.
+        return input.toISOString().slice(0, 10);
+      }
+
+      // 3. 입력값이 문자열인 경우 (applyTableFilters에서 호출될 때)
+      if (typeof input === 'string' && input.length >= 10) {
+        // 문자열의 앞 10자리를 잘라 'YYYY-MM-DD'를 반환합니다.
+        return input.substring(0, 10);
+      }
+      
+      // 4. 그 외의 모든 예외적인 경우
+      return '';
     }
 
     // [신규] 기본 날짜 범위(오늘 ~ 2주 전)를 설정하는 함수
@@ -460,24 +473,26 @@
     });
 
     filterBtn.addEventListener('click', async () => {
-        const startDateValue = startDateInput.value;
-        const endDateValue = endDateInput.value;
+        const startDateValue = startDateInput.value; // 예: "2025-07-19"
+        const endDateValue = endDateInput.value;   // 예: "2025-07-20"
 
         if (!startDateValue || !endDateValue) {
             alert('시작일과 종료일을 모두 선택해주세요.');
             return;
         }
 
-        // ✅ 수정된 부분: 날짜 문자열에 직접 KST 시간대(+09:00) 정보를 추가합니다.
-        const startDateForDB = `${startDateValue} 00:00:00+09:00`;
-        const endDateForDB = `${endDateValue} 23:59:59+09:00`;
+        // [✅ 이렇게 수정됩니다]
+        // new Date()와 .toISOString()을 모두 제거합니다.
+        // 사용자가 선택한 날짜 문자열에 시간 정보만 붙여서 DB로 보낼 문자열을 만듭니다.
+        // 이렇게 하면 시간대 변환이 전혀 일어나지 않습니다.
+        const startDateForDB = `${startDateValue} 00:00:00`;
+        const endDateForDB = `${endDateValue} 23:59:59`;
 
-            // ✅ 로그 추가: DB 조회에 사용될 최종 날짜/시간 값을 콘솔에 출력합니다.
-        console.log("📊 차트 필터링 조회 시작", {
+        console.log("📊 차트 필터링 조회 시작 (시간대 변환 없음)", {
             "사용자 선택 시작일": startDateValue,
             "사용자 선택 종료일": endDateValue,
-            "DB 조회 시작일시 (KST)": startDateForDB,
-            "DB 조회 종료일시 (KST)": endDateForDB
+            "DB 조회 시작일시": startDateForDB,
+            "DB 조회 종료일시": endDateForDB
         });
 
         const selectedChartTypes = Array.from(typeButtonsContainer.querySelectorAll('.type-btn.active')).map(btn => btn.dataset.type);
@@ -499,7 +514,7 @@
 
         const chartMemoText = memoSearchInput.value.trim();
         
-        // ✅ 수정된 부분: KST 시간대 정보가 포함된 문자열을 직접 전달합니다.
+        // 생성된 'YYYY-MM-DD HH:mm:ss' 형식의 문자열을 그대로 전달합니다.
         await fetchAndRenderChart(startDateForDB, endDateForDB, selectedChartCategories, chartTypesToQuery, chartMemoText);
     });
 
@@ -513,32 +528,36 @@
         const tableRows = document.querySelectorAll('#log-table tbody tr');
 
         tableRows.forEach(row => {
-            // ✅ 수정된 부분: UTC 시간을 Date 객체로 변환하여 KST 날짜를 정확히 추출
+            // 1. row에 저장된 UTC 시간(ISO 문자열)을 가져온다.
             const rowTimelineUTC = row.dataset.timeline;
-            let rowKSTDateStr = '';
-            if (rowTimelineUTC) {
-                const dateObj = new Date(rowTimelineUTC);
-                rowKSTDateStr = formatDateForInput(dateObj); // 'YYYY-MM-DD' 형식으로 변환
+            if (!rowTimelineUTC) { // timeline 데이터가 없는 row는 무시
+                row.style.display = 'none';
+                return;
             }
+
+            // 2. UTC 문자열로 KST 기준의 Date 객체를 생성한다.
+            const rowKSTDateStr = formatDateForInput(rowTimelineUTC);
             
             const rowType = row.querySelector('.type-select')?.value;
             const rowCategory = row.querySelector('.category-select')?.value;
-            const memoText = row.querySelector('.memo-input')?.value.toLowerCase();
+            const memoText = (row.querySelector('.memo-input')?.value || '').toLowerCase();
 
+            // 필터 조건 검사
+            const dateMatch = (!startDate || rowKSTDateStr >= startDate) && (!endDate || rowKSTDateStr <= endDate);
+            
             let typeMatch = true;
             if (selectedType === '출금') {
                 typeMatch = (rowType === '출금' || rowType === '출금취소');
             } else if (selectedType !== 'all') {
-                typeMatch = (rowType === 'selectedType');
+                typeMatch = (rowType === selectedType);
             }
 
-            // ✅ 수정된 부분: KST 기준으로 변환된 날짜로 비교
-            const dateMatch = (!startDate || rowKSTDateStr >= startDate) && (!endDate || rowKSTDateStr <= endDate);
             const categoryMatch = selectedCategory === 'all' || rowCategory === selectedCategory;
             const memoMatch = memoText.includes(searchText);
 
+            // 최종적으로 보여줄지 말지 결정
             if (dateMatch && typeMatch && categoryMatch && memoMatch) {
-                row.style.display = '';
+                row.style.display = ''; // 테이블의 기본 tr display 속성으로 복원
             } else {
                 row.style.display = 'none';
             }
@@ -694,7 +713,7 @@
       const { data, error } = await supa
         .from('card_logs')
         .select('*')
-        .order('timeline', { ascending: false });
+        .order('timeline', { ascending: true });
 
       if (error) {
         console.error('초기 로드 오류:', error);
@@ -704,9 +723,12 @@
       const tbody = document.querySelector('#log-table tbody');
       tbody.innerHTML = '';
 
-      data.reverse().forEach(row => {
-        appendRow(row);
+      data.forEach(row => { // reverse()를 제거하고 forEach로 변경
+        appendRow(row);     // appendRow는 이제 prepend로 동작하므로 순서가 맞음
       });
+      
+      // 모든 데이터를 DOM에 추가한 후, 마지막에 필터를 한번 전체 적용
+      applyTableFilters(); 
     }
 
     function formatNumber(num) {
@@ -714,18 +736,22 @@
     } 
 
     function formatDateCompact(dateString) {
-      const date = new Date(dateString); // ISO 형식 → Date 객체
-      const MM = String(date.getUTCMonth() + 1).padStart(2, '0');
-      const DD = String(date.getUTCDate()).padStart(2, '0');
-      const hh = String(date.getUTCHours()).padStart(2, '0');
-      const mm = String(date.getUTCMinutes()).padStart(2, '0');
-      return `${MM}/${DD} ${hh}:${mm}`;
+      if (!dateString || dateString.length < 16) return '';
+
+      // "2025-07-19T18:54:00+00:00" 형태의 문자열을 가정
+      const month = dateString.substring(5, 7);
+      const day = dateString.substring(8, 10);
+      const hour = dateString.substring(11, 13);
+      const minute = dateString.substring(14, 16);
+
+      return `${month}/${day} ${hour}:${minute}`;
     }
 
 
     function appendRow(row) {
         const tbody = document.querySelector('#log-table tbody');
         const tr = document.createElement('tr');
+        // KST/UTC 혼동을 막기 위해 기준이 되는 UTC 시간을 data 속성에 저장
         tr.dataset.timeline = row.timeline;
 
         const categoryOptions = categories.map(cat =>
@@ -734,6 +760,7 @@
         const typeOptions = ['출금', '입금', '출금취소', '기타'].map(type =>
             `<option value="${type}" ${row.type === type ? 'selected' : ''}>${type}</option>`
         ).join('');
+
         let typeClass = '';
         if (row.type === '입금') typeClass = 'deposit';
         else if (row.type === '출금') typeClass = 'withdrawal';
@@ -743,53 +770,31 @@
         tr.innerHTML = `
             <td>${formatDateCompact(row.timeline)}</td>
             <td>
-              <select class="form-select form-select-sm category-select" data-id="${row.id}" onchange="updateCategory(this)">
-                <option value="" disabled>선택</option>
-                ${categoryOptions}
-              </select>
+                <select class="form-select form-select-sm category-select" data-id="${row.id}" onchange="updateCategory(this)">
+                    <option value="" disabled>선택</option>
+                    ${categoryOptions}
+                </select>
             </td>
-            <td>${formatNumber(row.amount)}</td>
+            <td>${row.amount.toLocaleString('ko-KR')}</td>
             <td>${row.card}</td>
             <td>  
-              <select class="form-select form-select-sm type-select ${typeClass}" data-id="${row.id}" onchange="updateType(this)">
-                <option value="" disabled>선택</option>
-                ${typeOptions}
-              </select>
+                <select class="form-select form-select-sm type-select ${typeClass}" data-id="${row.id}" onchange="updateType(this)">
+                    <option value="" disabled>선택</option>
+                    ${typeOptions}
+                </select>
             </td>
-            <td>${formatNumber(row.balance)}</td>
+            <td>${row.balance.toLocaleString('ko-KR')}</td>
             <td>${row.store}</td>
             <td>
-              <input type="text" class="form-control form-control-sm memo-input" value="${row.memo || ''}" 
-                data-id="${row.id}" onblur="updateMemo(this)" />
+                <input type="text" class="form-control form-control-sm memo-input" value="${row.memo || ''}" 
+                    data-id="${row.id}" onblur="updateMemo(this)" />
             </td>
         `;
 
-        // 테이블 필터링 로직
-        const startDate = tableStartDate.value;
-        const endDate = tableEndDate.value;
-        const selectedType = tableTypeFilter.value; // selectedTypes -> selectedType
-        const selectedCategory = tableCategoryFilter.value;
-        const searchText = tableMemoSearch.value.toLowerCase().trim();
-        
-        const rowDateStr = row.timeline.slice(0, 10);
-
-        let typeMatch = true;
-        if (selectedType === '출금') {
-            typeMatch = (row.type === '출금' || row.type === '출금취소');
-        } else if (selectedType !== 'all') {
-            typeMatch = (row.type === selectedType);
-        }
-
-        const dateMatch = (!startDate || rowDateStr >= startDate) && (!endDate || rowDateStr <= endDate);
-        const categoryMatch = selectedCategory === 'all' || row.category === selectedCategory;
-        const memoMatch = (row.memo || '').toLowerCase().includes(searchText);
-
-        if (!(dateMatch && typeMatch && categoryMatch && memoMatch)) {
-            tr.style.display = 'none';
-        }
-        
+        // 새로운 행을 테이블의 가장 위쪽에 추가
         tbody.prepend(tr);
     }
+
 
     async function updateCategory(selectEl) {
       const newCategory = selectEl.value;
