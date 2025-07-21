@@ -443,6 +443,7 @@
     }
 
     async function saveChanges() {
+      console.log('editedRows:', editedRows);
       for (const id of editedRows) {
         const row = rowsData.find(r => r.id === id);
         const { error } = await supabaseClient.from('accounts').update({

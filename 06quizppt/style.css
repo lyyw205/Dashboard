@@ -54,7 +54,9 @@ input{
 
 
 .quiz-count-text {
+  font-family: 'Pretendard', sans-serif;
   display: flex;
+  margin-bottom: 5px;
 }
 
 .quiz-count-input {
@@ -64,6 +66,7 @@ input{
 }
 
 .joystick {
+  font-family: 'Pretendard', sans-serif;
   display: flex;
   flex-direction: column;
   width: 70%;
@@ -75,6 +78,7 @@ input{
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  margin-top: 10px;
 }
 
 .btn-gamestart, .btn-prev, .btn-next {
@@ -84,11 +88,11 @@ input{
 }
 
 .btn-prev {
-  width: 45%;
+  width: 48%;
 }
 
 .btn-next {
-  width: 45%;
+  width: 48%;
 }
 
 #all-sets {
@@ -97,6 +101,7 @@ input{
   gap: 10px;
   padding: 0;
   margin-top: 5px;
+  font-family: 'Pretendard', sans-serif;
 }
 
 #all-sets li {

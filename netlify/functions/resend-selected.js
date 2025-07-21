@@ -68,16 +68,14 @@ const MESSAGE_CONFIG = {
     successMessage: '✅입금재촉',
     failMessage: '❌입금재촉',
   },
-    // 예시 1: 파티 확정 안내 메시지
-  'confirm_party': {
+  'entrance': {
     template: 'KA01TP250715090235325oUMiDjsbRaU', // 1. CoolSMS에서 발급받은 실제 템플릿 ID
     memoField: 'memo3',                        // 2. 이 메시지의 상태를 기록할 DB 컬럼명 (예: memo4)
     keyword: '입장재촉',
     successMessage: '✅입장재촉',        // 3. 발송 성공 시 DB에 기록될 텍스트
     failMessage: '❌입장재촉',          // 4. 발송 실패 시 DB에 기록될 텍스트
   },
-  // 예시 2: 만족도 조사 요청 메시지
-  'survey_request': {
+  'review': {
     template: 'SURVEY_REQUEST_TEMPLATE_ID',    // 1. 실제 템플릿 ID
     memoField: 'memo3',                       // 2. DB 컬럼명 (예: memo6)
     keyword: '후기',
