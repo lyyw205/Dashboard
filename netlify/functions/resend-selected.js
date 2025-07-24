@@ -67,6 +67,7 @@ const MESSAGE_CONFIG = {
     keyword: '입금재촉',
     successMessage: '✅입금재촉',
     failMessage: '❌입금재촉',
+    variables: (user) => ({})
   },
   'entrance': {
     template: 'KA01TP250715090235325oUMiDjsbRaU', // 1. CoolSMS에서 발급받은 실제 템플릿 ID
