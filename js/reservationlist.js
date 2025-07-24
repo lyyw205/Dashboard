@@ -58,7 +58,7 @@ function renderTabs(dates) {
 
     tabContainer.appendChild(btn);
 
-    // 첫 날짜 선택 시 active 표시 및 테이블 렌더
+    // 첫 날짜 선택 시 active 표시 및 테이블 렌더 
     if (firstRender) {
       btn.classList.add('active');
       renderTable(groupedData[dateStr]);
@@ -189,13 +189,24 @@ async function fetchData() {
   const sortedDates = Object.keys(groupedData).sort((a, b) => {
     const aDate = new Date(a);
     const bDate = new Date(b);
-    
-    // aDate는 이미 자정 기준이므로, setHours가 필요 없습니다.
-    // today와 비교할 때 aDate가 더 작은지만 확인하면 됩니다.
-    const aIsPast = aDate < today ? 1 : 0;
-    const bIsPast = bDate < today ? 1 : 0;
-    
-    return aIsPast - bIsPast || bDate - aDate;
+
+    const aIsPast = aDate < today;
+    const bIsPast = bDate < today;
+
+    // 1. 그룹 정렬: 미래(false) 그룹이 과거(true) 그룹보다 먼저 오도록 정렬
+    // aIsPast가 false(0), bIsPast가 true(1)이면 a가 먼저 옴.
+    if (aIsPast !== bIsPast) {
+      return aIsPast - bIsPast;
+    }
+
+    // 2. 그룹 내 정렬
+    if (!aIsPast) { // 둘 다 미래 날짜인 경우
+      // 오름차순 정렬 (가까운 날짜부터)
+      return aDate - bDate; 
+    } else { // 둘 다 과거 날짜인 경우
+      // 내림차순 정렬 (최근에 지난 날짜부터)
+      return bDate - aDate;
+    }
   });
 
   renderTabs(sortedDates);
