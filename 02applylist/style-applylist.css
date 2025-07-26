@@ -50,7 +50,7 @@ th {
 
 /* 짝수행 배경색상 */
 .table-striped-custom > tbody > tr:nth-child(even) td {
-  background-color: #fafafa;
+  background-color: #f1f1f1;
 }
 
 /* 홀수행 배경색상 */
