@@ -75,6 +75,7 @@ const MESSAGE_CONFIG = {
     keyword: '입장재촉',
     successMessage: '✅입장재촉',        // 3. 발송 성공 시 DB에 기록될 텍스트
     failMessage: '❌입장재촉',          // 4. 발송 실패 시 DB에 기록될 텍스트
+    variables: (user) => ({})
   },
   'review': {
     template: 'SURVEY_REQUEST_TEMPLATE_ID',    // 1. 실제 템플릿 ID
