@@ -37,8 +37,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   const mainContent = document.querySelector('.main-content');
   const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
   const mobileMenu = document.getElementById('mobile-menu');
+  const pageLoader = document.getElementById('page-loader');
 
-  if (!sidebar || !toggleBtn || !mainContent || !mobileMenuToggle || !mobileMenu) {
+  if (!sidebar || !toggleBtn || !mainContent || !mobileMenuToggle || !mobileMenu || !pageLoader) {
     console.warn("사이드바 또는 메인 콘텐츠의 필수 요소가 페이지에 없습니다.");
     return;
   }
@@ -98,4 +99,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // --- 초기화 ---
   updateLayout();
+
+  setTimeout(() => {
+    mainContent.classList.add('loaded');
+  }, 10);
+  
+  // 3. 페이지의 모든 리소스(이미지, 데이터 등)가 로드된 후 로딩 화면 숨기기
+  window.onload = () => {
+    pageLoader.classList.add('hidden');
+  };
 });
