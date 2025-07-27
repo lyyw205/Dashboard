@@ -3,32 +3,23 @@
 <head>
   <meta charset="UTF-8" />
   <title>룰렛 항목 입력</title>
-  <style>
-    body { font-family: Pretendard, sans-serif; text-align: center; padding: 50px; }
-    textarea { width: 300px; height: 200px; }
-    button { margin-top: 20px; padding: 10px 20px; font-size: 16px; }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css" /> <!-- 페이지 고유 CSS -->
 </head>
 <body>
-  <h2>룰렛 항목을 줄마다 입력하세요</h2>
-  <textarea id="entries" placeholder="예: 1등\n2등\n3등..."></textarea><br>
-  <button onclick="openWheel()">룰렛 돌리기</button>
 
-  <script>
-    function openWheel() {
-      const data = document.getElementById('entries').value
-        .split('\n')
-        .map(e => e.trim())
-        .filter(e => e !== '');
-
-      if (data.length === 0) {
-        alert('항목을 하나 이상 입력하세요.');
-        return;
-      }
-
-      localStorage.setItem('rouletteEntries', JSON.stringify(data));
-      window.open('wheel.html', '_blank', 'width=500,height=600');
-    }
-  </script>
+  <!-- ✅ 실제 콘텐츠는 이 <main> 태그 안에 모두 넣습니다 -->
+  <main class="main-content">
+    <div class="form-container">
+      <h2>룰렛 항목을 줄마다 입력하세요</h2>
+      <textarea id="entries" placeholder="예: 1등
+2등
+3등..."></textarea><br>
+      <button onclick="openWheel()">룰렛 돌리기</button>
+    </div>
+  </main>
+  
+  <!-- ✅ body가 닫히기 직전, 이 스크립트 한 줄만 추가하면 끝! -->
+  <script src="../common/sidebar.js"></script>
 </body>
 </html>
