@@ -91,6 +91,15 @@ const ALIMTALK_CONFIG = {
           '#{date}': formattedDate
         }),
       },
+      '문토': {
+        template: 'KA01TP250709145734382Qm8j2DgohNp', // 특별 선물 (내용이 같다면 그대로 사용)
+        successMessage: '✅문토',
+        variables: (user, formattedDate) => ({
+          '#{고객명}': user.name,
+          '#{파티명}': '게릴라 파티',
+          '#{date}': formattedDate
+        }),
+      },
     }
   },
   // --- 여자 사용자 설정 ---
@@ -119,6 +128,15 @@ const ALIMTALK_CONFIG = {
       '재환': {
         template: 'KA01TP250709145734382Qm8j2DgohNp', // 예: 여자용 특별 선물 템플릿 ID
         successMessage: '✅무료초대_여',
+        variables: (user, formattedDate) => ({
+          '#{고객명}': user.name,
+          '#{파티명}': '게릴라 파티',
+          '#{date}': formattedDate
+        }),
+      },
+      '문토': {
+        template: 'KA01TP250709145734382Qm8j2DgohNp', // 특별 선물 (내용이 같다면 그대로 사용)
+        successMessage: '✅문토',
         variables: (user, formattedDate) => ({
           '#{고객명}': user.name,
           '#{파티명}': '게릴라 파티',

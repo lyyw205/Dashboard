@@ -82,12 +82,15 @@ function renderTable(data) {
     <thead>
       <tr>
         <th>입장체크</th>
-        <th>닉네임</th> 
+        <th>번호</th> 
         <th>이름</th>
         <th>전화번호</th>
         <th>성별</th>
+        <th>직업</th>
         <th>MBTI</th>
-        <th>장소문자</th>
+        <th>이상형</th>
+        <th>안내문자</th>
+        <th>메인</th>
         <th>애프터</th>
         <th>메모</th>
       </tr>
@@ -100,8 +103,11 @@ function renderTable(data) {
           <td>${row.name || ''}</td>
           <td>${row.phone || ''}</td>
           <td>${row.gender || ''}</td>
+          <td>${row.job || ''}</td>
           <td>${row.mbti || ''}</td>
+          <td>${row.ideal || ''}</td>
           <td>${row.memo3 || ''}</td>
+          <td><input type="checkbox" class="form-check-input memo-checkbox" ${row.memo2 ? 'checked' : ''} data-id="${row.id}" data-field="memo2" /></td>
           <td><input type="checkbox" class="form-check-input memo-checkbox" ${row.memo4 ? 'checked' : ''} data-id="${row.id}" data-field="memo4" /></td>
           <td><input type="text" class="memoinput" value="${row.memo5 || ''}" data-id="${row.id}" data-field="memo5" /></td>
         </tr>
@@ -171,8 +177,8 @@ let groupedData = {};
 async function fetchData() {
   const { data, error } = await supabase
     .from('responses')
-    .select('id, name, phone, gender, mbti, apply_date, memo3, memo4, memo5, nickname, incheck, created_at')
-    .eq('memo2', true)
+    .select('id, name, phone, gender, job, mbti, ideal, apply_date, memo2, memo3, memo4, memo5, nickname, incheck, created_at')
+    .or('memo2.eq.true,memo4.eq.true') 
     .order('created_at', { ascending: false });
 
   if (error) {

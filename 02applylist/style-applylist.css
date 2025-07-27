@@ -128,25 +128,25 @@ td:nth-child(11) {
 
 th:nth-child(12),
 td:nth-child(12) {
-  width: 100px;
+  width: 120px;
   text-align: center;
 }
 
 th:nth-child(13),
 td:nth-child(13) {
-  width: 60px;
+  width: 180px;
   text-align: center;
 }
 
 th:nth-child(14),
 td:nth-child(14) {
-  width: 180px;
+  width: 50px;
   text-align: center;
 }
 
 th:nth-child(15),
 td:nth-child(15) {
-  width: 60px;
+  width: 50px;
   text-align: center;
 }
 
