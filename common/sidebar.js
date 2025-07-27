@@ -37,6 +37,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const mainContent = document.querySelector('.main-content');
   const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
   const mobileMenu = document.getElementById('mobile-menu');
+  
 
   if (!sidebar || !toggleBtn || !mainContent || !mobileMenuToggle || !mobileMenu) {
     console.warn("사이드바 또는 메인 콘텐츠의 필수 요소가 페이지에 없습니다.");
