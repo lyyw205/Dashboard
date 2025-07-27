@@ -433,7 +433,7 @@
       // 6. 각 세트 사이에 검은색 슬라이드를 추가하여 최종 슬라이드 목록을 만듭니다.
       const slidesToSend = validSets.flatMap((set, index) => {
         // 검은색 빈 슬라이드 객체 정의
-        const blackSlide = { bg: '#000000', text: '' };
+        const blackSlide = { bg: '#000000', text: '출발!' };
 
         // 현재 세트가 마지막 세트가 아니라면, 세트 뒤에 검은 슬라이드를 추가합니다.
         if (index < validSets.length - 1) {
