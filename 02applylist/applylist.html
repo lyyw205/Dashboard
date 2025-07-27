@@ -445,16 +445,16 @@
           <td>${row.birth_year || ''}</td>
           <td>${row.phone || ''}</td>
           <td>${row.gender || ''}</td>
-          <td>${row.job || ''}</td>
-          <td>${row.mbti || ''}</td>
-          <td>${row.ideal || ''}</td>
-          <td>${row.apply_date ? formatApplyDate(row.apply_date) : ''}</td>
+          <td title="${row.job || ''}">${row.job || ''}</td>
+          <td title="${row.mbti || ''}">${row.mbti || ''}</td>
+          <td title="${row.ideal || ''}">${row.ideal || ''}</td>
+          <td >${row.apply_date ? formatApplyDate(row.apply_date) : ''}</td>
           <td>${row.coupon || ''}</td>
-          <td><input type="text" class="memo-input" data-id="${row.id}" data-field="memo1" value="${row.memo1 || ''}"></td>
-          <td><input type="text" class="memo-input" data-id="${row.id}" data-field="memo3" value="${row.memo3 || ''}"></td>
+          <td><input type="text" class="memo-input" data-id="${row.id}" data-field="memo1" title="${row.memo1 || ''}" value="${row.memo1 || ''}"></td>
+          <td><input type="text" class="memo-input" data-id="${row.id}" data-field="memo3" title="${row.memo3 || ''}" value="${row.memo3 || ''}"></td>
           <td><input type="checkbox" class="form-check-input memo-checkbox" data-id="${row.id}" data-field="memo2" ${row.memo2 === true ? 'checked' : ''}></td>
           <td><input type="checkbox" class="form-check-input memo-checkbox" data-id="${row.id}" data-field="memo4" ${row.memo4 === true ? 'checked' : ''}></td>
-          <td><input type="text" class="memo-input" data-id="${row.id}" data-field="memo5" value="${row.memo5 || ''}"></td>
+          <td><input type="text" class="memo-input" data-id="${row.id}" data-field="memo5" title="${row.memo5 || ''}" value="${row.memo5 || ''}"></td>
         `;
         tableBody.appendChild(tr);
       });

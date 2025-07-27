@@ -1,261 +1,260 @@
-@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css");
+  @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css");
 
-.dashboard {
-  display: flex;
-}
+  .dashboard {
+    display: flex;
+  }
 
-.table-table {
-  table-layout: fixed;
-  /* border-collapse: separate; 행 분리 */
-  /* border-spacing: 0 5px; 분리된 행 사이 간격 / 두개는 세트옵션 */
-  width: max-content;
-}
+  .table-table {
+    table-layout: fixed;
+    /* border-collapse: separate; 행 분리 */
+    /* border-spacing: 0 5px; 분리된 행 사이 간격 / 두개는 세트옵션 */
+  }
 
-.table-wrapper {
-  flex-grow: 1;
-  overflow-x: hidden; /* ← 페이지에 스크롤 안 생기게 */
-}
+  .table-wrapper {
+    flex-grow: 1;
+    overflow-x: hidden; /* ← 페이지에 스크롤 안 생기게 */
+  }
 
-.table-responsive {
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  box-sizing: border-box;
-}
+  .table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    box-sizing: border-box;
+  }
 
-tr {
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
-  transition: background 0.2s;   
-}
+  tr {
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    transition: background 0.2s;   
+  }
 
-td {
-  font-family: 'Pretendard Variable', sans-serif;
-  font-weight: 400;
-  font-size: 14px;
-  height: 45px;
-  white-space: nowrap;
-  overflow: hidden;
-}
+  td {
+    font-family: 'Pretendard Variable', sans-serif;
+    font-weight: 400;
+    font-size: 14px;
+    height: 45px;
+    white-space: nowrap;
+    overflow: hidden;
+  }
 
-th {
-  font-family: 'Pretendard Variable', sans-serif;
-  font-weight: 600;
-  font-size: 15px;
-  height: 45px;
-  white-space: nowrap;
-  overflow: hidden;
-  align-content: center;
-  background-color: #f1f3f7 !important; /* 테이블헤더 배경색상 */
-  color: #666 !important; /* 테이블헤더 텍스트색상 */
-}
+  th {
+    font-family: 'Pretendard Variable', sans-serif;
+    font-weight: 600;
+    font-size: 15px;
+    height: 45px;
+    white-space: nowrap;
+    overflow: hidden;
+    align-content: center;
+    background-color: #f1f3f7 !important; /* 테이블헤더 배경색상 */
+    color: #666 !important; /* 테이블헤더 텍스트색상 */
+  }
 
-/* 짝수행 배경색상 */
-.table-striped-custom > tbody > tr:nth-child(even) td {
-  background-color: #f5f5f5;
-}
+  /* 짝수행 배경색상 */
+  .table-striped-custom > tbody > tr:nth-child(even) td {
+    background-color: #f5f5f5;
+  }
 
-/* 홀수행 배경색상 */
-.table-striped-custom > tbody > tr:nth-child(odd) td {
-  background-color: #ffffff;
-}
+  /* 홀수행 배경색상 */
+  .table-striped-custom > tbody > tr:nth-child(odd) td {
+    background-color: #ffffff;
+  }
 
-th:nth-child(1),
-td:nth-child(1) {
-  width: 50px;
-  text-align: center;
-}
+  th:nth-child(1),
+  td:nth-child(1) {
+    width: 50px;
+    text-align: center;
+  }
 
-th:nth-child(2),
-td:nth-child(2) {
-  width: 100px;
-  text-align: center;
-}
+  th:nth-child(2),
+  td:nth-child(2) {
+    width: 100px;
+    text-align: center;
+  }
 
-th:nth-child(3),
-td:nth-child(3) {
-  width: 80px;
-  text-align: center;
-}
+  th:nth-child(3),
+  td:nth-child(3) {
+    width: 80px;
+    text-align: center;
+  }
 
-th:nth-child(4),
-td:nth-child(4) {
-  width: 60px;
-  text-align: center;
-}
+  th:nth-child(4),
+  td:nth-child(4) {
+    width: 80px;
+    text-align: center;
+  }
 
-th:nth-child(5),
-td:nth-child(5) {
-  width: 120px;
-  text-align: center;
-}
+  th:nth-child(5),
+  td:nth-child(5) {
+    width: 120px;
+    text-align: center;
+  }
 
-th:nth-child(6),
-td:nth-child(6) {
-  width: 60px;
-  text-align: center;
-}
+  th:nth-child(6),
+  td:nth-child(6) {
+    width: 80px;
+    text-align: center;
+  }
 
-th:nth-child(7),
-td:nth-child(7) {
-  width: 80px;
-  text-align: center;
-}
-
-
-th:nth-child(8),
-td:nth-child(8) {
-  width: 80px;
-  text-align: center;
-}
-
-th:nth-child(9),
-td:nth-child(9) {
-  width: 120px;
-  text-align: center;
-}
+  th:nth-child(7),
+  td:nth-child(7) {
+    width: 100px;
+    text-align: center;
+  }
 
 
-th:nth-child(10),
-td:nth-child(10) {
-  width: 100px;
-  text-align: center;
-}
+  th:nth-child(8),
+  td:nth-child(8) {
+    width: 80px;
+    text-align: center;
+  }
 
-th:nth-child(11),
-td:nth-child(11) {
-  width: 120px;
-  text-align: center;
-}
-
-th:nth-child(12),
-td:nth-child(12) {
-  width: 120px;
-  text-align: center;
-}
-
-th:nth-child(13),
-td:nth-child(13) {
-  width: 180px;
-  text-align: center;
-}
-
-th:nth-child(14),
-td:nth-child(14) {
-  width: 50px;
-  text-align: center;
-}
-
-th:nth-child(15),
-td:nth-child(15) {
-  width: 50px;
-  text-align: center;
-}
-
-th:nth-child(16),
-td:nth-child(16) {
-  width: 300px;
-  text-align: center;
-}
-
-#search-name, #filter-gender, #filter-date {
-  border: 1px solid #dcdfe6;
-  padding: 8px 14px;
-  font-size: 14px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-#filter-date {
-  width: 130px;
-}
-
-.memo-input {
-  border: none;
-  outline: none;
-  background: transparent;
-  padding: 0;
-  margin: 0;
-  font: inherit;
-  width: 100%;
-  text-align: center; /* 필요에 따라 left/right 조정 */
-}
-
-.form-check-input.memo-checkbox {
-  width: 16px;
-  height: 16px;
-}
-
-.form-check-input.row-checkbox {
-  width: 16px;
-  height: 16px;
-}
-
-.form-check-input.row-checkbox:checked {
-  background-color: #6366f1;      /* 체크된 배경색 */
-  border-color: #6366f1;          /* 체크된 테두리색 */
-}
+  th:nth-child(9),
+  td:nth-child(9) {
+    width: 180px;
+    text-align: center;
+  }
 
 
-.form-check-input.memo-checkbox:checked {
-  background-color: #6366f1;      /* 체크된 배경색 */
-  border-color: #6366f1;          /* 체크된 테두리색 */
-}
+  th:nth-child(10),
+  td:nth-child(10) {
+    width: 100px;
+    text-align: center;
+  }
 
-.btn-group {
-  gap: 5px;
-  margin-top: 10px;
-}
+  th:nth-child(11),
+  td:nth-child(11) {
+    width: 150px;
+    text-align: center;
+  }
 
-.btn-group, 
-.btn-group-vertical {
-  display: flex;
-}
+  th:nth-child(12),
+  td:nth-child(12) {
+    width: 120px;
+    text-align: center;
+  }
+
+  th:nth-child(13),
+  td:nth-child(13) {
+    width: 180px;
+    text-align: center;
+  }
+
+  th:nth-child(14),
+  td:nth-child(14) {
+    width: 50px;
+    text-align: center;
+  }
+
+  th:nth-child(15),
+  td:nth-child(15) {
+    width: 50px;
+    text-align: center;
+  }
+
+  th:nth-child(16),
+  td:nth-child(16) {
+    width: 300px;
+    text-align: center;
+  }
+
+  #search-name, #filter-gender, #filter-date {
+    border: 1px solid #dcdfe6;
+    padding: 8px 14px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  #filter-date {
+    width: 130px;
+  }
+
+  .memo-input {
+    border: none;
+    outline: none;
+    background: transparent;
+    padding: 0;
+    margin: 0;
+    font: inherit;
+    width: 100%;
+    text-align: center; /* 필요에 따라 left/right 조정 */
+  }
+
+  .form-check-input.memo-checkbox {
+    width: 16px;
+    height: 16px;
+  }
+
+  .form-check-input.row-checkbox {
+    width: 16px;
+    height: 16px;
+  }
+
+  .form-check-input.row-checkbox:checked {
+    background-color: #6366f1;      /* 체크된 배경색 */
+    border-color: #6366f1;          /* 체크된 테두리색 */
+  }
 
 
-.btn.sendbtn1 {
-  background-color: #ececec;
-  font-family: 'Pretendard Variable', sans-serif;
-  font-weight: 500;
-  padding: 3px 15px;
-  border-radius: 10px !important;
-  flex: initial;
-}
+  .form-check-input.memo-checkbox:checked {
+    background-color: #6366f1;      /* 체크된 배경색 */
+    border-color: #6366f1;          /* 체크된 테두리색 */
+  }
 
-.btn.sendbtn1:hover {
-  background-color: #cacaca;
-  padding: 3px 15px;
-  border-radius: 10px !important;
-  flex: initial;
-}
+  .btn-group {
+    gap: 5px;
+    margin-top: 10px;
+  }
 
-.btn.sendbtn2 {
-  background-color: #ececec;
-  font-family: 'Pretendard Variable', sans-serif;
-  font-weight: 500;
-  padding: 3px 15px;
-  border-radius: 10px !important;
-  flex: initial;
-}
+  .btn-group, 
+  .btn-group-vertical {
+    display: flex;
+  }
 
-.btn.sendbtn2:hover {
-  background-color: #cacaca;
-  padding: 3px 15px;
-  border-radius: 10px !important;
-  flex: initial;
-}
 
-.btn.sendbtn3 {
-  background-color: #ececec;
-  font-family: 'Pretendard Variable', sans-serif;
-  font-weight: 500;
-  padding: 3px 15px;
-  border-radius: 10px !important;
-  flex: initial;
-}
+  .btn.sendbtn1 {
+    background-color: #ececec;
+    font-family: 'Pretendard Variable', sans-serif;
+    font-weight: 500;
+    padding: 3px 15px;
+    border-radius: 10px !important;
+    flex: initial;
+  }
 
-.btn.sendbtn3:hover {
-  background-color: #cacaca;
-  padding: 3px 15px;
-  border-radius: 10px !important;
-  flex: initial;
-}
+  .btn.sendbtn1:hover {
+    background-color: #cacaca;
+    padding: 3px 15px;
+    border-radius: 10px !important;
+    flex: initial;
+  }
+
+  .btn.sendbtn2 {
+    background-color: #ececec;
+    font-family: 'Pretendard Variable', sans-serif;
+    font-weight: 500;
+    padding: 3px 15px;
+    border-radius: 10px !important;
+    flex: initial;
+  }
+
+  .btn.sendbtn2:hover {
+    background-color: #cacaca;
+    padding: 3px 15px;
+    border-radius: 10px !important;
+    flex: initial;
+  }
+
+  .btn.sendbtn3 {
+    background-color: #ececec;
+    font-family: 'Pretendard Variable', sans-serif;
+    font-weight: 500;
+    padding: 3px 15px;
+    border-radius: 10px !important;
+    flex: initial;
+  }
+
+  .btn.sendbtn3:hover {
+    background-color: #cacaca;
+    padding: 3px 15px;
+    border-radius: 10px !important;
+    flex: initial;
+  }
 
