@@ -795,7 +795,7 @@
             <td>${formatDateCompact(row.timeline)}</td>
             <td>
                 <select class="form-select form-select-sm category-select" data-id="${row.id}" onchange="updateCategory(this)">
-                    <option value="" disabled>선택</option>
+                    <option value="" disabled ${!row.category ? 'selected' : ''}>선택</option>
                     ${categoryOptions}
                 </select>
             </td>
