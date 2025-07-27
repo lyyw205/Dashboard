@@ -82,12 +82,13 @@ const ALIMTALK_CONFIG = {
           '#{date}': formattedDate
         }),
       },
-      'SPECIALGIFT25': {
-        template: 'KA01TP250705163644669ytqNtJ0gaZl', // 특별 선물 (내용이 같다면 그대로 사용)
-        successMessage: '✅특별선물_남',
-        variables: (user) => ({
+      '민수': {
+        template: 'KA01TP250709145734382Qm8j2DgohNp', // 특별 선물 (내용이 같다면 그대로 사용)
+        successMessage: '✅민수초대_남',
+        variables: (user, formattedDate) => ({
           '#{고객명}': user.name,
-          '#{선물명}': '스타벅스 쿠폰'
+          '#{파티명}': '게릴라 파티',
+          '#{date}': formattedDate
         }),
       },
     }
@@ -115,12 +116,13 @@ const ALIMTALK_CONFIG = {
           '#{date}': formattedDate
         }),
       },
-      'SPECIALGIFT25': {
-        template: 'TEMPLATE_ID_FOR_FEMALE_GIFT', // 예: 여자용 특별 선물 템플릿 ID
-        successMessage: '✅특별선물_여',
-        variables: (user) => ({
+      '재환': {
+        template: 'KA01TP250709145734382Qm8j2DgohNp', // 예: 여자용 특별 선물 템플릿 ID
+        successMessage: '✅무료초대_여',
+        variables: (user, formattedDate) => ({
           '#{고객명}': user.name,
-          '#{선물명}': '프리미엄 디저트 세트' // 예시: 여자에게는 다른 선물
+          '#{파티명}': '게릴라 파티',
+          '#{date}': formattedDate
         }),
       },
     }
