@@ -199,11 +199,8 @@
   .btn-group {
     gap: 5px;
     margin-top: 10px;
-  }
-
-  .btn-group, 
-  .btn-group-vertical {
     display: flex;
+    flex-direction: column;
   }
 
 
@@ -212,6 +209,8 @@
     font-family: 'Pretendard Variable', sans-serif;
     font-weight: 500;
     padding: 3px 15px;
+    margin: 5px;
+    width: 180px;
     border-radius: 10px !important;
     flex: initial;
   }
@@ -219,6 +218,8 @@
   .btn.sendbtn1:hover {
     background-color: #cacaca;
     padding: 3px 15px;
+    width: 180px;
+    margin: 5px;
     border-radius: 10px !important;
     flex: initial;
   }
@@ -227,6 +228,8 @@
     background-color: #ececec;
     font-family: 'Pretendard Variable', sans-serif;
     font-weight: 500;
+    width: 200px;
+    margin: 5px;
     padding: 3px 15px;
     border-radius: 10px !important;
     flex: initial;
@@ -235,6 +238,8 @@
   .btn.sendbtn2:hover {
     background-color: #cacaca;
     padding: 3px 15px;
+    width: 200px;
+    margin: 5px;
     border-radius: 10px !important;
     flex: initial;
   }

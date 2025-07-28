@@ -34,20 +34,99 @@ function formatKoreanDate(isoDateString) {
   return `${month}월 ${day}일`;
 }
 
+// 템플릿 ID 목록 (1번 파일의 ALIMTALK_CONFIG와 동일하게 맞춤)
+const FREE_INVITE_TEMPLATE = 'KA01TP250709145734382Qm8j2DgohNp'; // 무료초대 -> 바로 장소문자 템플릿
+const MALE_PAID_TEMPLATE = 'KA01TP250717092857251yAnTUzfxJvp'; // 입금안내(남)
+const FEMALE_PAID_TEMPLATE = 'KA01TP250707173844176ndkmNlwondi'; // 입금안내(여)
+
+// 무료 쿠폰 코드 목록 (1번 파일과 동일하게 대문자로 관리)
+const MALE_FREE_COUPONS = ['WEINVITEYOU', '민수', '재환', '문토']; //
+const FEMALE_FREE_COUPONS = ['WEINVITEYOU','민수', '재환', '문토'];
+
 // --- 메시지 타입별 설정을 한 곳에서 관리 ---
 const MESSAGE_CONFIG = {
   'resend_failed': {
-    template: (user) => user.coupon_code === 'FREEPARTY24' ? 'FREE_INVITE_TEMPLATE_V1' : 'PAYMENT_INFO_TEMPLATE',
     memoField: 'memo1',
-    successMessage: (user) => user.coupon_code === 'FREEPARTY24' ? '✅무료초대_재발송완료' : '✅유료안내_재발송완료',
-    variables: (user) => ({ '고객명': user.name })
+
+    // 템플릿 ID를 동적으로 결정
+    template: (user) => {
+      const gender = user.gender || '공통';
+      // 중요: 재전송 로직에서 사용하는 user 객체의 쿠폰 필드명이 'coupon'인지 'coupon_code'인지 확인하세요.
+      // 여기서는 'coupon'으로 가정하고 작성합니다.
+      const couponCode = user.coupon ? user.coupon.trim().toUpperCase() : null;
+
+      if (gender === '남자') {
+        if (couponCode && MALE_FREE_COUPONS.includes(couponCode)) {
+          return FREE_INVITE_TEMPLATE;
+        }
+        return MALE_PAID_TEMPLATE;
+      }
+      
+      if (gender === '여자') {
+        if (couponCode && FEMALE_FREE_COUPONS.includes(couponCode)) {
+          return FREE_INVITE_TEMPLATE;
+        }
+        return FEMALE_PAID_TEMPLATE;
+      }
+
+      // 성별 정보가 없는 경우 기본 유료 템플릿
+      return FEMALE_PAID_TEMPLATE;
+    },
+
+    // 성공 메시지를 동적으로 결정
+    successMessage: (user) => {
+      const gender = user.gender || '공통';
+      const couponCode = user.coupon ? user.coupon.trim().toUpperCase() : null;
+
+      if (gender === '남자') {
+        if (couponCode && MALE_FREE_COUPONS.includes(couponCode)) {
+          return `✅무료초대_남_${couponCode}`; 
+        }
+        return '✅입금안내_남';
+      }
+      
+      if (gender === '여자') {
+        if (couponCode && FEMALE_FREE_COUPONS.includes(couponCode)) {
+          return `✅무료초대_여_${couponCode}`;
+        }
+        return '✅입금안내_여';
+      }
+
+      return '✅입금안내_공통';
+    },
+
+    // 알림톡 변수(#{})를 동적으로 결정
+    variables: (user) => {
+      const gender = user.gender || '공통';
+      const couponCode = user.coupon ? user.coupon.trim().toUpperCase() : null;
+      const formattedApplyDate = formatKoreanDate(user.apply_date);
+
+      const isMaleAndFree = (gender === '남자' && couponCode && MALE_FREE_COUPONS.includes(couponCode));
+      const isFemaleAndFree = (gender === '여자' && couponCode && FEMALE_FREE_COUPONS.includes(couponCode));
+
+      // 무료 초대 대상인 경우
+      if (isMaleAndFree || isFemaleAndFree) {
+        return {
+          '#{고객명}': user.name,
+          '#{파티명}': '게릴라 파티',
+          '#{date}': formattedApplyDate
+        };
+      }
+      
+      // 유료 안내 대상인 경우
+      return {
+        '#{고객명}': user.name,
+        '#{브랜드이름}': '게릴라 파티',
+        '#{파티날짜}': formattedApplyDate
+      };
+    }
   },
   'location': {
-    template: 'KA01TP250709145734382Qm8j2DgohNp',
+    template: 'KA01TP250725103215185gMM09ZrdeDh',
     memoField: 'memo3',
-    keyword: '확정문자',
-    successMessage: '✅확정문자',
-    failMessage: '❌확정문자', // 실패 메시지도 추가해주는 것이 좋습니다.
+    keyword: '장소문자',
+    successMessage: '✅장소문자',
+    failMessage: '❌장소문자', // 실패 메시지도 추가해주는 것이 좋습니다.
     // variables를 함수로 만들어서 user 객체를 인자로 받음
     variables: (user) => {
       // 함수 안에서 formatKoreanDate를 호출하여 날짜를 변환
@@ -70,24 +149,58 @@ const MESSAGE_CONFIG = {
     variables: (user) => ({})
   },
   'entrance': {
-    template: 'KA01TP250715090235325oUMiDjsbRaU', // 1. CoolSMS에서 발급받은 실제 템플릿 ID
+    template: 'KA01TP250728071222845K3Rr2ZMO4oq', // 1. CoolSMS에서 발급받은 실제 템플릿 ID
     memoField: 'memo3',                        // 2. 이 메시지의 상태를 기록할 DB 컬럼명 (예: memo4)
-    keyword: '입장재촉',
-    successMessage: '✅입장재촉',        // 3. 발송 성공 시 DB에 기록될 텍스트
-    failMessage: '❌입장재촉',          // 4. 발송 실패 시 DB에 기록될 텍스트
-    variables: (user) => ({})
+    keyword: '입장안내',
+    successMessage: '✅입장안내(일반)',        // 3. 발송 성공 시 DB에 기록될 텍스트
+    failMessage: '❌입장안내(일반)',          // 4. 발송 실패 시 DB에 기록될 텍스트
+    variables: (user) => ({
+      '#{브랜드명}': '게릴라 파티'
+    })
+  },
+  'entrance2': {
+    template: 'KA01TP250728073901156nzSLS3pWWVw', // 1. CoolSMS에서 발급받은 실제 템플릿 ID
+    memoField: 'memo3',                        // 2. 이 메시지의 상태를 기록할 DB 컬럼명 (예: memo4)
+    keyword: '입장안내',
+    successMessage: '✅입장안내(초대)',        // 3. 발송 성공 시 DB에 기록될 텍스트
+    failMessage: '❌입장안내(초대)',          // 4. 발송 실패 시 DB에 기록될 텍스트
+    variables: (user) => ({
+      '#{고객명}': user.name,
+      '#{브랜드명}': '게릴라 파티'
+    })
   },
   'review': {
-    template: 'SURVEY_REQUEST_TEMPLATE_ID',    // 1. 실제 템플릿 ID
+    template: 'KA01TP250728091343537cMnl2OyYPsI',    // 1. 실제 템플릿 ID
     memoField: 'memo3',                       // 2. DB 컬럼명 (예: memo6)
     keyword: '후기',
-    successMessage: '✅후기',     // 3. 성공 메시지
-    failMessage: '❌후기',       // 4. 실패 메시지
-    variables: (user) => ({                   // 5. 변수 설정
-      '#{고객명}': user.name,
-      '#{설문조사링크}': 'https://example.com/survey' // 예시: 설문조사 링크 변수
-    })
-  }
+    successMessage: '✅후기(일반/남)',     // 3. 성공 메시지
+    failMessage: '❌후기(일반/남)',       // 4. 실패 메시지
+    variables: (user) => ({})
+  },
+  'review1': {
+    template: 'KA01TP2507260429579241AtnXD6QQIx',    // 1. 실제 템플릿 ID
+    memoField: 'memo3',                       // 2. DB 컬럼명 (예: memo6)
+    keyword: '후기',
+    successMessage: '✅후기(일반/여)',     // 3. 성공 메시지
+    failMessage: '❌후기(일반/여)',       // 4. 실패 메시지
+    variables: (user) => ({})
+  },
+  'review2': {
+    template: 'KA01TP250728070139799s2AwuVqSwYG',    // 1. 실제 템플릿 ID
+    memoField: 'memo3',                       // 2. DB 컬럼명 (예: memo6)
+    keyword: '후기',
+    successMessage: '✅후기(문토)',     // 3. 성공 메시지
+    failMessage: '❌후기(문토)',       // 4. 실패 메시지
+    variables: (user) => ({})
+  },
+  'review3': {
+    template: 'KA01TP250728074631591vikenhhLrRr',    // 1. 실제 템플릿 ID
+    memoField: 'memo3',                       // 2. DB 컬럼명 (예: memo6)
+    keyword: '후기',
+    successMessage: '✅후기(무료초대)',     // 3. 성공 메시지
+    failMessage: '❌후기(무료초대)',       // 4. 실패 메시지
+    variables: (user) => ({})
+  }  
 };
 
 

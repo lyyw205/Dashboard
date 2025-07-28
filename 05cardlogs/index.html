@@ -65,16 +65,16 @@
           <div class="row g-3">
             <!-- 날짜 필터 -->
             <div class="col-md-2">
-              <label for="table-start-date" class="form-label"><strong>시작일</strong></label>
+              <label for="table-start-date" class="form-label"><strong> 시작일</strong></label>
               <input type="date" id="table-start-date" class="form-control">
             </div>
             <div class="col-md-2">
-              <label for="table-end-date" class="form-label"><strong>종료일</strong></label>
+              <label for="table-end-date" class="form-label"><strong> 종료일</strong></label>
               <input type="date" id="table-end-date" class="form-control">
             </div>
             <!-- 카테고리 필터 -->
             <div class="mb-3 col-md-2">
-              <label for="table-category-filter" class="form-label"><strong>카테고리</strong></label>
+              <label for="table-category-filter" class="form-label"><strong> 카테고리</strong></label>
               <select id="table-category-filter" class="form-select">
                 <option value="all">-- 전체 보기 --</option>
                 <!-- 카테고리는 JavaScript로 채워집니다 -->
@@ -82,16 +82,20 @@
             </div>
                 <!-- 종류 필터 -->
             <div class="col-md-2">
-              <label for="table-type-filter" class="form-label"><strong>종류</strong></label>
+              <label for="table-type-filter" class="form-label"><strong> 종류</strong></label>
               <select id="table-type-filter" class="form-select">
                 <option value="all">-- 전체 --</option>
                 <option value="출금">출금</option>
                 <option value="입금">입금</option>
               </select>
             </div>
-            <div class="col-md-4">
-              <label for="table-memo-search" class="form-label"><strong>메모 검색</strong></label>
-              <input type="text" id="table-memo-search" class="form-control" placeholder="메모 내용 검색...">
+            <div class="col-md-2">
+              <label for="table-store-search" class="form-label"><strong> 결제처 검색</strong></label>
+              <input type="text" id="table-store-search" class="form-control" placeholder="결제처명 입력">
+            </div>
+            <div class="col-md-2">
+              <label for="table-memo-search" class="form-label"><strong> 메모 검색</strong></label>
+              <input type="text" id="table-memo-search" class="form-control" placeholder="메모 내용 입력">
             </div>
           </div>
         </div>
@@ -142,6 +146,7 @@
     const tableTypeFilter = document.getElementById('table-type-filter');
     const tableCategoryFilter = document.getElementById('table-category-filter');
     const tableMemoSearch = document.getElementById('table-memo-search');
+    const tableStoreSearch = document.getElementById('table-store-search');
 
     function formatDateForInput(input) {
       // 1. 입력값이 없는 경우, 에러 방지를 위해 빈 문자열 반환
@@ -251,6 +256,7 @@
         const selectedType = tableTypeFilter.value;
         const selectedCategory = tableCategoryFilter.value;
         const searchText = tableMemoSearch.value.toLowerCase().trim();
+        const storeSearchText = tableStoreSearch.value.toLowerCase().trim();
 
         const tableRows = document.querySelectorAll('#log-table tbody tr');
 
@@ -268,6 +274,7 @@
             const rowType = row.querySelector('.type-select')?.value;
             const rowCategory = row.querySelector('.category-select')?.value;
             const memoText = (row.querySelector('.memo-input')?.value || '').toLowerCase();
+            const storeText = (row.querySelector('.store-cell')?.textContent || '').toLowerCase();
 
             // 필터 조건 검사
             const dateMatch = (!startDate || rowKSTDateStr >= startDate) && (!endDate || rowKSTDateStr <= endDate);
@@ -281,9 +288,10 @@
 
             const categoryMatch = selectedCategory === 'all' || rowCategory === selectedCategory;
             const memoMatch = memoText.includes(searchText);
+            const storeMatch = storeText.includes(storeSearchText);
 
             // 최종적으로 보여줄지 말지 결정
-            if (dateMatch && typeMatch && categoryMatch && memoMatch) {
+            if (dateMatch && typeMatch && categoryMatch && memoMatch && storeMatch) {
                 row.style.display = ''; // 테이블의 기본 tr display 속성으로 복원
             } else {
                 row.style.display = 'none';
@@ -432,6 +440,7 @@
     tableTypeFilter.addEventListener('change', applyTableFilters); // 새로 추가된 드롭다운의 이벤트
     tableCategoryFilter.addEventListener('change', applyTableFilters);
     tableMemoSearch.addEventListener('input', applyTableFilters);
+    tableStoreSearch.addEventListener('input', applyTableFilters);
 
     //=======================================================
     // 기존 테이블 관련 로직
@@ -511,7 +520,7 @@
                 </select>
             </td>
             <td>${row.balance.toLocaleString('ko-KR')}</td>
-            <td>${row.store}</td>
+            <td class="store-cell">${row.store}</td>
             <td>
                 <input type="text" class="form-control form-control-sm memo-input" value="${row.memo || ''}" 
                     data-id="${row.id}" onblur="updateMemo(this)" />
