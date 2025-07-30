@@ -1,11 +1,13 @@
+# [build] 섹션은 빌드에 관한 전반적인 설정을 담당합니다.
 [build]
-  # 이 섹션은 그대로 두거나, 필요 없다면 지워도 됩니다.
-  # publish = "public" 
+  # ★★★ 함수 디렉토리를 여기서 지정하는 것이 가장 안정적입니다.
+  functions = "netlify/functions"
+  
+  # 만약 사용하는 빌드 명령어나 publish 폴더가 있다면 여기에 둡니다.
+  # command = "npm run build"
+  # publish = "public"
 
-# ★★★★★ 두 개의 [functions]를 아래와 같이 하나로 합칩니다. ★★★★★
+# [functions] 섹션은 모든 함수에 공통으로 적용될 설정을 담당합니다.
+# "어떤 파일들을 추가로 포함할 것인가?" 와 같은 설정을 넣습니다.
 [functions]
-  # 함수 코드가 있는 폴더 지정
-  directory = "netlify/functions/"
-
-  # 배포 시 함께 포함할 파일들 지정
   included_files = ["netlify/functions/modules/**"]
