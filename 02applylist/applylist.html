@@ -28,52 +28,34 @@
         </div>
         <div class="btn-group" role="group" aria-label="메시지 발송 버튼 그룹">
           <div>
-            <button type="button" class="btn sendbtn1 message-sender" 
-                    data-message-type="resend_failed" 
-                    data-confirm-text="선택한 사람들 중 '발송 실패' 상태인 경우에만 재발송합니다. 실행할까요?">
-              🚨 입금안내 발송
+            <button type="button" class="btn btn-dark message-sender" 
+                    data-message-type="resend-failed" 
+                    data-confirm-text="[초기 안내 재전송] 선택한 사람들 중 '발송 실패' 상태인 경우에만 재발송합니다. 실행할까요?">
+              🚨 초기안내 재전송
             </button>
-            <button type="button" class="btn sendbtn1 message-sender" 
+            <button type="button" class="btn btn-secondary message-sender" 
                     data-message-type="reminder" 
                     data-confirm-text="선택한 사람들에게 '입금 재촉' 문자를 발송할까요?">
               💵 입금재촉 발송
             </button>
-            <button type="button" class="btn sendbtn1 message-sender" 
+            <button type="button" class="btn btn-info message-sender" 
                     data-message-type="location" 
                     data-confirm-text="선택한 사람들에게 '장소 안내' 문자를 발송할까요?">
               📍 장소안내 발송
             </button>
-            <button type="button" class="btn sendbtn1 message-sender" 
+            
+            <!-- 'entrance'와 'entrance2'가 'entrance' 하나로 통합됨 -->
+            <button type="button" class="btn btn-primary message-sender" 
                     data-message-type="entrance" 
-                    data-confirm-text="선택한 사람들에게 '입장 독려' 문자를 발송할까요?">
-              📢 입장문자 (일반)
+                    data-confirm-text="선택한 사람들에게 조건에 맞는 '입장 안내' 문자를 발송할까요? (일반/초대 자동 구분)">
+              📢 입장안내 발송
             </button>
-            <button type="button" class="btn sendbtn1 message-sender" 
-                    data-message-type="entrance2" 
-                    data-confirm-text="선택한 사람들에게 '입장 독려' 문자를 발송할까요?">
-              📢 입장문자 (초대)
-            </button>
-          </div>
-          <div>
-            <button type="button" class="btn sendbtn2 message-sender" 
+
+            <!-- 'review', 'review1', 'review2', 'review3'가 'review' 하나로 통합됨 -->
+            <button type="button" class="btn btn-success message-sender" 
                     data-message-type="review" 
-                    data-confirm-text="선택한 사람들에게 '후기 작성' 문자를 발송할까요?">
-              📝 후기문자 (일반/남)
-            </button>
-            <button type="button" class="btn sendbtn2 message-sender" 
-                    data-message-type="review1" 
-                    data-confirm-text="선택한 사람들에게 '후기 작성' 문자를 발송할까요?">
-              📝 후기문자 (일반/여)
-            </button>
-            <button type="button" class="btn sendbtn2 message-sender" 
-                    data-message-type="review2" 
-                    data-confirm-text="선택한 사람들에게 '후기 작성' 문자를 발송할까요?">
-              📝 후기문자 (문토)
-            </button>
-            <button type="button" class="btn sendbtn2 message-sender" 
-                    data-message-type="review3" 
-                    data-confirm-text="선택한 사람들에게 '후기 작성' 문자를 발송할까요?">
-              📝 후기문자 (무료초대)
+                    data-confirm-text="선택한 사람들에게 조건에 맞는 '후기 요청' 문자를 발송할까요? (성별/쿠폰 등 자동 구분)">
+              📝 후기요청 발송
             </button>
           </div>
         </div> 
