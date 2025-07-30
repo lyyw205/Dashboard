@@ -17,7 +17,7 @@ async function updateResponse(id, updateData) {
   if (error) {
     console.error(`❌ memo1 업데이트 실패 (id=${id}):`, error.message);
   } else {
-    console.log(`📝 memo1 업데이트 완료 (id=${id}, status=${status})`);
+    console.log(`📝 DB 업데이트 완료 (id=${id}):`, JSON.stringify(updateData));
   }
 }
 
