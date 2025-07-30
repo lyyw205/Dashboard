@@ -1,5 +1,17 @@
 // 1. _config.js에서 공통 기능만 가져옵니다.
 const { supabase, sendAlimtalk, corsHeaders } = require('./modules/_config.js');
+// ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+// ★★★ 핵심 변경점: 필요한 모든 모듈을 미리, 명시적으로 불러옵니다. ★★★
+// ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+const modules = {
+'location': require('./modules/location.js'),
+'reminder': require('./modules/reminder.js'),
+'entrance': require('./modules/entrance.js'),
+'review': require('./modules/review.js'),
+'resend-failed': require('./modules/resend-failed.js'),
+// 나중에 'survey' 같은 새 모듈을 추가하면, 여기에도 한 줄 추가해주면 됩니다.
+// 'survey': require('./modules/survey.js'),
+};
 
 exports.handler = async (event) => {
   // CORS Preflight 요청 처리
