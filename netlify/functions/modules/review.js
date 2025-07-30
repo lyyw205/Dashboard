@@ -59,7 +59,9 @@ module.exports = {
   /**
    * (필수) 템플릿에 주입할 변수를 반환합니다.
    */
-getVariables: (user) => {
+  getVariables: (user) => {
+    return {};
+  },
   // getTemplateId와 완전히 동일한 분기 로직을 사용합니다.
   
   // 1. '문토' 쿠폰 사용자인가?
@@ -86,9 +88,6 @@ getVariables: (user) => {
   //   // 예시: '일반' 후기 템플릿에는 변수가 전혀 필요 없다고 가정
   //   return {}; // 빈 객체 반환
   // }
-
-  return{};
-},
 
   /**
    * (필수) 발송 결과를 조건에 맞는 성공 메시지로 DB에 업데이트합니다.
