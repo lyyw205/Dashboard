@@ -31,7 +31,7 @@ exports.handler = async (event) => {
 
     // ★★★ 핵심 로직 ★★★
     // 2. type 이름과 동일한 모듈 파일을 동적으로 불러옵니다.
-    const messageModule = modules[type];\
+    const messageModule = modules[type];
     
     if (!messageModule) {
       return {

@@ -45,18 +45,18 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // --- 데스크탑 로직 ---
-  const EXPANDED_MARGIN = '260px';
-  const COLLAPSED_MARGIN = '60px';
+  const EXPANDED_PADDING = '260px';
+  const COLLAPSED_PADDING = '60px';
 
   const updateLayout = () => {
     if (window.innerWidth > 768) {
       if (sidebar.classList.contains('collapsed')) {
-        mainContent.style.marginLeft = COLLAPSED_MARGIN;
+        mainContent.style.paddingLeft = COLLAPSED_PADDING;
       } else {
-        mainContent.style.marginLeft = EXPANDED_MARGIN;
+        mainContent.style.paddingLeft = EXPANDED_PADDING;
       }
     } else {
-      mainContent.style.marginLeft = '0';
+      mainContent.style.paddingLeft = '0';
     }
   };
 
