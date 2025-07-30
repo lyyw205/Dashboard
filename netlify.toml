@@ -1,10 +1,11 @@
 [build]
-  # 빌드 결과물이 저장되는 폴더 (없다면 이 라인은 생략 가능)
+  # 이 섹션은 그대로 두거나, 필요 없다면 지워도 됩니다.
   # publish = "public" 
 
+# ★★★★★ 두 개의 [functions]를 아래와 같이 하나로 합칩니다. ★★★★★
 [functions]
   # 함수 코드가 있는 폴더 지정
   directory = "netlify/functions/"
 
-[functions]
+  # 배포 시 함께 포함할 파일들 지정
   included_files = ["netlify/functions/modules/**"]
