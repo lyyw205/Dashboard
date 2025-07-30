@@ -56,7 +56,7 @@ exports.handler = async (event) => {
     // 유효성 검사
     if (!newUser.phone) {
       console.warn('⚠️ 전화번호가 없어 건너뜁니다.');
-      await updateResponse(newUser.id, '❌발송실패(번호없음)'); // 실패 사유 기록
+      await updateResponse(newUser.id, { memo1: '❌발송실패(번호없음)' }); 
       return { statusCode: 200, body: 'No phone number, skipped.' };
     }
     if (newUser.memo1 && newUser.memo1 !== '처리 대기중') {
@@ -101,7 +101,7 @@ exports.handler = async (event) => {
     console.error('❌ 알림톡 자동 발송 함수 전체 실행 중 에러:', error);
     // 에러 발생 시 ID가 존재하면 실패 기록
     if (recordId) {
-        await updateResponse(recordId, '❌발송실패(시스템오류)');
+        await updateResponse(recordId, { memo1: '❌발송실패(시스템오류)' });
     }
     return { statusCode: 500, body: 'Internal Server Error' };
   }
