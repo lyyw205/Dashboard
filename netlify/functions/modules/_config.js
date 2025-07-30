@@ -122,7 +122,16 @@ const COUPON_CONFIG = [
       '#{date}': formattedDate
     }),
   },
-  
+  {
+    code: '문토',
+    template: 'KA01TP250709145734382Qm8j2DgohNp', // 남/여 공통 템플릿을 문자열로 바로 할당
+    successMessage: (user) => `✅민수초대_${user.gender}`, // 메시지는 동적으로 생성
+    variables: (user, formattedDate) => ({
+      '#{고객명}': user.name,
+      '#{파티명}': '게릴라 파티',
+      '#{date}': formattedDate
+    }),
+  },
   // --- 시나리오 3: 특정 성별에게만 적용되는 쿠폰의 경우 ---
   {
     code: 'LADYFIRST',
