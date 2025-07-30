@@ -68,7 +68,7 @@ async function sendAlimtalk(user, templateCode, variables) {
  */
 function formatKoreanDate(isoDateString) {
   if (!isoDateString) return '날짜 미정';
-  const date = new Date(isoDateDtrisng);
+  const date = new Date(isoDateString);
   if (isNaN(date.getTime())) return isoDateString;
   const month = date.getMonth() + 1;
   const day = date.getDate();
