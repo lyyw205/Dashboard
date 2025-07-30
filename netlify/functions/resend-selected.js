@@ -1,6 +1,14 @@
 // 1. _config.js에서 공통 기능만 가져옵니다.
 const { supabase, sendAlimtalk, corsHeaders } = require('./modules/_config.js');
 
+const modules = {
+  entrance: require('./modules/entrance.js'),
+  location: require('./modules/location.js'),
+  reminder: require('./modules/reminder.js'),
+  'resend-failed': require('./modules/resend-failed.js'),
+  review: require('./modules/review.js'),
+};
+
 exports.handler = async (event) => {
   // CORS Preflight 요청 처리
   if (event.httpMethod === 'OPTIONS') {
@@ -23,7 +31,15 @@ exports.handler = async (event) => {
 
     // ★★★ 핵심 로직 ★★★
     // 2. type 이름과 동일한 모듈 파일을 동적으로 불러옵니다.
-    const messageModule = require(`./modules/${type}.js`);
+    const messageModule = modules[type];\
+    
+    if (!messageModule) {
+      return {
+        statusCode: 404,
+        headers: corsHeaders,
+        body: JSON.stringify({ error: `정의되지 않은 메시지 타입입니다: '${type}'` }),
+      };
+    }
 
     // 3. 각 모듈에 정의된 'getUsers' 함수를 호출하여 발송 대상을 필터링합니다.
     const { users, error } = await messageModule.getUsers(supabase, ids);
