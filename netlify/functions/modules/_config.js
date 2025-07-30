@@ -103,6 +103,24 @@ const COUPON_CONFIG = [
       value: '✅장소문자'
     }
   },
+  {
+    code: 'PARTY',
+    // 템플릿과 성공 메시지를 객체로 만들어 성별에 따라 다른 값을 갖도록 함
+    template: {
+      '남자': 'KA01TP250717092857251yAnTUzfxJvp', // 남성용 무료 초대 템플릿
+      '여자': 'KA01TP250707173844176ndkmNlwondi',  // 여성용 무료 초대 템플릿 (예시)
+    },
+    successMessage: {
+      '남자': '✅현장초대_남',
+      '여자': '✅현장초대_여',
+    },
+    // 변수는 공통으로 사용 가능
+    variables: (user, formattedDate) => ({
+      '#{고객명}': user.name,
+      '#{파티명}': '게릴라 파티',
+      '#{date}': formattedDate
+    })
+  },
   
   // --- 시나리오 2: 남/여 공통 쿠폰이고, 템플릿도 완전히 동일한 경우 (가장 간단한 케이스) ---
   {
