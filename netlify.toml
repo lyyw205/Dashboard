@@ -5,3 +5,6 @@
 [functions]
   # 함수 코드가 있는 폴더 지정
   directory = "netlify/functions/"
+
+[functions]
+  included_files = ["netlify/functions/modules/**"]
