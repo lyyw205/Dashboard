@@ -98,6 +98,10 @@ const COUPON_CONFIG = [
       '#{파티명}': '게릴라 파티',
       '#{date}': formattedDate
     }),
+    extraUpdate: {
+      field: 'memo3',
+      value: '✅장소문자'
+    }
   },
   
   // --- 시나리오 2: 남/여 공통 쿠폰이고, 템플릿도 완전히 동일한 경우 (가장 간단한 케이스) ---
@@ -110,6 +114,10 @@ const COUPON_CONFIG = [
       '#{파티명}': '게릴라 파티',
       '#{date}': formattedDate
     }),
+    extraUpdate: {
+      field: 'memo3',
+      value: '✅장소문자'
+    }
   },
 
   {
@@ -121,6 +129,10 @@ const COUPON_CONFIG = [
       '#{파티명}': '게릴라 파티',
       '#{date}': formattedDate
     }),
+    extraUpdate: {
+      field: 'memo3',
+      value: '✅장소문자'
+    }
   },
   {
     code: '문토',
@@ -131,6 +143,10 @@ const COUPON_CONFIG = [
       '#{파티명}': '게릴라 파티',
       '#{date}': formattedDate
     }),
+    extraUpdate: {
+      field: 'memo3',
+      value: '✅장소문자'
+    }
   },
   // --- 시나리오 3: 특정 성별에게만 적용되는 쿠폰의 경우 ---
   {
@@ -224,6 +240,7 @@ function getInitialGuidanceConfig(user) {
     template: templateToSend,
     variables: configToSend.variables,
     successMessage: successMessageToSend,
+    extraUpdate: configToSend.extraUpdate || null 
   };
 }
 
