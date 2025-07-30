@@ -87,7 +87,7 @@ getVariables: (user) => {
   //   return {}; // 빈 객체 반환
   // }
 
-  return{}
+  return{};
 },
 
   /**
