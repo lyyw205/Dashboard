@@ -27,44 +27,42 @@
           <button class="btn btn-dark btn-sm" onclick="loadResponses()">🔍 필터 적용</button>
         </div>
         <div class="btn-group" role="group" aria-label="메시지 발송 버튼 그룹">
-          <div>
-            <button type="button" class="btn sendbtn1 message-sender" 
-                    data-message-type="resend-failed" 
-                    data-confirm-text="[초기 안내 재전송] 선택한 사람들 중 '발송 실패' 상태인 경우에만 재발송합니다. 실행할까요?">
-              🚨 초기안내 재전송
-            </button>
-            <button type="button" class="btn sendbtn1 message-sender" 
-                    data-message-type="reminder" 
-                    data-confirm-text="선택한 사람들에게 '입금 재촉' 문자를 발송할까요?">
-              💵 입금재촉 발송
-            </button>
-            <button type="button" class="btn sendbtn1 message-sender" 
-                    data-message-type="location" 
-                    data-confirm-text="선택한 사람들에게 '장소 안내' 문자를 발송할까요?">
-              📍 장소안내 발송
-            </button>
-            
-            <!-- 'entrance'와 'entrance2'가 'entrance' 하나로 통합됨 -->
-            <button type="button" class="btn sendbtn1 message-sender" 
-                    data-message-type="entrance" 
-                    data-confirm-text="선택한 사람들에게 조건에 맞는 '입장 안내' 문자를 발송할까요? (일반/초대 자동 구분)">
-              📢 입장안내 발송
-            </button>
+          <button type="button" class="btn sendbtn1 message-sender" 
+                  data-message-type="resend-failed" 
+                  data-confirm-text="[초기 안내 재전송] 선택한 사람들 중 '발송 실패' 상태인 경우에만 재발송합니다. 실행할까요?">
+            🚨 초기안내 재전송
+          </button>
+          <button type="button" class="btn sendbtn1 message-sender" 
+                  data-message-type="reminder" 
+                  data-confirm-text="선택한 사람들에게 '입금 재촉' 문자를 발송할까요?">
+            💵 입금재촉 발송
+          </button>
+          <button type="button" class="btn sendbtn1 message-sender" 
+                  data-message-type="location" 
+                  data-confirm-text="선택한 사람들에게 '장소 안내' 문자를 발송할까요?">
+            📍 장소안내 발송
+          </button>
+          
+          <!-- 'entrance'와 'entrance2'가 'entrance' 하나로 통합됨 -->
+          <button type="button" class="btn sendbtn1 message-sender" 
+                  data-message-type="entrance" 
+                  data-confirm-text="선택한 사람들에게 조건에 맞는 '입장 안내' 문자를 발송할까요? (일반/초대 자동 구분)">
+            📢 입장안내 발송
+          </button>
 
-            <!-- 'review', 'review1', 'review2', 'review3'가 'review' 하나로 통합됨 -->
-            <button type="button" class="btn sendbtn1 message-sender" 
-                    data-message-type="review" 
-                    data-confirm-text="선택한 사람들에게 조건에 맞는 '후기 요청' 문자를 발송할까요? (성별/쿠폰 등 자동 구분)">
-              📝 후기요청 발송
-            </button>
-          </div>
+          <!-- 'review', 'review1', 'review2', 'review3'가 'review' 하나로 통합됨 -->
+          <button type="button" class="btn sendbtn1 message-sender" 
+                  data-message-type="review" 
+                  data-confirm-text="선택한 사람들에게 조건에 맞는 '후기 요청' 문자를 발송할까요? (성별/쿠폰 등 자동 구분)">
+            📝 후기요청 발송
+          </button>
         </div> 
       </div>
       <div class="table-responsive">
         <table class="table table-striped-custom table-table table-borderless table-hover align-middle text-nowrap">
-          <thead class="table-header-wrapper">
+          <thead>
             <tr>
-              <th class="text-center"><input type="checkbox" class="form-check-input" id="check-all-resend"></th>
+              <th class="entrance-check style-checkbox"><input type="checkbox" class="form-check-input" id="check-all-resend"></th>
               <th class="submit-time">제출시각</th>
               <th class="submit-name">이름</th>
               <th class="submit-birth">출생년도</th>
@@ -74,19 +72,24 @@
               <th class="submit-mbti">MBTI</th>
               <th class="submit-ideal">이상형</th>
               <th class="submit-date">참여 날짜</th>
-              <th class="submit-tmi">쿠폰</th>
+              <th class="submit-coupon">쿠폰</th>
               <th class="automessage-deposit">입금문자</th>
               <th class="automessage-location">추가안내문자</th>
-              <th class="checkbox-deposit">메인</th>
-              <th class="checkbox-afterparty">애프터</th>
+              <th class="checkbox-deposit style-checkbox">메인</th>
+              <th class="checkbox-afterparty style-checkbox">애프터</th>
               <th class="memo">메모</th>
             </tr>
           </thead>
           <tbody id="response-table">
-            <tr><td colspan="13" class="text-center text-muted py-3">로딩 중...</td></tr>
+            <tr><td colspan="16" class="text-center text-muted py-3">로딩 중...</td></tr>
           </tbody>
         </table>
       </div>
+      <nav aria-label="Page navigation" class="d-flex justify-content-center mt-4">
+        <ul class="pagination" id="pagination-controls">
+          <!-- 페이지 번호는 JavaScript가 동적으로 생성할 것입니다. -->
+        </ul>
+      </nav>
     </div>
   </div>
   <script>
@@ -94,6 +97,10 @@
     const SUPABASE_URL = 'https://wqxmvqqkbxiykiotbusd.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndxeG12cXFrYnhpeWtpb3RidXNkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg0NDcyOTYsImV4cCI6MjA2NDAyMzI5Nn0.RmB92YtjLPMx4tkQibuRVT_T4DL3_O8Pny3ZA9DU0tk';
     const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const ITEMS_PER_PAGE = 50; // 한 페이지에 30개씩
+    let currentPage = 1;
+    
 
     // 2. 모든 함수 정의
     async function populateDateFilter() {
@@ -117,56 +124,111 @@
     }
 
     // 데이터 로딩 및 테이블 렌더링 함수 (기존과 동일)
-    async function loadResponses() {
+    async function loadResponses(page = 1) {
+      currentPage = page; // 현재 페이지 업데이트
+      const tableBody = document.getElementById('response-table');
+      tableBody.innerHTML = `<tr><td colspan="16" class="text-center text-muted py-5"><span class="spinner-border spinner-border-sm"></span> 로딩 중...</td></tr>`;
+
       const nameFilter = document.getElementById('search-name').value.trim();
       const genderFilter = document.getElementById('filter-gender').value;
       const dateFilter = document.getElementById('filter-date').value;
+      
+      const from = (page - 1) * ITEMS_PER_PAGE;
+      const to = page * ITEMS_PER_PAGE - 1;
 
-      let query = client.from('responses').select('*').order('created_at', { ascending: false });
+      let query = client
+        .from('responses')
+        // ★★★ { count: 'exact' } 로 전체 개수를 함께 가져옵니다. ★★★
+        .select('*', { count: 'exact' }) 
+        .order('created_at', { ascending: false });
 
-      if (nameFilter) query = query.ilike('name', `%${nameFilter}%`); // 이름 검색 최적화
+      if (nameFilter) query = query.ilike('name', `%${nameFilter}%`);
       if (genderFilter) query = query.eq('gender', genderFilter);
       if (dateFilter) query = query.eq('apply_date', dateFilter);
+      
+      // ★★★ .range() 로 필요한 만큼만 데이터를 자릅니다. ★★★
+      query = query.range(from, to);
 
-      const { data, error } = await query;
-      const tableBody = document.getElementById('response-table');
+      const { data, error, count } = await query; // count 변수 추가
       tableBody.innerHTML = '';
 
       if (error) {
         console.error('❌ Supabase 오류:', error);
-        tableBody.innerHTML = `<tr><td colspan="14">데이터를 불러오지 못했습니다.</td></tr>`;
+        tableBody.innerHTML = `<tr><td colspan="16">데이터를 불러오지 못했습니다.</td></tr>`;
         return;
       }
-
+      
       if (!data.length) {
-        tableBody.innerHTML = `<tr><td colspan="14">해당 조건의 결과가 없습니다.</td></tr>`;
+        tableBody.innerHTML = `<tr><td colspan="16">해당 조건의 결과가 없습니다.</td></tr>`;
+        renderPagination(0); // 페이지네이션 숨기기
         return;
       }
 
       data.forEach(row => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
-          <td class="text-center">
+          <td class="entrance-check style-checkbox">
             <input type="checkbox" class="form-check-input row-checkbox" data-id="${row.id}">
           </td>
-          <td>${formatKoreanShortDate(row.created_at)}</td>
-          <td>${row.name || ''}</td>
-          <td>${row.birth_year || ''}</td>
-          <td>${row.phone || ''}</td>
-          <td>${row.gender || ''}</td>
-          <td title="${row.job || ''}">${row.job || ''}</td>
-          <td title="${row.mbti || ''}">${row.mbti || ''}</td>
-          <td title="${row.ideal || ''}">${row.ideal || ''}</td>
-          <td >${row.apply_date ? formatApplyDate(row.apply_date) : ''}</td>
-          <td>${row.coupon || ''}</td>
-          <td><input type="text" class="memo-input" data-id="${row.id}" data-field="memo1" title="${row.memo1 || ''}" value="${row.memo1 || ''}"></td>
-          <td><input type="text" class="memo-input" data-id="${row.id}" data-field="memo3" title="${row.memo3 || ''}" value="${row.memo3 || ''}"></td>
-          <td><input type="checkbox" class="form-check-input memo-checkbox" data-id="${row.id}" data-field="memo2" ${row.memo2 === true ? 'checked' : ''}></td>
-          <td><input type="checkbox" class="form-check-input memo-checkbox" data-id="${row.id}" data-field="memo4" ${row.memo4 === true ? 'checked' : ''}></td>
-          <td><input type="text" class="memo-input" data-id="${row.id}" data-field="memo5" title="${row.memo5 || ''}" value="${row.memo5 || ''}"></td>
+          <td class="submit-time">${formatKoreanShortDate(row.created_at)}</td>
+          <td class="submit-name">${row.name || ''}</td>
+          <td class="submit-birth">${row.birth_year || ''}</td>
+          <td class="submit-phone">${row.phone || ''}</td>
+          <td class="submit-gender">${row.gender || ''}</td>
+          <td class="submit-job" title="${row.job || ''}">${row.job || ''}</td>
+          <td class="submit-mbti" title="${row.mbti || ''}">${row.mbti || ''}</td>
+          <td class="submit-ideal" title="${row.ideal || ''}">${row.ideal || ''}</td>
+          <td class="submit-date">${row.apply_date ? formatApplyDate(row.apply_date) : ''}</td>
+          <td class="submit-coupon">${row.coupon || ''}</td>
+          <td class="automessage-deposit"><input type="text" class="memo-input" data-id="${row.id}" data-field="memo1" title="${row.memo1 || ''}" value="${row.memo1 || ''}"></td>
+          <td class="automessage-location"><input type="text" class="memo-input" data-id="${row.id}" data-field="memo3" title="${row.memo3 || ''}" value="${row.memo3 || ''}"></td>
+          <td class="style-checkbox"><input type="checkbox" class="form-check-input memo-checkbox" data-id="${row.id}" data-field="memo2" ${row.memo2 === true ? 'checked' : ''}></td>
+          <td class="style-checkbox"><input type="checkbox" class="form-check-input memo-checkbox" data-id="${row.id}" data-field="memo4" ${row.memo4 === true ? 'checked' : ''}></td>
+          <td><input type="text" class="memo-input memo" data-id="${row.id}" data-field="memo5" title="${row.memo5 || ''}" value="${row.memo5 || ''}"></td>
         `;
         tableBody.appendChild(tr);
       });
+          // ★★★ 전체 개수를 기반으로 페이지네이션 UI를 렌더링합니다. ★★★
+    renderPagination(count);
+  }
+
+      // ★★★ [신규] 페이지네이션 UI를 렌더링하는 함수 ★★★
+    function renderPagination(totalItems) {
+      const paginationContainer = document.getElementById('pagination-controls');
+      paginationContainer.innerHTML = '';
+      
+      if (totalItems === 0) return;
+
+      const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
+
+      if (totalPages <= 1) return; // 1페이지 이하면 굳이 표시 안 함
+      
+      let paginationHTML = '';
+      
+      // '이전' 버튼
+      paginationHTML += `
+        <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+          <a class="page-link" href="#" onclick="loadResponses(${currentPage - 1})"><</a>
+        </li>
+      `;
+
+      // 페이지 번호 버튼
+      for (let i = 1; i <= totalPages; i++) {
+        paginationHTML += `
+          <li class="page-item ${i === currentPage ? 'active' : ''}">
+            <a class="page-link" href="#" onclick="loadResponses(${i})">${i}</a>
+          </li>
+        `;
+      }
+      
+      // '다음' 버튼
+      paginationHTML += `
+        <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+          <a class="page-link" href="#" onclick="loadResponses(${currentPage + 1})">></a>
+        </li>
+      `;
+      
+      paginationContainer.innerHTML = paginationHTML;
     }
 
     // ★★★ [신규] 선택된 항목에 메시지를 보내는 범용 함수 ★★★
@@ -201,7 +263,7 @@
         if (!response.ok) throw new Error(result.error || '서버에서 오류가 발생했습니다.');
         
         alert(`요청 완료!\n\n${result.message}`);
-        loadResponses();
+        loadResponses(currentPage); // 현재 페이지 다시 로드
         document.getElementById('check-all-resend').checked = false; // 전체 선택 해제
 
       } catch (error) {
@@ -245,7 +307,7 @@
         tableHeader.addEventListener('click', (e) => {
             // '필터 적용' 버튼을 클릭한 경우
             if (e.target.matches('#filters button')) {
-                loadResponses();
+                loadResponses(1);
             }
             // '메시지 발송' 버튼(공통 클래스 .message-sender)을 클릭한 경우
             if (e.target.matches('.message-sender')) {
@@ -256,7 +318,7 @@
         // Enter 키로 이름 검색 필터 적용
         document.getElementById('search-name').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
-                loadResponses();
+                loadResponses(1);
             }
         });
 
@@ -306,7 +368,7 @@
           
         // 초기 데이터 로딩
         populateDateFilter();
-        loadResponses();
+        loadResponses(currentPage);
     });
     
     // 4. 실시간 구독 로직 (기존과 동일)
@@ -314,7 +376,7 @@
       .on('postgres_changes', { event: '*', schema: 'public', table: 'responses' }, 
         payload => {
           console.log('📡 Realtime 변경 감지됨:', payload);
-          loadResponses(); // INSERT, UPDATE, DELETE 모든 변경에 대해 테이블 다시 불러옴
+          loadResponses(currentPage); // INSERT, UPDATE, DELETE 모든 변경에 대해 테이블 다시 불러옴
         }
       )
       .subscribe();
