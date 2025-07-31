@@ -30,21 +30,18 @@ const corsHeaders = {
  * @returns {Promise<boolean>} - 발송 성공 시 true, 실패 시 false
  */
 async function sendAlimtalk(user, templateCode, variables) {
+  // resend-selected.js에 있던 개선된 버전의 sendAlimtalk 함수를 여기에 둡니다.
   const messageService = new SolapiMessageService(
     process.env.COOLSMS_API_KEY,
     process.env.COOLSMS_API_SECRET
   );
   
   const payload = {
-    to: user.phone ? user.phone.replace(/-/g, '') : '',
+    to: user.phone.replace(/-/g, ''),
     kakaoOptions: {
       pfId: process.env.COOLSMS_PFID,
       templateId: templateCode,
-      variables: variables,
-      customFields: { 
-        recordId: user.id, 
-        userName: user.name 
-      }
+      variables: variables
     }
   };
 
@@ -144,7 +141,7 @@ const COUPON_CONFIG = [
   {
     code: '재환',
     template: 'KA01TP250709145734382Qm8j2DgohNp', // 남/여 공통 템플릿을 문자열로 바로 할당
-    successMessage: (user) => `✅재환초대_${user.gender}`, // 메시지는 동적으로 생성
+    successMessage: (user) => `✅민수초대_${user.gender}`, // 메시지는 동적으로 생성
     variables: (user, formattedDate) => ({
       '#{고객명}': user.name,
       '#{파티명}': '게릴라 파티',
@@ -158,7 +155,7 @@ const COUPON_CONFIG = [
   {
     code: '문토',
     template: 'KA01TP250709145734382Qm8j2DgohNp', // 남/여 공통 템플릿을 문자열로 바로 할당
-    successMessage: (user) => `✅문토예약_${user.gender}`, // 메시지는 동적으로 생성
+    successMessage: (user) => `✅민수초대_${user.gender}`, // 메시지는 동적으로 생성
     variables: (user, formattedDate) => ({
       '#{고객명}': user.name,
       '#{파티명}': '게릴라 파티',
