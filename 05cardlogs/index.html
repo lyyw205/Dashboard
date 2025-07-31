@@ -55,13 +55,12 @@
           </div>
         </div>
         <div id="summary-container" class="summary-container mt-4 p-3 border rounded bg-light" style="display: none;">
-          <h4>🔍 조회 결과 요약</h4>
           <div class="row">
-            <div class="col-6">
+            <div class="col-2">
               <p class="summary-label">총 입금액</p>
               <p id="total-deposit" class="summary-value deposit-color">0 원</p>
             </div>
-            <div class="col-6">
+            <div class="col-2">
               <p class="summary-label">총 출금액</p>
               <p id="total-withdrawal" class="summary-value withdrawal-color">0 원</p>
             </div>
@@ -437,21 +436,29 @@
                     datalabels: {
                         display: context => context.dataset.data[context.dataIndex] > 0,
                         formatter: (value, context) => {
+                            // 1. 총액 계산 (기존과 동일)
                             let total = context.datasetIndex === 0 ? totalDeposit : totalWithdrawal;
-                            const percentage = total > 0 ? (value / total) * 100 : 0;
-                            const formattedValue = new Intl.NumberFormat('ko-KR').format(value);
-                            return `${formattedValue}\n(${percentage.toFixed(1)}%)`;
+                            
+                            // 2. 백분율 계산 및 소수점 제거 (Math.round 사용)
+                            const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
+                            
+                            // 3. 금액 포맷팅 및 '원' 추가
+                            const formattedValue = new Intl.NumberFormat('ko-KR').format(value) + '원';
+                            
+                            // 4. 백분율이 위로, 금액이 아래로 오도록 순서 변경 및 최종 문자열 반환
+                            return `${percentage}%\n${formattedValue}`;
                         },
-                        anchor: 'end',
+                        anchor: 'start',
                         align: 'center',
-                        offset: 7,
+                        offset: 0,
                         font: {
                             family: "'Pretendard Variable', sans-serif", // 원하는 폰트 패밀리 지정
-                            weight: '400',
-                            size: 11,
-                            lineHeight: 1.2 // 줄 간격 조절
+                            weight: '500',
+                            size: 12,
+                            lineHeight: 1.5 // 줄 간격 조절
                         },
-                        color: '#333'
+                        color: '#333',
+                        textAlign: 'center' // 두 줄 텍스트 가운데 정렬
                     },
                     title: { display: true, text: chartTitle, font: { size: 16 } },
                     legend: { position: 'top' },
@@ -471,6 +478,14 @@
                 scales: {
                     x: {
                         stacked: false,
+                        ticks: {
+                            padding: 20, // x축과 라벨 사이의 간격을 10px로 설정
+                            font: {
+                                size: 13,       // 폰트 크기를 13px로 설정 (원하는 크기로 조절)
+                                weight: 'bold', // 폰트를 굵게(bold) 설정
+                                family: "'Pretendard Variable', sans-serif" // 폰트 종류 지정
+                            }
+                        }
                     },
                     y: {
                         stacked: false,
