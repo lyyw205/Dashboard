@@ -237,3 +237,23 @@ select.type-select {
 #chart-container {
   display: none;
 }
+
+
+.summary-container {
+  /* 원하는 스타일 추가 */
+}
+.summary-label {
+  font-size: 1rem;
+  color: #6c757d;
+  margin-bottom: 0.25rem;
+}
+.summary-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+.deposit-color {
+  color: #0d6efd; /* 부트스트랩 파란색 */
+}
+.withdrawal-color {
+  color: #dc3545; /* 부트스트랩 빨간색 */
+}

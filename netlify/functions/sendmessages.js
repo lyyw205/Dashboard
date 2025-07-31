@@ -53,15 +53,19 @@ exports.handler = async (event) => {
     }
     console.log('✅ 전체 데이터 조회 성공:', newUser);
 
+    const userCouponCode = newUser.coupon ? newUser.coupon.trim().toUpperCase() : null;
     // 유효성 검사
-    if (!newUser.phone) {
-      console.warn('⚠️ 전화번호가 없어 건너뜁니다.');
-      await updateResponse(newUser.id, { memo1: '❌발송실패(번호없음)' }); 
-      return { statusCode: 200, body: 'No phone number, skipped.' };
-    }
+    // memo1 필드 검사는 먼저 수행
     if (newUser.memo1 && newUser.memo1 !== '처리 대기중') {
       console.warn(`⚠️ 이미 처리된 제출이라 건너뜁니다 (id=${newUser.id}, memo1=${newUser.memo1})`);
       return { statusCode: 200, body: 'Already processed, skipped.' };
+    }
+    
+    // 전화번호 유효성 검사 (단, '문토' 쿠폰은 예외)
+    if (userCouponCode !== '문토' && !newUser.phone) {
+      console.warn('⚠️ 전화번호가 없어 건너뜁니다.');
+      await updateResponse(newUser.id, { memo1: '❌발송실패(번호없음)' }); 
+      return { statusCode: 200, body: 'No phone number, skipped.' };
     }
 
     // 알림톡 발송 분기 처리
@@ -69,13 +73,22 @@ exports.handler = async (event) => {
     
     const formattedApplyDate = formatKoreanDate(newUser.apply_date);
     
-    // 4. 알림톡 발송
-    const isSent = await sendAlimtalk(
-      newUser,
-      config.template,
-      config.variables(newUser, formattedApplyDate)
-    );
+    let isSent = false; // 발송 성공 여부 변수
 
+        // ★★★ '문토' 특별 처리 분기 ★★★
+    if (userCouponCode === '문토') {
+      console.log("✨ '문토' 예약자 특별 처리: 문자 발송을 건너뛰고 바로 성공으로 간주합니다.");
+      isSent = true; // 실제 발송 없이 성공으로 처리
+    } else {
+      // 그 외 모든 경우에만 실제 알림톡 발송
+      isSent = await sendAlimtalk(
+        newUser,
+        config.template,
+        config.variables(newUser, formattedApplyDate)
+      );
+    }
+    
+    
     const statusMessage = isSent ? config.successMessage : '❌발송실패';
     // 1. 기본적으로 업데이트할 데이터를 만듭니다 (memo1).
     let dbUpdatePayload = {

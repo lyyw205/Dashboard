@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="../common/sidebar.css"/>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
 </head>
 <body>
   <div class="cardlogs-main main-content">
@@ -51,6 +52,19 @@
                     <!-- 조회 버튼 -->
           <div class="col-md-3 mt-3">
             <button id="filter-btn" class="btn btn-search w-100">조회하기</button>
+          </div>
+        </div>
+        <div id="summary-container" class="summary-container mt-4 p-3 border rounded bg-light" style="display: none;">
+          <h4>🔍 조회 결과 요약</h4>
+          <div class="row">
+            <div class="col-6">
+              <p class="summary-label">총 입금액</p>
+              <p id="total-deposit" class="summary-value deposit-color">0 원</p>
+            </div>
+            <div class="col-6">
+              <p class="summary-label">총 출금액</p>
+              <p id="total-withdrawal" class="summary-value withdrawal-color">0 원</p>
+            </div>
           </div>
         </div>
         
@@ -128,6 +142,7 @@
       'https://wqxmvqqkbxiykiotbusd.supabase.co',
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndxeG12cXFrYnhpeWtpb3RidXNkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg0NDcyOTYsImV4cCI6MjA2NDAyMzI5Nn0.RmB92YtjLPMx4tkQibuRVT_T4DL3_O8Pny3ZA9DU0tk'
     );
+    Chart.register(ChartDataLabels);
 
     const categories = ['광고', '장소 대관', '안주/주류', '비품', '업무추진비', '공과금', '파티비', '현장판매', '대관', '기타'];
 
@@ -247,7 +262,7 @@
         const chartMemoText = memoSearchInput.value.trim();
         
         // 생성된 'YYYY-MM-DD HH:mm:ss' 형식의 문자열을 그대로 전달합니다.
-        await fetchAndRenderChart(startDateForDB, endDateForDB, selectedChartCategories, chartTypesToQuery, chartMemoText);
+        await fetchDataAndDisplayResults(startDateForDB, endDateForDB, selectedChartCategories, chartTypesToQuery, chartMemoText);
     });
 
     function applyTableFilters() {
@@ -299,139 +314,176 @@
         });
     }
     
-    async function fetchAndRenderChart(startDate, endDate, categories, typesToQuery, memoText) {
-        // 불필요한 typesToFetch 계산 로직을 제거하고 typesToQuery를 직접 사용합니다.
-        let query = supa
-            .from('card_logs')
-            .select('category, amount, type')
+    async function fetchDataAndDisplayResults(startDate, endDate, categories, typesToQuery, memoText) {
+        // 1. DB에서 데이터 조회
+        let query = supa.from('card_logs').select('category, amount, type')
             .in('type', typesToQuery)
             .gte('timeline', startDate)
             .lte('timeline', endDate)
             .in('category', categories);
+        if (memoText) query = query.ilike('memo', `%${memoText}%`);
 
-        if (memoText) {
-            query = query.ilike('memo', `%${memoText}%`);
-        }
+        const { data: rawData, error } = await query;
+        if (error) { /* ... */ return; }
 
-        const { data: chartData, error } = await query;
+        // 2. 총액 계산 및 화면 표시
+        let totalDeposit = 0;
+        let totalWithdrawal = 0;
+        rawData.forEach(item => {
+            if (item.type === '입금') totalDeposit += item.amount;
+            else if (item.type === '출금') totalWithdrawal += item.amount;
+            else if (item.type === '출금취소') totalWithdrawal -= item.amount;
+        });
+        document.getElementById('total-deposit').textContent = `${formatNumber(totalDeposit)} 원`;
+        document.getElementById('total-withdrawal').textContent = `${formatNumber(totalWithdrawal)} 원`;
+        document.getElementById('summary-container').style.display = 'block';
 
-        if (error) {
-            console.error('차트 데이터 조회 오류:', error);
-            alert('데이터를 가져오는 데 실패했습니다.');
-            return;
-        }
-
-        const categoryTotals = {};
-        categories.forEach(cat => categoryTotals[cat] = 0);
-        chartData.forEach(item => {
-            if (categoryTotals.hasOwnProperty(item.category)) {
-                if (item.type === '출금취소') {
-                    categoryTotals[item.category] -= item.amount;
-                } else {
-                    categoryTotals[item.category] += item.amount;
+        // 3. 카테고리별 데이터 집계
+        const depositCategoryTotals = {};
+        const withdrawalCategoryTotals = {};
+        categories.forEach(cat => {
+            depositCategoryTotals[cat] = 0;
+            withdrawalCategoryTotals[cat] = 0;
+        });
+        rawData.forEach(item => {
+            if (item.type === '입금') {
+                if (depositCategoryTotals.hasOwnProperty(item.category)) depositCategoryTotals[item.category] += item.amount;
+            } else if (item.type === '출금' || item.type === '출금취소') {
+                if (withdrawalCategoryTotals.hasOwnProperty(item.category)) {
+                    if(item.type === '출금') withdrawalCategoryTotals[item.category] += item.amount;
+                    else withdrawalCategoryTotals[item.category] -= item.amount;
                 }
             }
         });
 
-        // 차트 제목을 위한 로직
-        const originalSelectedTypes = typesToQuery.filter(t => t !== '출금취소');
-        const chartTypeTitle = originalSelectedTypes.join(' & ');
-        renderBarChart(categoryTotals, chartTypeTitle);
+        // 4. ★★★ 실제 차트에 표시할 데이터만 필터링 ★★★
+        const dynamicLabels = [];
+        const dynamicDepositValues = [];
+        const dynamicWithdrawalValues = [];
+        categories.forEach(label => {
+            const depositValue = depositCategoryTotals[label] || 0;
+            const withdrawalValue = withdrawalCategoryTotals[label] || 0;
+            if (depositValue > 0 || withdrawalValue > 0) {
+                dynamicLabels.push(label);
+                dynamicDepositValues.push(depositValue);
+                dynamicWithdrawalValues.push(withdrawalValue);
+            }
+        });
+
+        // 5. 모든 가공이 끝난 최종 데이터를 다음 함수에 전달
+        renderDualCategoryChart(dynamicLabels, dynamicDepositValues, dynamicWithdrawalValues, totalDeposit, totalWithdrawal);
     }
-    
-    function renderBarChart(data, type) {
-      const ctx = document.getElementById('category-chart').getContext('2d');
-      const labels = Object.keys(data);
-      const values = Object.values(data);
-      
-      if (categoryChart) {
-        categoryChart.destroy();
-      }
-
-      const chartTitle = `선택된 기간 및 카테고리별 ${type} 현황`;
-      const datasetLabel = `카테고리별 총 ${type} 금액 (원)`;
-
-      const chartColor = type === '입금' ? 'rgba(75, 192, 192, 0.6)' : 'rgba(255, 99, 132, 0.6)';
-      const chartBorderColor = type === '입금' ? 'rgba(75, 192, 192, 1)' : 'rgba(255, 99, 132, 1)';
-      
-      categoryChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: labels,
-          datasets: [{
-            label: datasetLabel,
-            data: values,
-            backgroundColor: chartColor,
-            borderColor: chartBorderColor,
-            borderWidth: 1,
-            maxBarThickness: 100
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            title: {
-              display: true,
-              text: chartTitle,
-              font: {
-                size: 16
-              }
-            },
-            tooltip: {
-              callbacks: {
-                label: function(context) {
-                  let label = context.dataset.label || '';
-                  if (label) {
-                    label += ': ';
-                  }
-                  if (context.parsed.y !== null) {
-                    label += new Intl.NumberFormat('ko-KR').format(context.parsed.y) + ' 원';
-                  }
-                  return label;
-                }
-              }
-            },
-            legend: {
-          // 범례를 클릭했을 때의 기본 동작(데이터 숨기기)을 비활성화합니다.
-              onClick: null 
-            }
-          },
-          scales: {
-            x: {
-              ticks: {
-                // 각 라벨을 어떻게 그릴지 정의하는 콜백함수
-                callback: function(value, index, ticks) {
-                  const categoryName = labels[index]; // 현재 인덱스의 카테고리명
-                  const categoryValue = values[index]; // 현재 인덱스의 금액
-                  
-                  // 금액이 0이 아니면 포맷팅, 0이면 빈 문자열
-                  const formattedValue = categoryValue !== 0 
-                    ? new Intl.NumberFormat('ko-KR').format(categoryValue)
-                    : '';
-
-                  // 배열로 반환하면 자동으로 여러 줄 라벨이 됩니다.
-                  return [categoryName, formattedValue];
-                },
-                font: {
-                  size: 12 // 폰트 크기 조절
-                }
-              }
-            },
-            y: {
-              beginAtZero: true,
-              ticks: {
-                callback: function(value, index, values) {
-                  return new Intl.NumberFormat('ko-KR').format(value);
-                },
-              grace: '5%'
-              }
-            }
-          }
+        
+    function renderDualCategoryChart(chartLabels, depositValues, withdrawalValues, totalDeposit, totalWithdrawal) {
+        const chartContainer = document.getElementById('chart-container');
+        const ctx = document.getElementById('category-chart').getContext('2d');
+        
+        if (categoryChart) {
+            categoryChart.destroy();
         }
-      });
-      // [신규] 차트가 성공적으로 그려진 후, 숨겨진 컨테이너를 보이게 만듭니다.
-      document.getElementById('chart-container').style.display = 'block';
+
+        // ★★★ (핵심) 가운데 정렬을 위한 패딩 로직 ★★★
+        // 이 함수는 이제 데이터 가공 없이 전달받은 값을 그대로 사용합니다.
+        const MIN_DISPLAY_CATEGORIES = 7;
+        const numActiveCategories = chartLabels.length;
+
+        let finalLabels = chartLabels;
+        let finalDepositValues = depositValues;
+        let finalWithdrawalValues = withdrawalValues;
+
+        if (numActiveCategories > 0 && numActiveCategories < MIN_DISPLAY_CATEGORIES) {
+            const paddingCount = Math.floor((MIN_DISPLAY_CATEGORIES - numActiveCategories) / 2);
+            const labelPadding = Array(paddingCount).fill('');
+            const dataPadding = Array(paddingCount).fill(null);
+            finalLabels = [...labelPadding, ...chartLabels, ...labelPadding];
+            finalDepositValues = [...dataPadding, ...depositValues, ...dataPadding];
+            finalWithdrawalValues = [...dataPadding, ...withdrawalValues, ...dataPadding];
+        }
+        // ★★★ 패딩 로직 끝 ★★★
+
+
+        // --- 3. 차트 렌더링 ---
+        const chartTitle = '선택된 기간 및 카테고리별 입/출금 현황';
+
+        categoryChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                // ★★★ 패딩이 적용된 최종 데이터를 사용합니다 ★★★
+                labels: finalLabels,
+                datasets: [
+                    {
+                        label: '총 입금액 (원)',
+                        data: finalDepositValues,
+                        backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                        borderColor: 'rgba(75, 192, 192, 1)'
+                        // maxBarThickness 등은 이제 불필요하므로 제거해도 좋습니다.
+                    },
+                    {
+                        label: '총 출금액 (원)',
+                        data: finalWithdrawalValues,
+                        backgroundColor: 'rgba(255, 99, 132, 0.6)',
+                        borderColor: 'rgba(255, 99, 132, 1)'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                // bar 관련 너비 옵션
+                categoryPercentage: 0.8, // 카테고리 열 내에서 막대 그룹이 차지하는 너비 비율
+                barPercentage: 0.7,      // 막대 그룹 내에서 각 막대가 차지하는 너비 비율
+                plugins: {
+                    // 데이터 라벨 플러그인 설정은 그대로 유지
+                    datalabels: {
+                        display: context => context.dataset.data[context.dataIndex] > 0,
+                        formatter: (value, context) => {
+                            let total = context.datasetIndex === 0 ? totalDeposit : totalWithdrawal;
+                            const percentage = total > 0 ? (value / total) * 100 : 0;
+                            const formattedValue = new Intl.NumberFormat('ko-KR').format(value);
+                            return `${formattedValue}\n(${percentage.toFixed(1)}%)`;
+                        },
+                        anchor: 'end',
+                        align: 'center',
+                        offset: 7,
+                        font: {
+                            family: "'Pretendard Variable', sans-serif", // 원하는 폰트 패밀리 지정
+                            weight: '400',
+                            size: 11,
+                            lineHeight: 1.2 // 줄 간격 조절
+                        },
+                        color: '#333'
+                    },
+                    title: { display: true, text: chartTitle, font: { size: 16 } },
+                    legend: { position: 'top' },
+                    tooltip: {
+                      callbacks: {
+                        label: function(context) {
+                          let label = context.dataset.label || '';
+                          if (label) { label += ': '; }
+                          if (context.parsed.y !== null) {
+                              label += new Intl.NumberFormat('ko-KR').format(context.parsed.y) + ' 원';
+                          }
+                          return label;
+                        }
+                      }
+                    }
+                },
+                scales: {
+                    x: {
+                        stacked: false,
+                    },
+                    y: {
+                        stacked: false,
+                        beginAtZero: true,
+                        ticks: {
+                            callback: value => new Intl.NumberFormat('ko-KR').format(value)
+                        },
+                        grace: '20%'
+                    }
+                }
+            }
+        });
+        chartContainer.style.display = 'block';
     }
 
     // [수정] 모든 필터 이벤트가 통합 함수를 호출하도록 연결
