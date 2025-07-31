@@ -130,6 +130,11 @@
             <tbody></tbody>
           </table>
         </div>
+        <nav aria-label="Page navigation" class="d-flex justify-content-center mt-4">
+          <ul class="pagination" id="pagination-controls">
+            <!-- 페이지 번호는 JavaScript가 동적으로 생성합니다. -->
+          </ul>
+        </nav>
       </div>
     </div>
   </div>
@@ -145,22 +150,13 @@
 
     const categories = ['광고', '장소 대관', '안주/주류', '비품', '업무추진비', '공과금', '파티비', '현장판매', '대관', '기타'];
 
-    //=======================================================
-    // 차트 및 필터링 관련 로직
-    //=======================================================
-    const typeButtonsContainer = document.getElementById('type-buttons-container');
-    const categoryButtonsContainer = document.getElementById('category-buttons-container');
-    const filterBtn = document.getElementById('filter-btn');
-    const startDateInput = document.getElementById('startDate');
-    const endDateInput = document.getElementById('endDate');
-    let categoryChart = null; 
-    const memoSearchInput = document.getElementById('memo-search-input');
-    const tableStartDate = document.getElementById('table-start-date');
-    const tableEndDate = document.getElementById('table-end-date');
-    const tableTypeFilter = document.getElementById('table-type-filter');
-    const tableCategoryFilter = document.getElementById('table-category-filter');
-    const tableMemoSearch = document.getElementById('table-memo-search');
-    const tableStoreSearch = document.getElementById('table-store-search');
+        // ★★★ [신규] 페이지네이션을 위한 전역 변수 추가 ★★★
+    const ITEMS_PER_PAGE = 70; // 한 페이지에 50개씩 표시 (원하는 숫자로 조절)
+    let currentPage = 1;
+
+    function formatNumber(num) {
+        return typeof num === 'number' ? num.toLocaleString('ko-KR') : '';
+    }
 
     function formatDateForInput(input) {
       // 1. 입력값이 없는 경우, 에러 방지를 위해 빈 문자열 반환
@@ -182,6 +178,35 @@
       // 4. 그 외의 모든 예외적인 경우
       return '';
     }
+
+    function formatDateCompact(dateString) {
+      if (!dateString || dateString.length < 16) return '';
+
+      // "2025-07-19T18:54:00+00:00" 형태의 문자열을 가정
+      const month = dateString.substring(5, 7);
+      const day = dateString.substring(8, 10);
+      const hour = dateString.substring(11, 13);
+      const minute = dateString.substring(14, 16);
+
+      return `${month}/${day} ${hour}:${minute}`;
+    }
+
+    //=======================================================
+    // 차트 및 필터링 관련 로직
+    //=======================================================
+    const typeButtonsContainer = document.getElementById('type-buttons-container');
+    const categoryButtonsContainer = document.getElementById('category-buttons-container');
+    const filterBtn = document.getElementById('filter-btn');
+    const startDateInput = document.getElementById('startDate');
+    const endDateInput = document.getElementById('endDate');
+    let categoryChart = null; 
+    const memoSearchInput = document.getElementById('memo-search-input');
+    const tableStartDate = document.getElementById('table-start-date');
+    const tableEndDate = document.getElementById('table-end-date');
+    const tableTypeFilter = document.getElementById('table-type-filter');
+    const tableCategoryFilter = document.getElementById('table-category-filter');
+    const tableMemoSearch = document.getElementById('table-memo-search');
+    const tableStoreSearch = document.getElementById('table-store-search');
 
     // [신규] 기본 날짜 범위(오늘 ~ 2주 전)를 설정하는 함수
     function setDefaultDateRange() {
@@ -264,53 +289,84 @@
         await fetchDataAndDisplayResults(startDateForDB, endDateForDB, selectedChartCategories, chartTypesToQuery, chartMemoText);
     });
 
-    function applyTableFilters() {
-        const startDate = tableStartDate.value;
-        const endDate = tableEndDate.value;
-        const selectedType = tableTypeFilter.value;
-        const selectedCategory = tableCategoryFilter.value;
-        const searchText = tableMemoSearch.value.toLowerCase().trim();
-        const storeSearchText = tableStoreSearch.value.toLowerCase().trim();
+    async function loadTableData(page = 1) {
+        currentPage = page;
+        const tbody = document.querySelector('#log-table tbody');
+        tbody.innerHTML = `<tr><td colspan="8" class="text-center text-muted py-5"><span class="spinner-border spinner-border-sm"></span> 로딩 중...</td></tr>`;
 
-        const tableRows = document.querySelectorAll('#log-table tbody tr');
+        // 1. 하단 테이블 필터들의 현재 값을 모두 읽어옵니다.
+        const startDate = document.getElementById('table-start-date').value;
+        const endDate = document.getElementById('table-end-date').value;
+        const selectedType = document.getElementById('table-type-filter').value;
+        const selectedCategory = document.getElementById('table-category-filter').value;
+        const memoSearch = document.getElementById('table-memo-search').value.trim();
+        const storeSearch = document.getElementById('table-store-search').value.trim();
 
-        tableRows.forEach(row => {
-            // 1. row에 저장된 UTC 시간(ISO 문자열)을 가져온다.
-            const rowTimelineUTC = row.dataset.timeline;
-            if (!rowTimelineUTC) { // timeline 데이터가 없는 row는 무시
-                row.style.display = 'none';
-                return;
-            }
+        const from = (page - 1) * ITEMS_PER_PAGE;
+        const to = page * ITEMS_PER_PAGE - 1;
 
-            // 2. UTC 문자열로 KST 기준의 Date 객체를 생성한다.
-            const rowKSTDateStr = formatDateForInput(rowTimelineUTC);
-            
-            const rowType = row.querySelector('.type-select')?.value;
-            const rowCategory = row.querySelector('.category-select')?.value;
-            const memoText = (row.querySelector('.memo-input')?.value || '').toLowerCase();
-            const storeText = (row.querySelector('.store-cell')?.textContent || '').toLowerCase();
+        // 2. 읽어온 필터 값을 바탕으로 Supabase 쿼리를 동적으로 구성합니다.
+        let query = supa
+            .from('card_logs')
+            .select('*', { count: 'exact' }) // 전체 개수도 함께 요청
+            .order('timeline', { ascending: false }); // 최신순으로 변경 (or true)
 
-            // 필터 조건 검사
-            const dateMatch = (!startDate || rowKSTDateStr >= startDate) && (!endDate || rowKSTDateStr <= endDate);
-            
-            let typeMatch = true;
-            if (selectedType === '출금') {
-                typeMatch = (rowType === '출금' || rowType === '출금취소');
-            } else if (selectedType !== 'all') {
-                typeMatch = (rowType === selectedType);
-            }
+        if (startDate) query = query.gte('timeline', `${startDate} 00:00:00`);
+        if (endDate) query = query.lte('timeline', `${endDate} 23:59:59`);
+        if (selectedCategory !== 'all') query = query.eq('category', selectedCategory);
+        if (memoSearch) query = query.ilike('memo', `%${memoSearch}%`);
+        if (storeSearch) query = query.ilike('store', `%${storeSearch}%`);
+        
+        // '출금' 선택 시 '출금취소'도 포함
+        if (selectedType === '출금') {
+            query = query.in('type', ['출금', '출금취소']);
+        } else if (selectedType !== 'all') {
+            query = query.eq('type', selectedType);
+        }
 
-            const categoryMatch = selectedCategory === 'all' || rowCategory === selectedCategory;
-            const memoMatch = memoText.includes(searchText);
-            const storeMatch = storeText.includes(storeSearchText);
+        // 3. 페이지네이션을 위한 .range()를 마지막에 추가합니다.
+        query = query.range(from, to);
+        
+        const { data, error, count } = await query;
+        tbody.innerHTML = ''; // 테이블 내용 비우기
 
-            // 최종적으로 보여줄지 말지 결정
-            if (dateMatch && typeMatch && categoryMatch && memoMatch && storeMatch) {
-                row.style.display = ''; // 테이블의 기본 tr display 속성으로 복원
-            } else {
-                row.style.display = 'none';
-            }
-        });
+        if (error) {
+            console.error('테이블 데이터 로드 오류:', error);
+            tbody.innerHTML = `<tr><td colspan="8">데이터를 불러오지 못했습니다.</td></tr>`;
+            return;
+        }
+
+        if (!data.length) {
+            tbody.innerHTML = `<tr><td colspan="8">해당 조건의 결과가 없습니다.</td></tr>`;
+            renderPagination(0); // 페이지네이션 숨기기
+            return;
+        }
+
+        // 4. 받아온 데이터로 테이블 행을 만듭니다.
+        data.forEach(row => appendRow(row));
+
+        // 5. 전체 개수를 바탕으로 페이지네이션 UI를 렌더링합니다.
+        renderPagination(count);
+    }
+
+        // ★★★ [신규] 페이지네이션 UI 렌더링 함수 ★★★
+    function renderPagination(totalItems) {
+        const paginationContainer = document.getElementById('pagination-controls');
+        paginationContainer.innerHTML = '';
+        const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
+
+        if (totalPages <= 1) return;
+        
+        // 이전 버튼
+        paginationContainer.innerHTML += `<li class="page-item ${currentPage === 1 ? 'disabled' : ''}"><a class="page-link" href="#" onclick="event.preventDefault(); loadTableData(${currentPage - 1});">이전</a></li>`;
+        
+        // 페이지 번호 버튼
+        for (let i = 1; i <= totalPages; i++) {
+            paginationContainer.innerHTML += `<li class="page-item ${i === currentPage ? 'active' : ''}"><a class="page-link" href="#" onclick="event.preventDefault(); loadTableData(${i});">${i}</a></li>`;
+        }
+
+        // 다음 버튼
+        paginationContainer.innerHTML += `<li class="page-item ${currentPage === totalPages ? 'disabled' : ''}"><a class="page-link" href="#" onclick="event.preventDefault(); loadTableData(${currentPage + 1});">다음</a></li>`;
     }
     
     async function fetchDataAndDisplayResults(startDate, endDate, categories, typesToQuery, memoText) {
@@ -502,53 +558,12 @@
     }
 
     // [수정] 모든 필터 이벤트가 통합 함수를 호출하도록 연결
-    tableStartDate.addEventListener('change', applyTableFilters);
-    tableEndDate.addEventListener('change', applyTableFilters);
-    tableTypeFilter.addEventListener('change', applyTableFilters); // 새로 추가된 드롭다운의 이벤트
-    tableCategoryFilter.addEventListener('change', applyTableFilters);
-    tableMemoSearch.addEventListener('input', applyTableFilters);
-    tableStoreSearch.addEventListener('input', applyTableFilters);
-
-    //=======================================================
-    // 기존 테이블 관련 로직
-    //=======================================================
-    async function loadInitialLogs() {
-      const { data, error } = await supa
-        .from('card_logs')
-        .select('*')
-        .order('timeline', { ascending: true });
-
-      if (error) {
-        console.error('초기 로드 오류:', error);
-        return;
-      }
-
-      const tbody = document.querySelector('#log-table tbody');
-      tbody.innerHTML = '';
-
-      data.forEach(row => { // reverse()를 제거하고 forEach로 변경
-        appendRow(row);     // appendRow는 이제 prepend로 동작하므로 순서가 맞음
-      });
-      
-      // 모든 데이터를 DOM에 추가한 후, 마지막에 필터를 한번 전체 적용
-      applyTableFilters(); 
-    }
-
-    function formatNumber(num) {
-      return typeof num === 'number' ? num.toLocaleString('ko-KR') : '';
-    } 
-
-    function formatDateCompact(dateString) {
-      if (!dateString || dateString.length < 16) return '';
-
-      // "2025-07-19T18:54:00+00:00" 형태의 문자열을 가정
-      const month = dateString.substring(5, 7);
-      const day = dateString.substring(8, 10);
-      const hour = dateString.substring(11, 13);
-      const minute = dateString.substring(14, 16);
-
-      return `${month}/${day} ${hour}:${minute}`;
-    }
+    document.getElementById('table-start-date').addEventListener('change', () => loadTableData(1));
+    document.getElementById('table-end-date').addEventListener('change', () => loadTableData(1));
+    document.getElementById('table-type-filter').addEventListener('change', () => loadTableData(1));
+    document.getElementById('table-category-filter').addEventListener('change', () => loadTableData(1));
+    document.getElementById('table-memo-search').addEventListener('input', () => loadTableData(1));
+    document.getElementById('table-store-search').addEventListener('input', () => loadTableData(1));
 
 
     function appendRow(row) {
@@ -595,7 +610,7 @@
         `;
 
         // 새로운 행을 테이블의 가장 위쪽에 추가
-        tbody.prepend(tr);
+        tbody.append(tr);
     }
 
 
@@ -663,7 +678,7 @@
     setDefaultDateRange();
     createCategoryButtons();
     populateTableFilter();
-    loadInitialLogs();
+    loadTableData();
 
     // ✅ 실시간 삽입만 감지
     supa
