@@ -362,38 +362,65 @@
         paginationContainer.innerHTML += `<li class="page-item ${currentPage === totalPages ? 'disabled' : ''}"><a class="page-link" href="#" onclick="event.preventDefault(); loadTableData(${currentPage + 1});">다음</a></li>`;
     }
     
-    async function fetchDataAndDisplayResults(startDate, endDate, categories, typesToQuery, memoText) {
-        // 1. DB에서 데이터 조회
-        let query = supa.from('card_logs').select('category, amount, type')
+    async function fetchDataAndDisplayResults(startDate, endDate, selectedCategories, typesToQuery, memoText) {
+        // --- 1. 전체 기간의 총액 계산 (퍼센트 기준값용) ---
+        // 카테고리 필터를 제외하고 먼저 쿼리하여 전체 총액을 구합니다.
+        let totalQuery = supa.from('card_logs').select('amount, type')
+            .in('type', typesToQuery)
+            .gte('timeline', startDate)
+            .lte('timeline', endDate);
+        if (memoText) {
+            totalQuery = totalQuery.ilike('memo', `%${memoText}%`);
+        }
+
+        const { data: totalData, error: totalError } = await totalQuery;
+        if (totalError) {
+            console.error('전체 총액 데이터 조회 오류:', totalError);
+            alert('데이터를 불러오는 데 실패했습니다.');
+            return;
+        }
+        
+        // 이 변수들이 최종 퍼센트 계산의 기준이 됩니다.
+        let grandTotalDeposit = 0;
+        let grandTotalWithdrawal = 0;
+        totalData.forEach(item => {
+            if (item.type === '입금') grandTotalDeposit += item.amount;
+            else if (item.type === '출금') grandTotalWithdrawal += item.amount;
+            else if (item.type === '출금취소') grandTotalWithdrawal -= item.amount;
+        });
+
+        // 화면 상단의 요약 정보도 전체 기간 기준으로 표시
+        document.getElementById('total-deposit').textContent = `${formatNumber(grandTotalDeposit)} 원`;
+        document.getElementById('total-withdrawal').textContent = `${formatNumber(grandTotalWithdrawal)} 원`;
+        document.getElementById('summary-container').style.display = 'block';
+
+
+        // --- 2. 차트에 표시할 특정 카테고리의 데이터 계산 ---
+        // 이제 선택된 카테고리를 포함하여 차트에 그릴 데이터를 쿼리합니다.
+        let chartQuery = supa.from('card_logs').select('category, amount, type')
             .in('type', typesToQuery)
             .gte('timeline', startDate)
             .lte('timeline', endDate)
-            .in('category', categories);
-        if (memoText) query = query.ilike('memo', `%${memoText}%`);
+            .in('category', selectedCategories); // ★ 여기에만 카테고리 필터 적용
+        if (memoText) {
+            chartQuery = chartQuery.ilike('memo', `%${memoText}%`);
+        }
 
-        const { data: rawData, error } = await query;
-        if (error) { /* ... */ return; }
+        const { data: chartData, error: chartError } = await chartQuery;
+        if (chartError) {
+            console.error('차트 데이터 조회 오류:', chartError);
+            alert('차트 데이터를 불러오는 데 실패했습니다.');
+            return;
+        }
 
-        // 2. 총액 계산 및 화면 표시
-        let totalDeposit = 0;
-        let totalWithdrawal = 0;
-        rawData.forEach(item => {
-            if (item.type === '입금') totalDeposit += item.amount;
-            else if (item.type === '출금') totalWithdrawal += item.amount;
-            else if (item.type === '출금취소') totalWithdrawal -= item.amount;
-        });
-        document.getElementById('total-deposit').textContent = `${formatNumber(totalDeposit)} 원`;
-        document.getElementById('total-withdrawal').textContent = `${formatNumber(totalWithdrawal)} 원`;
-        document.getElementById('summary-container').style.display = 'block';
-
-        // 3. 카테고리별 데이터 집계
+        // 카테고리별 데이터 집계 (기존 로직과 동일)
         const depositCategoryTotals = {};
         const withdrawalCategoryTotals = {};
-        categories.forEach(cat => {
+        selectedCategories.forEach(cat => {
             depositCategoryTotals[cat] = 0;
             withdrawalCategoryTotals[cat] = 0;
         });
-        rawData.forEach(item => {
+        chartData.forEach(item => {
             if (item.type === '입금') {
                 if (depositCategoryTotals.hasOwnProperty(item.category)) depositCategoryTotals[item.category] += item.amount;
             } else if (item.type === '출금' || item.type === '출금취소') {
@@ -404,11 +431,11 @@
             }
         });
 
-        // 4. ★★★ 실제 차트에 표시할 데이터만 필터링 ★★★
+        // 실제 차트에 표시할 데이터만 필터링 (기존 로직과 동일)
         const dynamicLabels = [];
         const dynamicDepositValues = [];
         const dynamicWithdrawalValues = [];
-        categories.forEach(label => {
+        selectedCategories.forEach(label => {
             const depositValue = depositCategoryTotals[label] || 0;
             const withdrawalValue = withdrawalCategoryTotals[label] || 0;
             if (depositValue > 0 || withdrawalValue > 0) {
@@ -418,8 +445,9 @@
             }
         });
 
-        // 5. 모든 가공이 끝난 최종 데이터를 다음 함수에 전달
-        renderDualCategoryChart(dynamicLabels, dynamicDepositValues, dynamicWithdrawalValues, totalDeposit, totalWithdrawal);
+        // --- 3. 차트 렌더링 ---
+        // ★★★ 최종적으로 차트 렌더링 함수에 '전체 기간 총액'을 전달합니다. ★★★
+        renderDualCategoryChart(dynamicLabels, dynamicDepositValues, dynamicWithdrawalValues, grandTotalDeposit, grandTotalWithdrawal);
     }
         
     function renderDualCategoryChart(chartLabels, depositValues, withdrawalValues, totalDeposit, totalWithdrawal) {
