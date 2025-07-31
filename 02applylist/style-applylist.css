@@ -171,7 +171,7 @@
     font-weight: 500;
     padding: 3px 15px;
     margin: 5px;
-    width: 180px;
+    width: 150px;
     border-radius: 10px !important;
     flex: initial;
   }
@@ -179,7 +179,7 @@
   .btn.sendbtn1:hover {
     background-color: #cacaca;
     padding: 3px 15px;
-    width: 180px;
+    width: 150px;
     margin: 5px;
     border-radius: 10px !important;
     flex: initial;

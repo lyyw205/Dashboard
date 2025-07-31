@@ -30,18 +30,21 @@ const corsHeaders = {
  * @returns {Promise<boolean>} - 발송 성공 시 true, 실패 시 false
  */
 async function sendAlimtalk(user, templateCode, variables) {
-  // resend-selected.js에 있던 개선된 버전의 sendAlimtalk 함수를 여기에 둡니다.
   const messageService = new SolapiMessageService(
     process.env.COOLSMS_API_KEY,
     process.env.COOLSMS_API_SECRET
   );
   
   const payload = {
-    to: user.phone.replace(/-/g, ''),
+    to: user.phone ? user.phone.replace(/-/g, '') : '',
     kakaoOptions: {
       pfId: process.env.COOLSMS_PFID,
       templateId: templateCode,
-      variables: variables
+      variables: variables,
+      customFields: { 
+        recordId: user.id, 
+        userName: user.name 
+      }
     }
   };
 
