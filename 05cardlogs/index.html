@@ -148,7 +148,7 @@
     );
     Chart.register(ChartDataLabels);
 
-    const categories = ['광고', '장소 대관', '안주/주류', '비품', '업무추진비', '공과금', '파티비', '현장판매', '대관', '기타'];
+    const categories = ['광고', '장소 대관', '주류', '비품/안주', '업무추진비', '공과금', '파티비', '현장판매', '대관', '기타'];
 
         // ★★★ [신규] 페이지네이션을 위한 전역 변수 추가 ★★★
     const ITEMS_PER_PAGE = 70; // 한 페이지에 50개씩 표시 (원하는 숫자로 조절)
@@ -258,13 +258,6 @@
         // 이렇게 하면 시간대 변환이 전혀 일어나지 않습니다.
         const startDateForDB = `${startDateValue} 00:00:00`;
         const endDateForDB = `${endDateValue} 23:59:59`;
-
-        console.log("📊 차트 필터링 조회 시작 (시간대 변환 없음)", {
-            "사용자 선택 시작일": startDateValue,
-            "사용자 선택 종료일": endDateValue,
-            "DB 조회 시작일시": startDateForDB,
-            "DB 조회 종료일시": endDateForDB
-        });
 
         const selectedChartTypes = Array.from(typeButtonsContainer.querySelectorAll('.type-btn.active')).map(btn => btn.dataset.type);
         const chartTypesToQuery = [...selectedChartTypes];
