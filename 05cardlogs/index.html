@@ -431,6 +431,15 @@
             }
         });
 
+                // 1. 차트에 표시될 카테고리별 합계를 다시 모두 더하여 '필터링된 총액'을 계산합니다.
+        const filteredTotalDeposit = Object.values(depositCategoryTotals).reduce((sum, val) => sum + val, 0);
+        const filteredTotalWithdrawal = Object.values(withdrawalCategoryTotals).reduce((sum, val) => sum + val, 0);
+
+        // 2. 이 '필터링된 총액'으로 summary-container의 내용을 업데이트합니다.
+        document.getElementById('total-deposit').textContent = `${formatNumber(filteredTotalDeposit)} 원`;
+        document.getElementById('total-withdrawal').textContent = `${formatNumber(filteredTotalWithdrawal)} 원`;
+        document.getElementById('summary-container').style.display = 'block';
+
         // 실제 차트에 표시할 데이터만 필터링 (기존 로직과 동일)
         const dynamicLabels = [];
         const dynamicDepositValues = [];
