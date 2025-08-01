@@ -4,7 +4,6 @@
 const TEMPLATES = {
   'GENERAL_MALE': 'KA01TP250728091343537cMnl2OyYPsI', // 후기(일반/남)
   'GENERAL_FEMALE': 'KA01TP2507260429579241AtnXD6QQIx', // 후기(일반/여)
-  'MUNTO': 'KA01TP250728070139799s2AwuVqSwYG',          // 후기(문토)
   'INVITED': 'KA01TP250728074631591vikenhhLrRr',         // 후기(무료초대)
 };
 const MEMO_FIELD = 'memo3'; 
@@ -20,6 +19,7 @@ module.exports = {
       .from('responses')
       .select(`id, name, phone, gender, coupon, memo1, ${MEMO_FIELD}`) // ★★★ gender, coupon, memo1 모두 필요
       .in('id', ids)
+      .not('coupon', 'ilike', '문토') 
       .or(
         `${MEMO_FIELD}.not.like.%${KEYWORD}%,` +
         `${MEMO_FIELD}.like.%❌${KEYWORD}%,` +
@@ -34,22 +34,17 @@ module.exports = {
   getTemplateId: (user) => {
     // ★★★ 복잡한 분기 처리: 구체적인 조건부터 확인하는 것이 중요합니다. ★★★
     
-    // 1. '문토' 쿠폰 사용자인가?
-    if (user.coupon && user.coupon.toUpperCase() === '문토') {
-      console.log(`[review] ${user.name}님은 '문토' 사용자입니다.`);
-      return TEMPLATES['MUNTO'];
-    } 
-    // 2. '무료초대' 대상자인가?
-    else if (user.memo1 && (user.memo1.includes('무료초대'))) {
+    // 1. '무료초대' 대상자인가?
+    if (user.memo1 && (user.memo1.includes('무료초대'))) {
       console.log(`[review] ${user.name}님은 '무료초대' 대상자입니다.`);
       return TEMPLATES['INVITED'];
     }
-    // 3. 일반 참석자(여자)인가?
+    // 2. 일반 참석자(여자)인가?
     else if (user.gender === '여자') {
       console.log(`[review] ${user.name}님은 '일반(여)' 참석자입니다.`);
       return TEMPLATES['GENERAL_FEMALE'];
     }
-    // 4. 그 외 모든 경우 (일반 참석자(남자) 및 성별 미지정)
+    // 3. 그 외 모든 경우 (일반 참석자(남자) 및 성별 미지정)
     else {
       console.log(`[review] ${user.name}님은 '일반(남)' 참석자입니다.`);
       return TEMPLATES['GENERAL_MALE'];
@@ -97,10 +92,8 @@ module.exports = {
     const failMsg = `❌${KEYWORD}`;
     
     // getTemplateId와 동일한 로직으로 성공 메시지를 결정합니다.
-    if (user.coupon && user.coupon.toUpperCase() === '문토') {
-      successMsg = '✅후기(문토)';
-    } 
-    else if (user.memo1 && (user.memo1.includes('무료초대'))) {
+
+    if (user.memo1 && (user.memo1.includes('무료초대'))) {
       successMsg = '✅후기(무료초대)';
     }
     else if (user.gender === '여자') {
