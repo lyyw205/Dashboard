@@ -70,7 +70,7 @@ module.exports = {
    * @param {boolean} isSent - 알림톡 발송 성공 여부
    */
   updateStatus: async (supabase, user, isSent) => {
-    const successMsg = `✅${KEYWORD}`;
+    const successMsg = `⏰${KEYWORD}`;
     const failMsg = `❌${KEYWORD}`;
     
     const messageToAppend = isSent ? successMsg : failMsg;
@@ -78,7 +78,7 @@ module.exports = {
 
     // 기존 메모에서 같은 키워드의 성공/실패 메시지를 정규식으로 안전하게 제거 (중복 방지)
     const cleanedMemo = existingMemo
-        .replace(new RegExp(`✅${KEYWORD}`, 'g'), '')
+        .replace(new RegExp(`⏰${KEYWORD}`, 'g'), '')
         .replace(new RegExp(`❌${KEYWORD}`, 'g'), '')
         .trim();
 

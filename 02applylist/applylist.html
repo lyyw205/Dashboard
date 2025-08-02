@@ -24,7 +24,13 @@
           <select id="filter-date" class="form-select form-select-sm">
             <option value="">날짜</option>
           </select>
+          <select id="filter-status" class="form-select form-select-sm" style="max-width: 120px;">
+            <option value="">신청 상태</option>
+            <option value="confirmed">확정</option>
+            <option value="unconfirmed">미확정</option>
+          </select>
           <button class="btn btn-dark btn-sm" onclick="loadResponses()">🔍 필터 적용</button>
+          <button type="button" class="btn reset-btn btn-sm" onclick="resetFilters()">🔄 초기화</button>
         </div>
         <div class="btn-group flex-wrap" role="group" aria-label="메시지 발송 버튼 그룹">
           <button type="button" class="btn sendbtn1 message-sender" 
@@ -132,6 +138,7 @@
       const nameFilter = document.getElementById('search-name').value.trim();
       const genderFilter = document.getElementById('filter-gender').value;
       const dateFilter = document.getElementById('filter-date').value;
+      const statusFilter = document.getElementById('filter-status').value;
       
       const from = (page - 1) * ITEMS_PER_PAGE;
       const to = page * ITEMS_PER_PAGE - 1;
@@ -145,6 +152,15 @@
       if (nameFilter) query = query.ilike('name', `%${nameFilter}%`);
       if (genderFilter) query = query.eq('gender', genderFilter);
       if (dateFilter) query = query.eq('apply_date', dateFilter);
+      if (statusFilter === 'confirmed') {
+        // '확정' 조건: memo2가 true이거나 또는 memo4가 true인 경우
+        // Supabase의 or() 함수를 사용합니다.
+        query = query.or('memo2.is.true,memo4.is.true');
+      } else if (statusFilter === 'unconfirmed') {
+        // '미확정' 조건: memo2가 true가 아니고 그리고 memo4도 true가 아닌 경우
+        // (null과 false를 모두 포함하기 위해 .not('...', 'is', 'true')를 사용합니다)
+        query = query.not('memo2', 'is', 'true').not('memo4', 'is', 'true');
+      }
       
       // ★★★ .range() 로 필요한 만큼만 데이터를 자릅니다. ★★★
       query = query.range(from, to);
@@ -191,6 +207,16 @@
           // ★★★ 전체 개수를 기반으로 페이지네이션 UI를 렌더링합니다. ★★★
     renderPagination(count);
   }
+    function resetFilters() {
+      // 1. 모든 필터 입력 요소의 값을 기본값('')으로 변경합니다.
+      document.getElementById('search-name').value = '';
+      document.getElementById('filter-gender').value = '';
+      document.getElementById('filter-date').value = '';
+      document.getElementById('filter-status').value = '';
+
+      // 2. 필터가 해제된 상태로 첫 페이지 데이터를 다시 불러옵니다.
+      loadResponses(1);
+    }
 
       // ★★★ [신규] 페이지네이션 UI를 렌더링하는 함수 ★★★
     function renderPagination(totalItems) {

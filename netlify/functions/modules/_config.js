@@ -137,6 +137,20 @@ const COUPON_CONFIG = [
       value: '✅장소문자'
     }
   },
+  {
+    code: '선준',
+    template: 'KA01TP250709145734382Qm8j2DgohNp', // 남/여 공통 템플릿을 문자열로 바로 할당
+    successMessage: (user) => `✅무료초대_선준`, // 메시지는 동적으로 생성
+    variables: (user, formattedDate) => ({
+      '#{고객명}': user.name,
+      '#{파티명}': '게릴라 파티',
+      '#{date}': formattedDate
+    }),
+    extraUpdate: {
+      field: 'memo3',
+      value: '✅장소문자'
+    }
+  },
 
   {
     code: '재환',
