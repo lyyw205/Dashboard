@@ -81,9 +81,9 @@ module.exports = {
     let successMsg;
     // getTemplateId/getVariables와 동일한 조건으로 성공 메시지를 다르게 설정합니다.
     if (user.memo1 && (user.memo1.includes('무료초대'))) {
-      successMsg = '✅입장안내(초대)';
+      successMsg = '🔔입장안내(초대)';
     } else {
-      successMsg = '✅입장안내(일반)';
+      successMsg = '🔔입장안내(일반)';
     }
     const failMsg = `❌${KEYWORD}`;
     
@@ -92,8 +92,8 @@ module.exports = {
 
     // 기존의 모든 입장안내 관련 메시지를 정규식으로 찾아서 지웁니다.
     const cleanedMemo = existingMemo
-        .replace(new RegExp(`✅입장안내\\(초대\\)`, 'g'), '')
-        .replace(new RegExp(`✅입장안내\\(일반\\)`, 'g'), '')
+        .replace(new RegExp(`🔔입장안내\\(초대\\)`, 'g'), '')
+        .replace(new RegExp(`🔔입장안내\\(일반\\)`, 'g'), '')
         .replace(new RegExp(`❌${KEYWORD}`, 'g'), '')
         .trim();
 

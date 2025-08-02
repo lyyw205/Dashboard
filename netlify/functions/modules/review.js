@@ -94,13 +94,13 @@ module.exports = {
     // getTemplateId와 동일한 로직으로 성공 메시지를 결정합니다.
 
     if (user.memo1 && (user.memo1.includes('무료초대'))) {
-      successMsg = '✅후기(무료초대)';
+      successMsg = '✏️후기(무료초대)';
     }
     else if (user.gender === '여자') {
-      successMsg = '✅후기(일반/여)';
+      successMsg = '✏️후기(일반/여)';
     }
     else {
-      successMsg = '✅후기(일반/남)';
+      successMsg = '✏️후기(일반/남)';
     }
     
     const messageToAppend = isSent ? successMsg : failMsg;
@@ -108,10 +108,10 @@ module.exports = {
 
     // 기존에 기록된 모든 종류의 '후기' 관련 메시지를 전부 찾아서 지웁니다.
     const cleanedMemo = existingMemo
-        .replace(/✅후기\(문토\)/g, '')
-        .replace(/✅후기\(무료초대\)/g, '')
-        .replace(/✅후기\(일반\/남\)/g, '')
-        .replace(/✅후기\(일반\/여\)/g, '')
+        .replace(/✏️후기\(문토\)/g, '')
+        .replace(/✏️후기\(무료초대\)/g, '')
+        .replace(/✏️후기\(일반\/남\)/g, '')
+        .replace(/✏️후기\(일반\/여\)/g, '')
         .replace(new RegExp(failMsg, 'g'), '')
         .trim();
 
