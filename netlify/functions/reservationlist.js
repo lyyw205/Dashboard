@@ -102,11 +102,11 @@ function renderTable(data) {
           <td><input type="text" class="nicknameinput" value="${row.nickname || ''}" data-id="${row.id}" data-field="nickname" /></td>  
           <td>${row.name || ''}</td>
           <td>${row.phone || ''}</td>
-          <td>${row.gender || ''}</td>
-          <td>${row.job || ''}</td>
-          <td>${row.mbti || ''}</td>
-          <td>${row.ideal || ''}</td>
-          <td>${row.memo3 || ''}</td>
+          <td >${row.gender || ''}</td>
+          <td title="${row.job || ''}">${row.job || ''}</td>
+          <td title="${row.mbti || ''}">${row.mbti || ''}</td>
+          <td title="${row.ideal || ''}">${row.ideal || ''}</td>
+          <td title="${row.memo3 || ''}">${row.memo3 || ''}</td>
           <td><input type="checkbox" class="form-check-input memo-checkbox" ${row.memo2 ? 'checked' : ''} data-id="${row.id}" data-field="memo2" /></td>
           <td><input type="checkbox" class="form-check-input memo-checkbox" ${row.memo4 ? 'checked' : ''} data-id="${row.id}" data-field="memo4" /></td>
           <td><input type="text" class="memoinput" value="${row.memo5 || ''}" data-id="${row.id}" data-field="memo5" /></td>
