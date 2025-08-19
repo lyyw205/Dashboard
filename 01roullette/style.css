@@ -103,7 +103,7 @@ body {
 .card:not(.title-card) .card-front {
     background-color: #a1b7ff; /* 초록색 */
     color: white;
-    font-size: 48px;
+    font-size: 30px;
 }
 .card:not(.title-card) .card-back {
     background-color: #263464; /* 주황색 */
