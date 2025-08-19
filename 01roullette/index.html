@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>클릭 뽑기 페이지</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- 1. 뒤집히는 제목 카드 -->
+    <div class="card title-card" id="title-card">
+        <div class="card-inner">
+            <div class="card-front">
+                <div>경품 카드<br>번호를 선택해주세요!</div>
+            </div>
+            <div class="card-back" id="title-card-back">
+                <!-- 자바스크립트가 이곳에 키워드를 채워줍니다 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. 일반 카드들이 들어갈 공간 -->
+    <div class="card-container" id="card-container"></div>
+
+    <script src="roullette.js"></script>
+</body>
+</html>
