@@ -126,7 +126,7 @@
       const { data, error } = await supabase
         .from("party_cards")
         .select("*")
-        .order("date", { ascending: true });
+        .order("deadline", { ascending: false });
 
       if (error) return alert("❌ 불러오기 실패: " + error.message);
       tbody.innerHTML = "";
