@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', function() {
         window.open('board.html', '_blank');
 
         // 5. 현재 창에 정답 리스트 표시
-        answerSheet.innerHTML = '<h2>★ 경품 결과 ★</h2>';
+        answerSheet.innerHTML = '<h2>뽑기판 배열</h2>';
         const resultList = document.createElement('ul');
         shuffledKeywords.forEach((keyword, index) => {
             const listItem = document.createElement('li');
