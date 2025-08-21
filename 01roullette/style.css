@@ -71,7 +71,7 @@ h1 {
 
 .title-card { width: 400px; height: 150px; margin: 0 auto; }
 .title-card .flippable-inner { border-radius: 10px; }
-.title-card .flippable-front { background-color: #fff color: rgb(0, 0, 0); font-size: 24px; font-weight: bold; border-radius: 10px; }
+.title-card .flippable-front { background-color: #fff; color: rgb(0, 0, 0); font-size: 24px; font-weight: bold; border-radius: 10px; }
 .title-card .flippable-back { background-color: #263464; color: #ffffff; font-size: 24px; font-weight: bold; border-radius: 10px; }
 
 .item-card { width: 200px; height: 150px; }
