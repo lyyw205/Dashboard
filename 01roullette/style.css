@@ -1,15 +1,17 @@
-
-
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css");
+body {
+    font-family: 'Pretendard Variable', sans-serif;
+}
 /* --- 1. 설정 페이지(index.html) 스타일 --- */
 .setup-container {
     max-width: 600px;
-    margin: 0 auto;
+    margin: 100px auto;
     background-color: white;
     padding: 30px;
     border-radius: 10px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.1);
 }
-.input-group {
+.input-group {  
     margin-bottom: 20px;
     text-align: left;
 }
