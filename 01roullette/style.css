@@ -71,10 +71,24 @@ h1 {
 
 .title-card { width: 400px; height: 150px; margin: 0 auto; }
 .title-card .flippable-inner { border-radius: 10px; }
-.title-card .flippable-front { background-color: #e0e0e0; color: rgb(0, 0, 0); font-size: 24px; font-weight: bold; border-radius: 10px; }
+.title-card .flippable-front { background-color: #fff color: rgb(0, 0, 0); font-size: 24px; font-weight: bold; border-radius: 10px; }
 .title-card .flippable-back { background-color: #263464; color: #ffffff; font-size: 24px; font-weight: bold; border-radius: 10px; }
 
 .item-card { width: 200px; height: 150px; }
 .item-card .flippable-inner { box-shadow: 0 4px 8px rgba(0,0,0,0.2); border-radius: 10px; }
 .item-card .flippable-front { background-color: #a1b7ff; color: white; font-size: 30px; font-weight: bold; border-radius: 10px; }
 .item-card .flippable-back { background-color: #263464; color: #ffffff; font-size: 20px; font-weight: bold; border-radius: 10px; }
+
+.title-text-1 {
+    font-family: 'Pretendard Variable', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: #000;
+}
+
+.title-text-2 {
+    font-family: 'Pretendard Variable', sans-serif;
+    font-size: 20px;
+    font-weight: 500;
+    color: #000;
+}
