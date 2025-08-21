@@ -3,25 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>클릭 뽑기 페이지</title>
+    <title>뽑기판 생성기</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../common/sidebar.css"/>
 </head>
 <body>
-    <!-- 1. 뒤집히는 제목 카드 -->
-    <div class="card title-card" id="title-card">
-        <div class="card-inner">
-            <div class="card-front">
-                <div>경품 카드<br>번호를 선택해주세요!</div>
-            </div>
-            <div class="card-back" id="title-card-back">
-                <!-- 자바스크립트가 이곳에 키워드를 채워줍니다 -->
-            </div>
+    <div class="setup-container">
+        <h1>뽑기판 만들기</h1>
+
+        <div class="input-group">
+            <label for="title-keyword">히든 상품 키워드</label>
+            <input type="text" id="title-keyword" value="개발자 특별 선물">
         </div>
+
+        <div class="input-group">
+            <label for="keywords-input">일반 경품 키워드 (한 줄에 하나씩 입력)</label>
+            <textarea id="keywords-input" rows="10" placeholder="홍콩행 티켓&#10;기타&#10;팝튜브&#10;슬라임 세트"></textarea>
+        </div>
+
+        <button id="create-board-btn">뽑기판 만들기</button>
+
+        <!-- 뽑기판 생성 후 결과가 여기에 표시됩니다 -->
+        <div id="answer-sheet"></div>
     </div>
 
-    <!-- 2. 일반 카드들이 들어갈 공간 -->
-    <div class="card-container" id="card-container"></div>
-
-    <script src="roullette.js"></script>
+    <script src="main.js"></script>
+    <script src="/common/sidebar.js"></script>
 </body>
 </html>

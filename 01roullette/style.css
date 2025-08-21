@@ -1,112 +1,78 @@
+/* style.css */
+
 body {
     font-family: sans-serif;
     background-color: #f0f0f0;
     text-align: center;
-    padding-top: 40px;
+    padding: 40px 20px;
 }
 
-.head-card {
-    width: 100%;
-
+/* --- 1. 설정 페이지(index.html) 스타일 --- */
+.setup-container {
+    max-width: 600px;
+    margin: 0 auto;
+    background-color: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
 }
-
-.card-section {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+.input-group {
     margin-bottom: 20px;
+    text-align: left;
 }
-
-.card-container {
-    display: flex;
-    flex-wrap: wrap; /* 카드가 많아지면 다음 줄로 넘김 */
-    justify-content: center;
-    gap: 20px; /* 카드 사이의 간격 */
-    margin-top: 30px;
-    max-width: 1400px;
-        /* ★★★ 이렇게 한 줄로 수정해도 됩니다 ★★★ */
-    /* 위쪽(top) 30px, 좌우(left, right) auto, 아래쪽(bottom) 0 */
-    margin: 30px auto 0;
-}
-
-/* 카드 전체 영역 (3D 효과를 위한 기준) */
-.card {
-    background-color: transparent;
-    width: 200px;
-    height: 150px;
-    perspective: 1000px; /* 3D 효과를 위한 원근감 */
-    cursor: pointer;
-}
-
-/* 실제로 뒤집히는 영역 */
-.card-inner {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    transition: transform 0.6s; /* 뒤집히는 속도 */
-    transform-style: preserve-3d;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-    border-radius: 10px;
-}
-
-/* 클릭 시 card-inner에 is-flipped 클래스가 추가되면서 180도 회전 */
-.card.is-flipped .card-inner {
-    transform: rotateY(180deg);
-}
-
-/* 카드의 앞면과 뒷면 공통 스타일 */
-.card-front, .card-back {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    -webkit-backface-visibility: hidden; /* 뒷면 숨기기 (사파리 등) */
-    backface-visibility: hidden; /* 뒤집혔을 때 뒷면이 보이지 않도록 함 */
-    border-radius: 10px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 24px;
+.input-group label {
+    display: block;
+    margin-bottom: 8px;
     font-weight: bold;
 }
-
-/* 카드의 앞면 (키워드) */
-.card-front {
-    background-color: #7e97eb;
+.input-group input, .input-group textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box; /* 패딩이 너비에 포함되도록 설정 */
+}
+#create-board-btn {
+    width: 100%;
+    padding: 15px;
+    font-size: 18px;
+    font-weight: bold;
     color: white;
+    background-color: #4c6baf;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-bottom: 30px;
 }
+#answer-sheet {
+    text-align: left;
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 5px;
+}
+#answer-sheet ul { list-style-position: inside; padding-left: 0; }
 
-/* 카드의 뒷면 (내용) - 처음에는 뒤집어져 있음 */
-.card-back {
-    background-color: #33406b;
-    color: #ffffff;
-    transform: rotateY(180deg);
+/* --- 2. 게임 페이지(board.html) 스타일 --- */
+.card-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    max-width: 1400px;
+    margin: 30px auto 0;
 }
+.flippable { perspective: 1000px; cursor: pointer; background-color: transparent; }
+.flippable-inner { position: relative; width: 100%; height: 100%; transition: transform 0.6s; transform-style: preserve-3d; }
+.flippable.is-flipped .flippable-inner { transform: rotateY(180deg); }
+.flippable-front, .flippable-back { position: absolute; width: 100%; height: 100%; -webkit-backface-visibility: hidden; backface-visibility: hidden; display: flex; justify-content: center; align-items: center; text-align: center; }
+.flippable-back { transform: rotateY(180deg); }
 
-/* 1. 제목 카드 스타일 */
-.title-card {
-    width: 400px;
-    height: 150px;
-    margin: 0 auto; /* 가운데 정렬 */
-}
-.title-card .card-front {
-    background-color: #e0e0e0; /* 세련된 보라색 */
-    color: rgb(0, 0, 0);
-    font-size: 24px;
-}
-.title-card .card-back {
-    background-color: #263464; /* 밝은 노란색 */
-    color: #fff;
-    font-size: 24px;
-}
+.title-card { width: 400px; height: 150px; margin: 0 auto; }
+.title-card .flippable-inner { border-radius: 10px; }
+.title-card .flippable-front { background-color: #e0e0e0; color: rgb(0, 0, 0); font-size: 24px; font-weight: bold; border-radius: 10px; }
+.title-card .flippable-back { background-color: #263464; color: #ffffff; font-size: 24px; font-weight: bold; border-radius: 10px; }
 
-/* 2. 일반 카드 스타일 */
-.card:not(.title-card) .card-front {
-    background-color: #a1b7ff; /* 초록색 */
-    color: white;
-    font-size: 30px;
-}
-.card:not(.title-card) .card-back {
-    background-color: #263464; /* 주황색 */
-    color: #ffffff;
-    font-size: 20px;
-}
+.item-card { width: 200px; height: 150px; }
+.item-card .flippable-inner { box-shadow: 0 4px 8px rgba(0,0,0,0.2); border-radius: 10px; }
+.item-card .flippable-front { background-color: #a1b7ff; color: white; font-size: 30px; font-weight: bold; border-radius: 10px; }
+.item-card .flippable-back { background-color: #263464; color: #ffffff; font-size: 20px; font-weight: bold; border-radius: 10px; }

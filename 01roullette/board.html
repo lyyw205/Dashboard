@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>경품 뽑기판</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- 1. 히든 상품 카드 (JS가 내용 채움) -->
+    <div class="flippable title-card" id="title-card">
+        <div class="flippable-inner">
+            <div class="flippable-front">
+                <div>경품 카드<br>번호를 선택해주세요!</div>
+            </div>
+            <div class="flippable-back" id="title-card-back"></div>
+        </div>
+    </div>
+
+    <!-- 2. 일반 카드들이 생성될 공간 -->
+    <div class="card-container" id="card-container"></div>
+
+    <script src="board.js"></script>
+</body>
+</html>
