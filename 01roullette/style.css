@@ -1,7 +1,5 @@
 @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css");
-body {
-    font-family: 'Pretendard Variable', sans-serif;
-}
+
 /* --- 1. 설정 페이지(index.html) 스타일 --- */
 .setup-container {
     max-width: 600px;
@@ -14,11 +12,13 @@ body {
 .input-group {  
     margin-bottom: 20px;
     text-align: left;
+    font-family: 'Pretendard Variable', sans-serif;
 }
 .input-group label {
     display: block;
     margin-bottom: 8px;
     font-weight: bold;
+    font-family: 'Pretendard Variable', sans-serif;
 }
 .input-group input, .input-group textarea {
     width: 100%;
@@ -26,6 +26,7 @@ body {
     border: 1px solid #ccc;
     border-radius: 5px;
     box-sizing: border-box; /* 패딩이 너비에 포함되도록 설정 */
+    font-family: 'Pretendard Variable', sans-serif;
 }
 #create-board-btn {
     width: 100%;
@@ -44,6 +45,7 @@ body {
     background-color: #f9f9f9;
     padding: 20px;
     border-radius: 5px;
+    font-family: 'Pretendard Variable', sans-serif;
 }
 #answer-sheet ul { list-style-position: inside; padding-left: 0; }
 
