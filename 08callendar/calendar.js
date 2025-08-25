@@ -11,7 +11,6 @@ const monthYearElement = document.getElementById('month-year');
 const calendarDaysElement = document.getElementById('calendar-days');
 const prevMonthBtn = document.getElementById('prev-month-btn');
 const nextMonthBtn = document.getElementById('next-month-btn');
-const selectedEventDetails = document.getElementById('selected-event-details');
 const defaultEventList = document.getElementById('default-event-list');
 let currentDate = new Date();
 
@@ -95,7 +94,23 @@ async function initializeCalendar() {
 // (이하 캘린더를 그리고, 일정을 표시하는 함수들은 이전과 거의 동일)
 // 단, 정적인 'events' 배열 대신 동적인 'calendarEvents' 배열을 사용하도록 수정
 
+function createEventItemHTML(event, customClass = '') {
+    if (!event) return '';
+
+    const ddayLabel = calculateDdayLabel(event.deadline);
+
+    // ★★★ 핵심: div의 class 속성에 customClass 변수를 추가합니다. ★★★
+    // event-item 클래스는 공통 스타일을 위해 유지하고, 그 뒤에 새로운 클래스를 추가합니다.
+    return `
+        <div class="event-item ${customClass}">
+            <div class="event-label">${ddayLabel}</div>
+            <div class="event-description">${event.description}</div>
+        </div>
+    `;
+}
+
 function renderDefaultEvents() {
+    // 1. 초기 설정 및 데이터 분류 (기존과 동일)
     if (!calendarEvents || calendarEvents.length === 0) return;
     
     const today = new Date();
@@ -103,36 +118,43 @@ function renderDefaultEvents() {
 
     const pastEvents = calendarEvents.filter(e => e.dateObject < today);
     const upcomingEvents = calendarEvents.filter(e => e.dateObject >= today);
+
     pastEvents.sort((a, b) => b.dateObject - a.dateObject);
     upcomingEvents.sort((a, b) => a.dateObject - b.dateObject);
 
-    let html = '<h3>주요 일정</h3>';
+    // 2. HTML 생성을 시작합니다.
+    let html = '<div class="sub-title1">다음 파티</div>'; // 최상단 제목
+    let eventCount = 0;
 
-    // ★★★ "다가오는 일정" 대신 D-Day 라벨 사용 ★★★
-    if (upcomingEvents.length > 0) {
-        const ddayLabel = calculateDdayLabel(upcomingEvents[0].deadline);
-        html += `
-            <div class="default-event-item">
-                <span class="event-label">${ddayLabel}</span>
-                ${upcomingEvents[0].description}
-            </div>
-        `;
+    // 3. (첫 번째 항목) 가장 가까운 '예정 일정'을 추가합니다.
+    upcomingEvents.slice(0, 2).forEach(event => {
+        html += createEventItemHTML(event, 'upcoming-party-item');
+        eventCount++;
+    });
+
+    // 4. ★★★★★ 여기가 핵심 수정 부분입니다 ★★★★★
+    // '예정 일정'과 '지난 일정'이 둘 다 존재할 때만 중간 제목을 삽입합니다.
+    if (upcomingEvents.length > 0 && pastEvents.length > 0) {
+        // CSS로 꾸밀 수 있도록 class를 추가해줍니다.
+        html += '<div class="sub-title2">최근 파티</div>';
     }
 
-    // ★★★ "지난 일정" 대신 "마감" 라벨 사용 ★★★
+    // 5. (두 번째, 세 번째 항목) '지난 일정'을 최대 2개까지 추가합니다.
     pastEvents.slice(0, 2).forEach(event => {
-        html += `
-            <div class="default-event-item">
-                <span class="event-label">마감</span>
-                ${event.description}
-            </div>
-        `;
+        html += createEventItemHTML(event, 'past-party-item');
+        eventCount++;
     });
     
-    if (upcomingEvents.length === 0 && pastEvents.length === 0) {
-        html = '<p>현재 예정된 일정이 없습니다.</p>';
+    // 6. 표시할 일정이 하나도 없는 경우를 처리합니다.
+    if (eventCount === 0) {
+        html = '<div class="sub-title1">다음 파티</div><p>현재 예정된 일정이 없습니다.</p>';
     }
-    defaultEventList.innerHTML = html;
+    
+    // 7. 생성된 HTML을 페이지에 렌더링합니다.
+    const defaultEventListContainer = document.getElementById('default-event-list');
+    if(defaultEventListContainer) {
+        defaultEventListContainer.innerHTML = html;
+    }
 }
 
 // calendar_script.js 파일의 renderCalendar 함수를 아래 코드로 교체하세요.
@@ -205,11 +227,6 @@ function renderCalendar() {
         calendarDaysElement.appendChild(dayDiv);
     }
 
-    // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-    //                  핵심 수정 부분 끝
-    // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-    
-    // 다음 달 날짜 렌더링 (변경 없음)
     const totalCells = calendarDaysElement.children.length;
     const remainingCells = 42 - totalCells;
     for (let i = 1; i <= remainingCells; i++) {
@@ -221,16 +238,41 @@ function renderCalendar() {
 }
 
 function showSelectedEvent(dateString) {
-    // ★★★ 'events' 대신 'calendarEvents' 사용
-    const event = calendarEvents.find(e => e.date === dateString);
-    if (event) {
-        selectedEventDetails.innerHTML = `<p>${event.description}</p>`;
-        selectedEventDetails.classList.add('visible');
-    }
+    hideSelectedEvent();
+
+    const scheduleContainer = document.getElementById('schedule-container');
+    const defaultBox = document.getElementById('default-event-box');
+
+    if (!scheduleContainer || !defaultBox) return;
+
+    // 클릭된 날짜에 해당하는 모든 이벤트를 찾습니다. (하나 이상일 수 있으므로 filter 사용)
+    const eventsForThisDay = calendarEvents.filter(e => e.date === dateString);
+    if (eventsForThisDay.length === 0) return; // 이벤트가 없으면 종료
+
+    // 새로운 상세 정보 박스(새로운 흰색 박스)를 생성
+    const eventDetailBox = document.createElement('div');
+    eventDetailBox.id = 'selected-event-details';
+    eventDetailBox.classList.add('info-box2'); // 기존 박스와 동일한 스타일
+
+    // ★★★★★ 여기가 핵심입니다 ★★★★★
+    // 찾은 모든 이벤트에 대해 헬퍼 함수를 호출하여 HTML을 생성하고 합칩니다.
+    let eventsHtml = '';
+    eventsForThisDay.forEach(event => {
+        eventsHtml += createEventItemHTML(event, 'selected-day-item');
+    });
+
+    // 생성된 HTML을 새 박스의 내용으로 설정
+    eventDetailBox.innerHTML = eventsHtml;
+
+    // '주요 일정' 박스 앞에 새 박스를 삽입
+    scheduleContainer.insertBefore(eventDetailBox, defaultBox);
 }
 
 function hideSelectedEvent() {
-    selectedEventDetails.classList.remove('visible');
+    const eventDetailBox = document.getElementById('selected-event-details');
+    if (eventDetailBox) {
+        eventDetailBox.remove();
+    }
 }
 
 prevMonthBtn.addEventListener('click', () => { currentDate.setMonth(currentDate.getMonth() - 1); renderCalendar(); });
