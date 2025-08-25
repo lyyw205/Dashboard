@@ -146,9 +146,18 @@
         const rowData = {};
 
         cells.forEach(td => {
-          const key = td.dataset.key;
-          const input = td.querySelector("input");
-          rowData[key] = input.value.trim();
+            const key = td.dataset.key;
+            const input = td.querySelector("input");
+            const value = input.value.trim(); // 사용자가 입력한 값을 가져옵니다.
+
+            if (key === 'title') {
+                // 키(key)가 'title'일 경우 특별 처리
+                // 값이 비어있으면 null을, 값이 있으면 숫자로 변환하여 할당합니다.
+                rowData[key] = (value === '') ? null : Number(value);
+            } else {
+                // title이 아닌 다른 키들은 기존 방식 그대로 값을 할당합니다.
+                rowData[key] = value;
+            }
         });
 
         const isEmpty = Object.values(rowData).every(v => v === "");

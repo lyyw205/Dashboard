@@ -98,7 +98,7 @@ body {
 
 .calendar-days div.other-month {
     color: #ccc;
-    cursor: default;
+    cursor: pointer;
 }
 
 .calendar-days div.today {
@@ -126,7 +126,7 @@ body {
     height: 90%;
 
     /* [수정] 배경색을 투명도가 있는 빨간색으로 변경 */
-    background-color: rgba(180, 180, 180, 0.15); /* 15% 투명도의 빨간색 */
+    background-color: rgba(183, 214, 255, 0.247); /* 15% 투명도의 빨간색 */
     
     border-radius: 50%; /* 원 형태 유지 */
 

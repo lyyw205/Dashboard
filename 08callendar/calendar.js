@@ -174,45 +174,36 @@ function renderCalendar() {
     const lastDateOfMonth = new Date(year, month + 1, 0).getDate();
     const lastDateOfPrevMonth = new Date(year, month, 0).getDate();
     
-    // 이전 달 날짜 렌더링 (변경 없음)
+    // --- ★ 수정된 부분 1: 이전 달 날짜 렌더링 ---
     for (let i = firstDayOfMonth; i > 0; i--) {
         const dayDiv = document.createElement('div');
         dayDiv.textContent = lastDateOfPrevMonth - i + 1;
         dayDiv.classList.add('other-month');
+        // 클릭하면 이전 달로 이동하는 이벤트 리스너 추가
+        dayDiv.addEventListener('click', () => {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            renderCalendar();
+        });
         calendarDaysElement.appendChild(dayDiv);
     }
 
-    // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-    //                  핵심 수정 부분 시작
-    // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-
-    // 현재 달의 날짜들을 렌더링합니다.
+    // --- 현재 달 날짜 렌더링 (이 부분은 변경 없음) ---
     for (let i = 1; i <= lastDateOfMonth; i++) {
         const dayDiv = document.createElement('div');
         dayDiv.textContent = i;
         
-        // 캘린더에서 현재 그리고 있는 날짜를 'YYYY-MM-DD' 형식의 문자열로 만듭니다.
         const dateString = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
         
-        // 오늘 날짜인지 확인 (변경 없음)
         const today = new Date();
         if (i === today.getDate() && year === today.getFullYear() && month === today.getMonth()) {
             dayDiv.classList.add('today');
         }
 
-        // 'calendarEvents' 배열에서 현재 날짜(dateString)와 일치하는 이벤트를 찾습니다.
-        const eventsForThisDay = calendarEvents.filter(event => {
-            // ✅ [로그] 비교 과정을 콘솔에 출력합니다.
-            // 이 로그가 너무 많이 나온다면, 아래 if 블록 안으로 옮겨도 됩니다.
-            // console.log(`- 비교 중: 달력(${dateString}) vs 이벤트(${event.date})`);
-            return event.date === dateString;
-        });
+        const eventsForThisDay = calendarEvents.filter(event => event.date === dateString);
 
-        // 만약 일치하는 이벤트가 하나라도 있다면
         if (eventsForThisDay.length > 0) {
-
-            dayDiv.classList.add('event-day'); // 점을 표시하는 클래스 추가
-            dayDiv.addEventListener('click', () => { // 클릭 이벤트 추가
+            dayDiv.classList.add('event-day');
+            dayDiv.addEventListener('click', () => {
                 if (dayDiv.classList.contains('active')) {
                     hideSelectedEvent();
                     dayDiv.classList.remove('active');
@@ -227,12 +218,20 @@ function renderCalendar() {
         calendarDaysElement.appendChild(dayDiv);
     }
 
+    // --- ★ 수정된 부분 2: 다음 달 날짜 렌더링 ---
     const totalCells = calendarDaysElement.children.length;
-    const remainingCells = 42 - totalCells;
+    // 다음 달 날짜가 35칸(5줄) 또는 42칸(6줄)을 채우도록 동적으로 계산합니다.
+    const remainingCells = (totalCells > 35) ? 42 - totalCells : 35 - totalCells;
+
     for (let i = 1; i <= remainingCells; i++) {
         const dayDiv = document.createElement('div');
         dayDiv.textContent = i;
         dayDiv.classList.add('other-month');
+        // 클릭하면 다음 달로 이동하는 이벤트 리스너 추가
+        dayDiv.addEventListener('click', () => {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            renderCalendar();
+        });
         calendarDaysElement.appendChild(dayDiv);
     }
 }
