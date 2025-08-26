@@ -276,3 +276,14 @@ function formatKoreanDate(isoStr) {
 }
 
 fetchData();
+
+// 날짜 탭 컨테이너에서 마우스 휠 이벤트 감지
+const dateTabsContainer = document.getElementById('date-tabs');
+
+dateTabsContainer.addEventListener('wheel', (event) => {
+  // 기본 세로 스크롤 동작을 막음
+  event.preventDefault();
+
+  // 휠의 세로 스크롤 값(event.deltaY)을 가로 스크롤 값(scrollLeft)에 더해줌
+  dateTabsContainer.scrollLeft += event.deltaY;
+});
