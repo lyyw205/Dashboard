@@ -68,7 +68,7 @@
     text-align: center;
   }
   .submit-birth {
-    width: 80px;
+    width: 90px;
     text-align: center;
   }
   .submit-phone {
@@ -261,4 +261,40 @@
   /* [중요] 2번 열은 스크롤되므로, 1번 열의 너비만큼만 이동시킵니다. */
   left: 50px; /* .style-checkbox의 너비 */ 
   /* 이제 3번 열이 마지막 고정 열이므로, 여기에 그림자를 추가합니다. */
+}
+
+/* 정렬 가능한 헤더에 마우스 커서를 포인터로 변경 */
+thead th[data-column] {
+  cursor: pointer;
+  position: relative; /* 화살표 위치 기준점 */
+  user-select: none; /* 텍스트 드래그 방지 */
+}
+
+/* 정렬 방향을 표시할 화살표의 기본 스타일 (::after 가상 요소 사용) */
+thead th[data-column]::after {
+  content: '';
+  position: absolute;
+  right: 8px; /* 오른쪽 여백 */
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0; /* 평소에는 숨김 */
+  transition: opacity 0.2s;
+  font-size: 0.8em;
+}
+
+/* 정렬이 활성화된 헤더의 화살표만 보이도록 함 */
+thead th.sorted::after {
+  opacity: 0.8;
+}
+
+/* 오름차순(asc) 화살표 */
+thead th.sorted-asc::after {
+  content: '▲';
+  font-size: 10px;
+}
+
+/* 내림차순(desc) 화살표 */
+thead th.sorted-desc::after {
+  content: '▼';
+  font-size: 10px;
 }

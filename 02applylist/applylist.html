@@ -69,15 +69,15 @@
           <thead>
             <tr>
               <th class="entrance-check style-checkbox"><input type="checkbox" class="form-check-input" id="check-all-resend"></th>
-              <th class="submit-time">제출시각</th>
-              <th class="submit-name">이름</th>
-              <th class="submit-birth">출생년도</th>
+              <th class="submit-time" data-column="created_at">제출시각</th>
+              <th class="submit-name" data-column="name">이름</th>
+              <th class="submit-birth" data-column="birth_year">출생년도</th>
               <th class="submit-phone">전화번호</th>
-              <th class="submit-gender">성별</th>
+              <th class="submit-gender" data-column="gender">성별</th>
               <th class="submit-job">직업</th>
               <th class="submit-mbti">MBTI</th>
               <th class="submit-ideal">이상형</th>
-              <th class="submit-date">참여 날짜</th>
+              <th class="submit-date" data-column="apply_date">참여 날짜</th>
               <th class="submit-coupon">쿠폰</th>
               <th class="automessage-deposit">입금문자</th>
               <th class="automessage-location">추가안내문자</th>
@@ -106,6 +106,9 @@
 
     const ITEMS_PER_PAGE = 50; // 한 페이지에 30개씩
     let currentPage = 1;
+
+    let currentSortColumn = 'created_at'; // 기본 정렬 컬럼
+    let currentSortDirection = 'desc';   // 기본 정렬 방향 (내림차순)
     
 
     // 2. 모든 함수 정의
@@ -147,7 +150,7 @@
         .from('responses')
         // ★★★ { count: 'exact' } 로 전체 개수를 함께 가져옵니다. ★★★
         .select('*', { count: 'exact' }) 
-        .order('created_at', { ascending: false });
+        .order(currentSortColumn, { ascending: currentSortDirection === 'asc' });
 
       if (nameFilter) query = query.ilike('name', `%${nameFilter}%`);
       if (genderFilter) query = query.eq('gender', genderFilter);
@@ -391,10 +394,60 @@
                 checkbox.checked = e.target.checked;
             });
         });
+
+        const sortableHeaders = document.querySelectorAll('thead th[data-column]');
+
+        sortableHeaders.forEach(header => {
+          header.addEventListener('click', () => {
+            const clickedColumn = header.dataset.column;
+
+            // 엣지 케이스: 기본 정렬 상태('created_at', 'desc')에서 'created_at' 헤더를 처음 클릭한 경우
+            const isFirstClickOnDefault = (currentSortColumn === 'created_at' && currentSortDirection === 'desc' && clickedColumn === 'created_at');
+
+            // Case 1: 새로운 컬럼을 클릭했거나, 위에서 정의한 엣지 케이스에 해당하는 경우
+            if (currentSortColumn !== clickedColumn || isFirstClickOnDefault) {
+              currentSortColumn = clickedColumn;
+              currentSortDirection = 'asc'; // 항상 오름차순으로 시작
+            } 
+            // Case 2: 그 외의 경우 (활성화된 컬럼을 토글하는 경우)
+            else {
+              // 현재 오름차순('asc')이었다면 -> 내림차순('desc')으로 변경
+              if (currentSortDirection === 'asc') {
+                currentSortDirection = 'desc';
+              }
+              // 현재 내림차순('desc')이었다면 -> 기본 정렬(초기화)로 변경
+              else {
+                currentSortColumn = 'created_at';
+                currentSortDirection = 'desc';
+              }
+            }
+
+            loadResponses(1);
+            updateSortIndicators();
+          });
+        });
+
+        // ▼▼▼ [추가] 정렬 화살표를 업데이트하는 함수 ▼▼▼
+        function updateSortIndicators() {
+          // 모든 헤더에서 정렬 관련 클래스를 일단 제거
+          sortableHeaders.forEach(header => {
+            header.classList.remove('sorted', 'sorted-asc', 'sorted-desc');
+          });
+
+          // 현재 정렬 기준이 되는 헤더를 찾음
+          const activeHeader = document.querySelector(`th[data-column="${currentSortColumn}"]`);
+          
+          if (activeHeader) {
+            // 찾은 헤더에 'sorted'와 현재 정렬 방향 클래스를 추가
+            activeHeader.classList.add('sorted');
+            activeHeader.classList.add(`sorted-${currentSortDirection}`);
+          }
+        }
           
         // 초기 데이터 로딩
         populateDateFilter();
         loadResponses(currentPage);
+        updateSortIndicators();
     });
     
     // 4. 실시간 구독 로직 (기존과 동일)
