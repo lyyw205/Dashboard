@@ -1,3 +1,5 @@
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+
 /* 전체 기본 스타일 */
 body {
   font-family: 'Pretendard', sans-serif;
@@ -8,7 +10,6 @@ body {
 /* 대시보드 전체 래퍼 */
 .dashboard {
   display: flex;
-  min-height: 100vh;
 }
 
 /* 메인 */
@@ -67,6 +68,64 @@ body {
   transition: all 0.2s ease;
 }
 
+.manage-text, .games-text {
+    font-size: 20px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 5px;
+    margin-top: 20px;
+}
+
+.category-section {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.manage-category, .games-category {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 20px;
+    max-width: 700px;
+    flex-wrap: wrap;
+  }
+
+.content-link {
+    text-decoration: none;
+    color:#7282A6;
+    font-family: 'Pretendard', sans-serif;
+    font-size: 18px;
+    font-weight: 500;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.category-box {
+    width: 210px;
+    height: 120px;
+    margin-bottom: 16px;
+    justify-content: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    background-color: #ffffff;
+    display: flex;
+    align-items: center;
+}
+
+.category-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 3px;
+}
 /* 카드 hover 시 약간 떠오르는 효과 */
 .card:hover {
   transform: translateY(-4px);

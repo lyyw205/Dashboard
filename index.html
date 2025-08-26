@@ -10,7 +10,6 @@
   <link rel="stylesheet" href="/common/loader/loader.css">
   <link rel="stylesheet" href="style.css" />
   <script src="/common/loader/loader.js" defer></script>
-  <script src="/common/sidebar.js" defer></script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
@@ -25,7 +24,7 @@
   <!-- 로그인하지 않은 사용자에게 이 부분이 보입니다. -->
   <div id="login-prompt">
     <a href="index.html" class="sidebar-head-logo">
-      <span class="login-Gue">Gue</span><span class="login-rrilla">rrilla</span>
+      <div class="login-Gue">Gue</div><div class="login-rrilla">rrilla</div>
     </a>
     <h2>DASHBOARD</h2>
     <!-- Netlify Identity 로그인 버튼이 생성될 위치 -->
@@ -35,11 +34,11 @@
     <div class="dashboard main-content">
       <main class="main">
         <header class="main-header d-flex justify-content-between align-items-center">
-          <h1>나의 대시보드</h1>
+          <h1>Guerrilla</h1>
           <div data-netlify-identity-button></div>
         </header>
         <!-- 필터 -->
-        <div class="d-flex justify-content-end my-3">
+        <!-- <div class="d-flex justify-content-end my-3">
           <select id="range-select" class="form-select w-auto">
             <option value="week">이번 주</option>
             <option value="month">이번 달</option>
@@ -48,7 +47,6 @@
         </div>
 
         <div class="row g-4">
-          <!-- 💸 지출 카드 -->
           <div class="col-md-3">
             <div class="card p-3 shadow-sm">
               <h5 class="mb-2">💸 지출 합계</h5>
@@ -56,8 +54,6 @@
               <canvas id="expenseChart" height="200"></canvas>
             </div>
           </div>
-
-          <!-- 💰 수입 카드 -->
           <div class="col-md-3">
             <div class="card p-3 shadow-sm">
               <h5 class="mb-2">💰 수입 합계</h5>
@@ -65,21 +61,128 @@
               <canvas id="incomeChart" height="200"></canvas>
             </div>
           </div>
-        </div>
-
-        <section id="games" class="section">
-          <h2>인물게임</h2>
-          <!-- 여기엔 슬라이드 이미지 게임이 들어갈 수 있음 -->
-        </section>
-
-        <section id="settings" class="section">
-          <h2>설정업데이트</h2>
-          <p>난이도, 문제 수, 공개 여부 등을 설정</p>
-        </section>
+        </div> -->
       </main>
     </div>
   </div>
-  <script src="/common/sidebar.js"></script>
+    <div class="category-section">
+      <div class="manage-text">MANAGE</div>
+      <div class="manage-category">
+        <div class="category-box">
+          <a href="../02applylist/applylist.html" class="content-link">
+            <div class="category-content">
+              <div class="category-content-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7282A6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-spreadsheet-icon lucide-file-spreadsheet"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M8 13h2"/><path d="M14 13h2"/><path d="M8 17h2"/><path d="M14 17h2"/></svg>
+              </div>
+              <div class="category-content-text">파티신청서</div>
+            </div>
+          </a>
+        </div>
+        <div class="category-box">
+          <a href="../03reservationlist/reservationlist.html" class="content-link">
+            <div class="category-content">
+              <div class="category-content-icon"  >
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7282A6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sheet-icon lucide-sheet"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><line x1="3" x2="21" y1="9" y2="9"/><line x1="3" x2="21" y1="15" y2="15"/><line x1="9" x2="9" y1="9" y2="21"/><line x1="15" x2="15" y1="9" y2="21"/></svg>
+              </div>
+              <div class="category-content-text">예약시트</div>
+            </div>
+          </a>
+        </div>
+        <div class="category-box">
+          <a href="../05cardlogs/index.html" class="content-link">
+            <div class="category-content">
+              <div class="category-content-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7282A6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-piggy-bank-icon lucide-piggy-bank"><path d="M11 17h3v2a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-3a3.16 3.16 0 0 0 2-2h1a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1h-1a5 5 0 0 0-2-4V3a4 4 0 0 0-3.2 1.6l-.3.4H11a6 6 0 0 0-6 6v1a5 5 0 0 0 2 4v3a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1z"/><path d="M16 10h.01"/><path d="M2 8v1a2 2 0 0 0 2 2h1"/></svg>
+              </div>
+              <div class="category-content-text">재무기록</div>
+            </div>
+          </a>
+        </div>
+        <div class="category-box">
+          <a href="../13ga4/ga4.html" class="content-link">
+            <div class="category-content">
+              <div class="category-content-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7282A6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-proportions-icon lucide-proportions"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="M12 9v11"/><path d="M2 9h13a2 2 0 0 1 2 2v9"/></svg>     
+              </div>
+              <div class="category-content-text">구글 애널리틱스</div>
+            </div>
+          </a>
+        </div>
+        <div class="category-box">
+          <a href="../09party-cards-data/party_cards.html" class="content-link">
+            <div class="category-content">
+              <div class="category-content-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7282A6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-square-terminal-icon lucide-square-terminal"><path d="m7 11 2-2-2-2"/><path d="M11 13h4"/><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/></svg>
+              </div>
+              <div class="category-content-text">파티카드 데이터</div>
+            </div>
+          </a>
+        </div>
+        <div class="category-box">
+          <a href="../10accounts/accounts.html" class="content-link">
+            <div class="category-content">
+              <div class="category-content-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7282A6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-key-round-icon lucide-key-round"><path d="M2.586 17.414A2 2 0 0 0 2 18.828V21a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h1a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h.172a2 2 0 0 0 1.414-.586l.814-.814a6.5 6.5 0 1 0-4-4z"/><circle cx="16.5" cy="7.5" r=".5" fill="currentColor"/></svg>
+              </div>
+              <div class="category-content-text">게릴라 계정</div>
+            </div>
+          </a>
+        </div>
+      </div>
+      <div class="games-text">GAMES</div>
+      <div class="games-category">
+        <div class="category-box">
+          <a href="../07ppt/controller.html" class="content-link">
+            <div class="category-content">
+              <div class="category-content-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7282A6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-app-window-icon lucide-app-window"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M10 4v4"/><path d="M2 8h20"/><path d="M6 4v4"/></svg>
+              </div>
+              <div class="category-content-text">진행 PPT</div>
+            </div>
+          </a>
+        </div>
+        <div class="category-box">
+          <a href="../11stickgame/controller.html" class="content-link">
+            <div class="category-content">
+              <div class="category-content-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7282A6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-candy-cane-icon lucide-candy-cane"><path d="M5.7 21a2 2 0 0 1-3.5-2l8.6-14a6 6 0 0 1 10.4 6 2 2 0 1 1-3.464-2 2 2 0 1 0-3.464-2Z"/><path d="M17.75 7 15 2.1"/><path d="M10.9 4.8 13 9"/><path d="m7.9 9.7 2 4.4"/><path d="M4.9 14.7 7 18.9"/></svg>
+              </div>
+              <div class="category-content-text">막대게임</div>
+            </div>
+          </a>
+        </div>
+        <div class="category-box">
+          <a href="../06quizppt/index.html" class="content-link">
+            <div class="category-content">
+              <div class="category-content-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7282A6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-smile-icon lucide-smile"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" x2="9.01" y1="9" y2="9"/><line x1="15" x2="15.01" y1="9" y2="9"/></svg>
+              </div>
+              <div class="category-content-text">인물게임</div>
+            </div>
+          </a>
+        </div>
+        <div class="category-box">
+          <a href="../12finball/index.html" class="content-link">
+            <div class="category-content">
+              <div class="category-content-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7282A6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-loader-pinwheel-icon lucide-loader-pinwheel"><path d="M22 12a1 1 0 0 1-10 0 1 1 0 0 0-10 0"/><path d="M7 20.7a1 1 0 1 1 5-8.7 1 1 0 1 0 5-8.6"/><path d="M7 3.3a1 1 0 1 1 5 8.6 1 1 0 1 0 5 8.6"/><circle cx="12" cy="12" r="10"/></svg>              </div>
+              <div class="category-content-text">핀볼</div>
+            </div>
+          </a>
+        </div>
+        <div class="category-box">
+          <a href="../01roullette/index.html" class="content-link">
+            <div class="category-content">
+              <div class="category-content-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7282A6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-gift-icon lucide-gift"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13"/><path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"/><path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5"/></svg>              
+              </div>
+              <div class="category-content-text">경품뽑기</div>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="charts.js"></script>
