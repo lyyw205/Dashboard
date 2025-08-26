@@ -3,13 +3,15 @@
 /* 전체 기본 스타일 */
 body {
   font-family: 'Pretendard', sans-serif;
-  background: #f9f9fb;
+  background: #f3f3f3;
   margin: 0;
 }
 
 /* 대시보드 전체 래퍼 */
 .dashboard {
   display: flex;
+  background-color: #ffffff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
 
 /* 메인 */
@@ -59,6 +61,22 @@ body {
 }
 
 /* 📦 카드 전체 레이아웃 */
+.Gue {
+    font-family: 'Pretendard', 'sans-serif';
+    font-size: 30px;
+    font-weight: 900;
+    text-decoration: none;
+    color: #222;
+  }
+
+.rrilla {
+  font-family: 'Pretendard', 'sans-serif';
+  font-size: 30px;
+  font-weight: 900;
+  text-decoration: none;
+  color: #636dc4;
+}
+
 .card {
   border: none;
   border-radius: 16px;
@@ -83,6 +101,7 @@ body {
   align-items: center;
   flex-wrap: wrap;
   gap: 20px;
+  margin-top: 30px;
 }
 
 .manage-category, .games-category {
