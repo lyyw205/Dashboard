@@ -200,20 +200,21 @@
             const container = document.getElementById("all-sets");
 
             Object.entries(data).forEach(([group, content]) => {
-              const groupWrapper = document.createElement("div");
               
-              // ✅ 수정된 부분: group 이름의 공백을 하이픈(-)으로 변경합니다.
-              const safeClassName = group.replace(/\s+/g, '-');
-              
-              groupWrapper.className = "slide-group-container";
-              groupWrapper.classList.add(`group-${safeClassName}`); // 수정된 이름으로 클래스 추가
-
+              // ✅ 1. h3 제목을 먼저 생성해서 메인 컨테이너('all-sets')에 바로 추가합니다.
               const groupTitle = document.createElement("h3");
               groupTitle.className = "slide-group-title";
               groupTitle.textContent = group;
-              groupWrapper.appendChild(groupTitle);
+              container.appendChild(groupTitle);
 
-              // --- 이하 로직은 동일합니다 ---
+              // ✅ 2. h3을 제외한 '콘텐츠만'을 담을 Wrapper div를 생성합니다.
+              const groupWrapper = document.createElement("div");
+              const safeClassName = group.replace(/\s+/g, '-');
+              groupWrapper.className = "slide-group-container";
+              groupWrapper.classList.add(`group-${safeClassName}`);
+
+              // --- 이제부터 h4, ul 등의 콘텐츠는 모두 이 groupWrapper에 추가됩니다. ---
+              
               if (Array.isArray(content)) {
                 const ul = document.createElement("ul");
                 content.forEach(file => {
@@ -245,6 +246,8 @@
                   }
                 });
               }
+              
+              // ✅ 3. 콘텐츠가 모두 채워진 Wrapper div를 메인 컨테이너에 추가합니다.
               container.appendChild(groupWrapper);
             });
           });
