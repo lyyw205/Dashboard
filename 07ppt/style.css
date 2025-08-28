@@ -18,7 +18,6 @@ h3 {
 .slide-controller-wrapper {
   display: flex;
   flex-direction: column;
-  width: 80vw;
 }
 
 .ppt-start-button {
@@ -97,10 +96,6 @@ h3 {
   overflow-y: hidden;
 }
 
-#all-sets {
-  /* 이전에 여기에 border, background-color 등이 있었다면 모두 제거합니다. */
-  width: 90%; /* 화면 너비에 맞춤 */
-}
 
 .slide-thumb {
   position: relative;         /* 🔸 기준 잡기 */
@@ -173,4 +168,33 @@ h3 {
   pointer-events: none; /* [매우 중요] 인디케이터가 마우스 이벤트를 방해하지 않도록 함 */
   z-index: 10;
   transition: all 0.1s ease; /* 부드러운 이동 효과 */
+}
+
+.slide-group-title {
+  margin-top: 25px;
+  margin-bottom: 10px;
+  padding-bottom: 5px;
+  font-size: 1.5rem;
+  color: #333;
+}
+
+.slide-subgroup-title {
+  margin-top: 15px;
+  margin-bottom: 15px;
+  font-size: 1.1rem;
+  color: #555;
+  font-weight: bold;
+}
+
+/* 모든 그룹 컨테이너에 대한 공통 스타일 */
+.slide-group-container {
+  padding: 15px 30px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+/* 각 그룹별 고유 배경색 지정 */
+.group-공지,.group-자리바꾸기,.group-게임,.group-밸런스-게임 {
+  background-color: #f1f1f1;
 }

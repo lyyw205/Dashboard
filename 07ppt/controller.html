@@ -195,22 +195,59 @@
     }
 
     fetch("slides.json")
-      .then(res => res.json())
-      .then(data => {
-        const container = document.getElementById("all-sets");
-        Object.entries(data).forEach(([group, files]) => {
-          const title = document.createElement("h3");
-          title.textContent = group;
-          container.appendChild(title);
+          .then(res => res.json())
+          .then(data => {
+            const container = document.getElementById("all-sets");
 
-          const ul = document.createElement("ul");
-          files.forEach(file => {
-            const fullPath = `ppt-slides/${group}/${file}`;
-            ul.appendChild(makeSlideItem(fullPath, file));
+            Object.entries(data).forEach(([group, content]) => {
+              const groupWrapper = document.createElement("div");
+              
+              // ✅ 수정된 부분: group 이름의 공백을 하이픈(-)으로 변경합니다.
+              const safeClassName = group.replace(/\s+/g, '-');
+              
+              groupWrapper.className = "slide-group-container";
+              groupWrapper.classList.add(`group-${safeClassName}`); // 수정된 이름으로 클래스 추가
+
+              const groupTitle = document.createElement("h3");
+              groupTitle.className = "slide-group-title";
+              groupTitle.textContent = group;
+              groupWrapper.appendChild(groupTitle);
+
+              // --- 이하 로직은 동일합니다 ---
+              if (Array.isArray(content)) {
+                const ul = document.createElement("ul");
+                content.forEach(file => {
+                  const fullPath = `ppt-slides/${group}/${file}`;
+                  ul.appendChild(makeSlideItem(fullPath, file));
+                });
+                groupWrapper.appendChild(ul);
+              } 
+              else if (typeof content === 'object' && content !== null) {
+                Object.entries(content).forEach(([subName, files]) => {
+                  if(Array.isArray(files)) {
+                    const subTitle = document.createElement("h4");
+                    subTitle.className = "slide-subgroup-title";
+                    subTitle.textContent = subName;
+                    groupWrapper.appendChild(subTitle);
+                    
+                    const ul = document.createElement("ul");
+                    files.forEach(file => {
+                      const fullPath = `ppt-slides/${group}/${subName}/${file}`;
+                      ul.appendChild(makeSlideItem(fullPath, file));
+                    });
+                    groupWrapper.appendChild(ul);
+                  }
+                  else {
+                    const ul = document.createElement("ul");
+                    const fullPath = `ppt-slides/${group}/${subName}`;
+                    ul.appendChild(makeSlideItem(fullPath, subName));
+                    groupWrapper.appendChild(ul);
+                  }
+                });
+              }
+              container.appendChild(groupWrapper);
+            });
           });
-          container.appendChild(ul);
-        });
-      });
     
   </script>
   <script src="/common/sidebar.js"></script>
