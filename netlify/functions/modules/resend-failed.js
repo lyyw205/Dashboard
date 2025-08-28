@@ -13,7 +13,7 @@ module.exports = {
       .from('responses')
       .select('*') // 모든 정보가 필요하므로 '*'로 조회합니다.
       .in('id', ids)
-      .or(`memo1.like.%❌%,memo1.like.%${KEYWORD}%`); // '❌' 또는 '발송실패'가 포함된 경우
+      .or(`memo1.like.%❌%,memo1.like.%${KEYWORD}%,memo1.is.null,memo1.eq.''`); // '❌' 또는 '발송실패'가 포함된 경우
       
     return { users: data, error };
   },
