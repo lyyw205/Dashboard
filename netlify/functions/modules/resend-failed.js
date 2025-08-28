@@ -9,13 +9,37 @@ module.exports = {
    * (필수) 'memo1'에 실패 기록이 있는 사용자를 필터링합니다.
    */
   getUsers: async (supabase, ids) => {
-    const { data, error } = await supabase
+    // 1. '실패' 기록이 있는 사용자를 먼저 조회합니다.
+    const { data: failedUsers, error: failedError } = await supabase
       .from('responses')
-      .select('*') // 모든 정보가 필요하므로 '*'로 조회합니다.
+      .select('*')
       .in('id', ids)
-      .or(`memo1.like.%❌%,memo1.like.%${KEYWORD}%,memo1.is.null,memo1.eq.''`); // '❌' 또는 '발송실패'가 포함된 경우
-      
-    return { users: data, error };
+      .or(`memo1.like.%❌%,memo1.like.%${KEYWORD}%`);
+
+    if (failedError) {
+      console.error('실패 사용자 조회 중 오류:', failedError);
+      return { users: null, error: failedError };
+    }
+
+    // 2. 'memo1' 필드가 비어있거나 NULL인 사용자를 조회합니다.
+    const { data: emptyUsers, error: emptyError } = await supabase
+      .from('responses')
+      .select('*')
+      .in('id', ids)
+      .or(`memo1.is.null,memo1.eq.''`);
+
+    if (emptyError) {
+      console.error('비어있는 사용자 조회 중 오류:', emptyError);
+      return { users: null, error: emptyError };
+    }
+
+    // 3. 두 배열을 합치고, 중복된 ID를 제거합니다.
+    const allUsers = [...failedUsers, ...emptyUsers];
+    const uniqueUsers = Array.from(new Map(allUsers.map(user => [user.id, user])).values());
+    
+    console.log(`[resend-failed] 조회 결과: 실패 ${failedUsers.length}명, 비어있음 ${emptyUsers.length}명 => 총 ${uniqueUsers.length}명`);
+
+    return { users: uniqueUsers, error: null };
   },
 
   /**
