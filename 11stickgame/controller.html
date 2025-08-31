@@ -153,7 +153,7 @@
         return;
       }
 
-      const displayWindow = window.open("display.html", "display", "width=1000,height=700");
+      const displayWindow = window.open("display.html", "display_color", "width=1000,height=700");
       setTimeout(() => {
         displayWindow.postMessage({ type: "colorppt", slides: slidesToSend }, "*");
       }, 500);

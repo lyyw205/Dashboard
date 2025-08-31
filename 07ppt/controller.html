@@ -40,7 +40,7 @@
         displayWindow.postMessage({ type: "slides", slides: selectedSlides }, "*");
       } else {
         // 새 창을 엽니다. 데이터는 아직 보내지 않습니다.
-        displayWindow = window.open("display.html", "display", "width=1000,height=700");
+        displayWindow = window.open("display.html", "display_slides", "width=1000,height=700");
       }
       // 기존의 setTimeout 로직은 제거됩니다.
     }
