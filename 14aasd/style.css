@@ -2,11 +2,25 @@
 
 @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css");
 
+html {
+    height: 100%;
+}
+
 body {
+    /* body의 최소 높이를 화면 전체 높이로 설정합니다. */
+    min-height: 100%;
+    margin: 0; /* 브라우저의 기본 마진을 제거합니다. */
+
+    /* Flexbox를 사용하여 자식 요소들을 정렬합니다. */
+    display: flex;
+    flex-direction: column; /* 자식(h1, card-container)을 세로로 배치 */
+    justify-content: center; /* 세로(Y축) 방향 가운데 정렬 */
+    align-items: center;     /* 가로(X축) 방향 가운데 정렬 */
     font-family: 'Pretendard Variable', sans-serif;
     background-color: #f0f2f5;
     color: #333;
 }
+
 
 h1 {
     font-family: 'Pretendard Variable', sans-serif;
@@ -81,7 +95,6 @@ h1 {
     justify-content: center;
     gap: 20px;
     max-width: 1400px;
-    margin: 30px auto 0;
 }
 
 .flippable {
@@ -193,6 +206,7 @@ h1 {
     display: flex;
     flex-direction: column;
     align-items: center;
+    margin-bottom: 20px;
 }
 
 #card-count {
