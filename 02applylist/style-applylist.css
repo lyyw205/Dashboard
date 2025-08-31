@@ -129,6 +129,7 @@
     background-color: #e2e2e2;
     color: #202020;
     transition: background-color 0.2s ease, color 0.2s ease;
+    margin-right: 30px;
   }
 
   .reset-btn:hover {
@@ -304,10 +305,6 @@ thead th.sorted-desc::after {
 /* ▼ 아래는 기존에 작성했던 CSS 코드입니다. */
 #deposit-search-results:empty {
   display: none;
-}
-
-.deposit-search-section {
-  margin-left: 30px;
 }
 
 .deposit-search-input {
