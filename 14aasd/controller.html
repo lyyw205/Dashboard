@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>실시간 뽑기판 컨트롤러</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="setup-container">
+        <h1>실시간 지정 뽑기판 컨트롤러</h1>
+        <div class="input-group">
+            <label for="card-count">뽑기판 카드 개수</label>
+            <input type="number" id="card-count" value="16" min="1" max="100">
+        </div>
+        <p class="title-text-2" style="text-align: center; margin-bottom: 20px;">
+            경품을 입력하면 디스플레이에 즉시 반영됩니다.
+        </p>
+        <button id="create-board-btn">디스플레이 창 열기</button>
+        <div id="controller-grid">
+            <!-- 컨트롤러 입력 슬롯이 여기에 생성됩니다. -->
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const controllerGrid = document.getElementById('controller-grid');
+            const openDisplayBtn = document.getElementById('create-board-btn');
+            const cardCountInput = document.getElementById('card-count');
+            const channel = new BroadcastChannel('designated_lottery');
+
+            // [신규] 각 카드의 뒤집힘 상태를 컨트롤러에서 관리하기 위한 배열
+            let flipStates = [];
+
+            function generateControllerUI(count) {
+                controllerGrid.innerHTML = '';
+                // [수정] 상태 배열을 새로 생성된 개수에 맞게 초기화
+                flipStates = new Array(count).fill(false); 
+                for (let i = 1; i <= count; i++) {
+                    const slot = document.createElement('div');
+                    slot.className = 'controller-slot';
+                    slot.innerHTML = `
+                        <div class="slot-number">${i}</div>
+                        <input type="text" placeholder="경품 내용 입력..." data-slot="${i}">
+                        <!-- [신규] 뒤집기 버튼 추가, 기본은 비활성화(disabled) 상태 -->
+                        <button class="flip-btn" data-slot="${i}" disabled>뒤집기</button>
+                    `;
+                    controllerGrid.appendChild(slot);
+                }
+            }
+
+            openDisplayBtn.addEventListener('click', () => {
+                const count = cardCountInput.value;
+                window.open(`display.html?count=${count}`, 'lottery_display');
+            });
+
+            cardCountInput.addEventListener('input', () => {
+                const count = parseInt(cardCountInput.value, 10);
+                if (count > 0) {
+                    generateControllerUI(count);
+                }
+            });
+
+            generateControllerUI(parseInt(cardCountInput.value, 10));
+
+            // [수정] input 이벤트 리스너 로직 보강
+            controllerGrid.addEventListener('input', (event) => {
+                if (event.target.tagName === 'INPUT') {
+                    const slotNumber = event.target.dataset.slot;
+                    const keyword = event.target.value;
+                    
+                    // [신규] 입력 내용에 해당하는 뒤집기 버튼을 찾습니다.
+                    const flipButton = controllerGrid.querySelector(`.flip-btn[data-slot="${slotNumber}"]`);
+                    // [신규] 키워드가 있으면 버튼을 활성화, 없으면 다시 비활성화합니다.
+                    flipButton.disabled = keyword.trim() === '';
+
+                    // [수정] 메시지에 'type'을 추가하여 어떤 종류의 명령인지 명시합니다.
+                    channel.postMessage({
+                        type: 'text_update',
+                        slot: slotNumber,
+                        keyword: keyword
+                    });
+                }
+            });
+
+            // [신규] 뒤집기 버튼 클릭 이벤트 리스너 추가
+            controllerGrid.addEventListener('click', (event) => {
+                if (event.target.classList.contains('flip-btn')) {
+                    const slotNumber = event.target.dataset.slot;
+                    const slotIndex = parseInt(slotNumber) - 1;
+
+                    // [신규] 해당 슬롯의 뒤집힘 상태를 변경합니다. (true -> false, false -> true)
+                    flipStates[slotIndex] = !flipStates[slotIndex];
+                    // [신규] 버튼의 텍스트를 현재 상태에 맞게 변경합니다.
+                    event.target.textContent = flipStates[slotIndex] ? '원위치' : '뒤집기';
+                    
+                    // [신규] 디스플레이에 '카드를 뒤집으라'는 명령을 전송합니다.
+                    channel.postMessage({
+                        type: 'flip_card',
+                        slot: slotNumber
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

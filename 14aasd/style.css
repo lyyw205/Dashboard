@@ -1,0 +1,181 @@
+/* 이 파일의 내용을 아래 코드로 전체 교체해주세요. */
+
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css");
+
+body {
+    font-family: 'Pretendard Variable', sans-serif;
+    background-color: #f0f2f5;
+    color: #333;
+}
+
+h1 {
+    font-family: 'Pretendard Variable', sans-serif;
+    text-align: center;
+}
+
+.title-text-2 {
+    font-family: 'Pretendard Variable', sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    color: #555;
+}
+
+/* --- 1. 컨트롤러 페이지 스타일 --- */
+.setup-container {
+    max-width: 800px; /* 너비를 조금 넓혀 여러 컨트롤러를 담기 좋게 함 */
+    margin: 40px auto;
+    background-color: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+#create-board-btn {
+    width: 100%;
+    padding: 15px;
+    font-size: 18px;
+    font-weight: bold;
+    color: white;
+    background-color: #4c6baf;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-bottom: 30px;
+}
+
+#controller-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 15px;
+}
+
+.controller-slot {
+    background: #f9f9f9;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #eee;
+    text-align: center;
+}
+
+.controller-slot .slot-number {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: #4c6baf;
+}
+
+.controller-slot input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    text-align: center;
+    box-sizing: border-box;
+}
+
+/* --- 2. 디스플레이 페이지 스타일 --- */
+#card-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    max-width: 1400px;
+    margin: 30px auto 0;
+}
+
+.flippable {
+    perspective: 1000px;
+    background-color: transparent;
+}
+
+.flippable-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.6s;
+    transform-style: preserve-3d;
+}
+
+.flippable.is-flipped .flippable-inner {
+    transform: rotateY(180deg);
+}
+
+.flippable-front, .flippable-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 10px;
+    box-sizing: border-box;
+    word-break: break-all;
+}
+
+.flippable-back {
+    transform: rotateY(180deg);
+}
+
+.item-card {
+    width: 200px;
+    height: 150px;
+}
+
+.item-card .flippable-inner {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    border-radius: 10px;
+}
+
+.item-card .flippable-front {
+    background-color: #a1b7ff;
+    color: white;
+    font-size: 30px;
+    font-weight: bold;
+    border-radius: 10px;
+}
+
+.item-card .flippable-back {
+    background-color: #263464;
+    color: #ffffff;
+    font-size: 20px;
+    font-weight: bold;
+    border-radius: 10px;
+}
+
+/* --- 3. 활성화 상태 숨김 처리 --- */
+.item-card {
+    /* 모든 카드의 커서를 기본값으로 통일하여 시각적 힌트를 없앱니다. */
+    cursor: default;
+}
+/* .is-disabled 클래스는 이제 시각적 스타일 없이 기능만 제어합니다. */
+
+/* style.css 파일의 맨 아래에 이 코드를 추가하세요. */
+
+/* --- 컨트롤러 뒤집기 버튼 스타일 --- */
+.controller-slot .flip-btn {
+    width: 100%;
+    padding: 8px;
+    margin-top: 8px;
+    font-size: 14px;
+    font-weight: bold;
+    color: white;
+    background-color: #28a745; /* 초록색 */
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+/* 버튼이 활성화되었을 때 마우스를 올리면 색상 변경 */
+.controller-slot .flip-btn:not(:disabled):hover {
+    background-color: #218838;
+}
+
+/* 버튼이 비활성화되었을 때의 스타일 */
+.controller-slot .flip-btn:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}

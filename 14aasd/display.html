@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>뽑기판</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1 class="title-text-1" style="text-align: center; margin-top: 40px;">뽑기판</h1>
+    <div id="card-container">
+        <!-- 뽑기판 카드가 여기에 생성됩니다. -->
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const cardContainer = document.getElementById('card-container');
+            const channel = new BroadcastChannel('designated_lottery');
+            const params = new URLSearchParams(window.location.search);
+            const cardCount = parseInt(params.get('count'), 10) || 16;
+
+            for (let i = 1; i <= cardCount; i++) {
+                const card = document.createElement('div');
+                card.className = 'flippable item-card is-disabled';
+                card.id = `card-${i}`;
+                card.innerHTML = `
+                    <div class="flippable-inner">
+                        <div class="flippable-front">${i}</div>
+                        <div class="flippable-back"></div>
+                    </div>
+                `;
+                cardContainer.appendChild(card);
+            }
+
+            // [수정] 메시지 타입에 따라 다른 동작을 하도록 onmessage 핸들러를 수정합니다.
+            channel.onmessage = (event) => {
+                // 메시지에서 type, slot, keyword 데이터를 추출합니다.
+                const { type, slot, keyword } = event.data;
+                const targetCard = document.getElementById(`card-${slot}`);
+                if (!targetCard) return;
+
+                // switch 문을 사용하여 메시지 타입에 따라 분기합니다.
+                switch (type) {
+                    case 'text_update':
+                        const cardBack = targetCard.querySelector('.flippable-back');
+                        cardBack.textContent = keyword;
+
+                        if (keyword.trim() !== '') {
+                            targetCard.classList.remove('is-disabled');
+                            if (!targetCard.hasClickListener) {
+                                targetCard.addEventListener('click', () => {
+                                    if (!targetCard.classList.contains('is-disabled')) {
+                                        targetCard.classList.toggle('is-flipped');
+                                    }
+                                });
+                                targetCard.hasClickListener = true;
+                            }
+                        } else {
+                            targetCard.classList.add('is-disabled');
+                            targetCard.classList.remove('is-flipped');
+                        }
+                        break;
+                    
+                    case 'flip_card':
+                        // '뒤집기' 명령을 받으면 is-flipped 클래스를 토글합니다.
+                        targetCard.classList.toggle('is-flipped');
+                        break;
+                }
+            };
+        });
+    </script>
+</body>
+</html>
