@@ -22,7 +22,7 @@ h1 {
 
 /* --- 1. 컨트롤러 페이지 스타일 --- */
 .setup-container {
-    max-width: 800px; /* 너비를 조금 넓혀 여러 컨트롤러를 담기 좋게 함 */
+    max-width: 1400px; /* 너비를 조금 넓혀 여러 컨트롤러를 담기 좋게 함 */
     margin: 40px auto;
     background-color: white;
     padding: 30px;
@@ -178,4 +178,8 @@ h1 {
 .controller-slot .flip-btn:disabled {
     background-color: #ccc;
     cursor: not-allowed;
+}
+
+.input-group {
+    text-align: center;
 }
