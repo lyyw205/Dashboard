@@ -31,6 +31,15 @@
           </select>
           <button class="btn btn-dark btn-sm" onclick="loadResponses()">🔍 필터 적용</button>
           <button type="button" class="btn reset-btn btn-sm" onclick="resetFilters()">🔄 초기화</button>
+          <div class="d-flex flex-wrap gap-2 deposit-search-section">
+            <input class="deposit-search-input form-control form-control-sm" type="text" id="search-depositor-name" placeholder="입금자명 검색..." style="max-width: 150px;"/>
+            <button class="btn btn-dark btn-sm" id="btn-search-deposit">🔍 조회</button>
+          </div>
+        </div>
+        <div id="deposit-checker" class="p-3 my-3 border rounded bg-light">
+          <div id="deposit-search-results" class="mt-3 mb-3">
+            <!-- 검색 결과가 여기에 표시됩니다. -->
+          </div>
         </div>
         <div class="btn-group flex-wrap" role="group" aria-label="메시지 발송 버튼 그룹">
           <button type="button" class="btn sendbtn1 message-sender" 
@@ -216,6 +225,7 @@
       document.getElementById('filter-gender').value = '';
       document.getElementById('filter-date').value = '';
       document.getElementById('filter-status').value = '';
+      document.getElementById('deposit-checker').style.display = 'none';
 
       // 2. 필터가 해제된 상태로 첫 페이지 데이터를 다시 불러옵니다.
       loadResponses(1);
@@ -442,6 +452,96 @@
             activeHeader.classList.add('sorted');
             activeHeader.classList.add(`sorted-${currentSortDirection}`);
           }
+        }
+                // ▼▼▼ [신규] 입금 내역 빠른 조회 기능 ▼▼▼
+
+        // 1. 필요한 HTML 요소를 변수에 할당합니다.
+        const searchDepositBtn = document.getElementById('btn-search-deposit');
+        const searchDepositInput = document.getElementById('search-depositor-name');
+        const depositResultsContainer = document.getElementById('deposit-search-results');
+
+        // 2. 조회 버튼에 클릭 이벤트 리스너를 추가합니다.
+        searchDepositBtn.addEventListener('click', searchDeposits);
+
+        // 3. 검색 인풋에서 Enter 키를 눌렀을 때도 조회가 실행되도록 합니다.
+        searchDepositInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                searchDeposits();
+            }
+        });
+
+        // 4. Supabase DB에서 입금 내역을 검색하고 결과를 표시하는 메인 함수입니다.
+        async function searchDeposits() {
+            document.getElementById('deposit-checker').style.display = 'block';
+
+            const depositorName = searchDepositInput.value.trim();
+
+            if (!depositorName) {
+                alert('검색할 입금자명을 입력해주세요.');
+                return;
+            }
+
+            // 로딩 상태를 표시합니다.
+            depositResultsContainer.innerHTML = `<div class="text-center text-muted p-2"><span class="spinner-border spinner-border-sm"></span> 검색 중...</div>`;
+
+            try {
+                // [수정] select 구문에 'category', 'type'을 추가했습니다.
+                const { data, error } = await client
+                    .from('card_logs') // 카드 결제 내역 테이블
+                    .select('timeline, store, amount, category, type') // 필요한 컬럼 선택
+                    .eq('type', '입금') // '입금' 내역만 조회
+                    .ilike('store', `%${depositorName}%`) // 입력한 이름을 포함하는 모든 내역 (대소문자 무시)
+                    .order('timeline', { ascending: false }) // 최신순으로 정렬
+                    .limit(10); // 최대 10개까지 결과 표시
+
+                if (error) {
+                    throw error; // 에러가 발생하면 catch 블록으로 보냅니다.
+                }
+                
+                // 검색 결과를 화면에 렌더링하는 함수를 호출합니다.
+                renderDepositResults(data);
+
+            } catch (error) {
+                console.error('❌ 입금 내역 조회 실패:', error);
+                depositResultsContainer.innerHTML = `<div class="text-center text-danger p-2">조회 중 오류가 발생했습니다.</div>`;
+            }
+        }
+
+        // 5. 조회된 데이터를 바탕으로 HTML을 만들어 화면에 표시하는 함수입니다.
+        function renderDepositResults(results) {
+            if (!results || results.length === 0) {
+                depositResultsContainer.innerHTML = `<div class="text-center text-muted p-3" style="background-color: #f5f5f5;">일치하는 입금 내역이 없습니다.</div>`;
+                return;
+            }
+
+            // [수정] 결과 테이블의 헤더에 '카테고리'와 '종류'를 추가합니다.
+            let resultsHTML = `
+              <div class="result-item result-header">
+                <span class="result-time">입금 시각</span>
+                <span class="result-category">카테고리</span>
+                <span class="result-type">종류</span>
+                <span class="result-name">입금자명</span>
+                <span class="result-amount">금액</span>
+              </div>
+            `;
+
+            // [수정] 각 결과 행에 row.category와 row.type을 추가합니다.
+            results.forEach(row => {
+                const depositDate = new Date(row.timeline);
+                const formattedDate = `${String(depositDate.getMonth() + 1).padStart(2, '0')}.${String(depositDate.getDate()).padStart(2, '0')}. ${String(depositDate.getHours()).padStart(2, '0')}:${String(depositDate.getMinutes()).padStart(2, '0')}`;
+                
+                resultsHTML += `
+                  <div class="result-item">
+                    <span class="result-time">${formattedDate}</span>
+                    <span class="result-category">${row.category || '-'}</span>
+                    <span class="result-type">${row.type || '-'}</span>
+                    <span class="result-name">${row.store}</span>
+                    <span class="result-amount">${row.amount.toLocaleString('ko-KR')}원</span>
+                  </div>
+                `;
+            });
+
+            depositResultsContainer.innerHTML = resultsHTML;
         }
           
         // 초기 데이터 로딩
