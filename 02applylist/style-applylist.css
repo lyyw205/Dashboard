@@ -113,7 +113,7 @@
   }
 
 
-  #search-name, #filter-gender, #filter-date, .deposit-search-input{
+  #search-name, #filter-gender, #filter-date, #filter-status, .deposit-search-input{
     border: 1px solid #dcdfe6;
     padding: 8px 14px;
     font-size: 14px;
