@@ -206,11 +206,7 @@
     interact('.seat').draggable({
         modifiers: [interact.modifiers.restrictRect({ restriction: 'parent' })],
         listeners: {
-            start (event) {
-                isDragging = true;
-                // [추가됨] 드래그 시작 시 body에 'dragging' 클래스 추가
-                document.body.classList.add('dragging');
-            },
+            start (event) { isDragging = true; document.body.classList.add('dragging'); },
             move (event) {
                 const target = event.target;
                 const canvas = target.parentElement;
@@ -222,33 +218,42 @@
                 let newX = seat.x + event.dx;
                 let newY = seat.y + event.dy;
 
-                const snapThreshold = 10;
-                let snapX = null;
-                let snapY = null;
-                
-                table.seats.forEach((otherSeat, otherSeatIndex) => {
-                    if (seatIndex === otherSeatIndex) return;
-                    if (Math.abs(newX - otherSeat.x) < snapThreshold) snapX = otherSeat.x;
-                    if (Math.abs(newY - otherSeat.y) < snapThreshold) snapY = otherSeat.y;
-                });
+                if (isSnapEnabled) {
+                    const snapRange = 80; // [수정] 이 범위(px) 안에 있는 좌석만 스냅 대상으로 고려
+                    const snapThreshold = 8;
+                    let snapX = null;
+                    let snapY = null;
+                    
+                    table.seats.forEach((otherSeat, otherSeatIndex) => {
+                        if (seatIndex === otherSeatIndex) return;
 
-                canvas.querySelectorAll('.snap-guideline').forEach(el => el.remove());
+                        // [추가됨] 두 좌석 사이의 거리를 계산
+                        const distance = Math.sqrt(Math.pow(newX - otherSeat.x, 2) + Math.pow(newY - otherSeat.y, 2));
 
-                // [수정됨] 스냅이 활성화되었을 때만 마우스 움직임을 보정
-                const pullStrength = 0.2; // 자석 세기를 더 약하게 조정
-                if (snapX !== null) {
-                    newX = seat.x + (snapX - seat.x) * pullStrength + event.dx * (1 - pullStrength);
-                    const guideline = document.createElement('div');
-                    guideline.className = 'snap-guideline vertical';
-                    guideline.style.left = `${snapX + 25}px`;
-                    canvas.appendChild(guideline);
-                }
-                if (snapY !== null) {
-                    newY = seat.y + (snapY - seat.y) * pullStrength + event.dy * (1 - pullStrength);
-                    const guideline = document.createElement('div');
-                    guideline.className = 'snap-guideline horizontal';
-                    guideline.style.top = `${snapY + 25}px`;
-                    canvas.appendChild(guideline);
+                        // [추가됨] 거리가 snapRange 이내일 때만 스냅 로직 실행
+                        if (distance < snapRange) {
+                            if (Math.abs(newX - otherSeat.x) < snapThreshold) snapX = otherSeat.x;
+                            if (Math.abs(newY - otherSeat.y) < snapThreshold) snapY = otherSeat.y;
+                        }
+                    });
+
+                    canvas.querySelectorAll('.snap-guideline').forEach(el => el.remove());
+
+                    const pullStrength = 0.1;
+                    if (snapX !== null) {
+                        newX = seat.x + (snapX - seat.x) * pullStrength + event.dx * (1 - pullStrength);
+                        const guideline = document.createElement('div');
+                        guideline.className = 'snap-guideline vertical';
+                        guideline.style.left = `${snapX + 25}px`;
+                        canvas.appendChild(guideline);
+                    }
+                    if (snapY !== null) {
+                        newY = seat.y + (snapY - seat.y) * pullStrength + event.dy * (1 - pullStrength);
+                        const guideline = document.createElement('div');
+                        guideline.className = 'snap-guideline horizontal';
+                        guideline.style.top = `${snapY + 25}px`;
+                        canvas.appendChild(guideline);
+                    }
                 }
 
                 seat.x = newX;
@@ -259,7 +264,6 @@
                 setTimeout(() => { isDragging = false; }, 100);
                 const canvas = event.target.parentElement;
                 canvas.querySelectorAll('.snap-guideline').forEach(el => el.remove());
-                // [추가됨] 드래그 종료 시 body에서 'dragging' 클래스 제거
                 document.body.classList.remove('dragging');
             }
         }
