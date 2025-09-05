@@ -130,56 +130,22 @@
         tables.forEach((table, tableIndex) => {
             const canvas = document.createElement('div');
             canvas.className = 'table-canvas';
-            // CSS에서 테이블 번호를 가운데 정렬했으므로 JS에서 텍스트만 넘겨줌
             canvas.innerHTML = `<div class="table-center-drag">${table.name}</div>`;
             
-            const seatsCount = table.seats.length;
-            // CSS 파일에 정의된 값들을 JS 변수로 가져옴
-            const canvasWidth = 300;
-            const canvasHeight = 330;
+            // [수정됨] 새로운 초기 배치 로직
+            const positions = [];
             const seatSize = 50;
-            const tableRect = {
-                width: 80, height: 150,
-                left: (canvasWidth / 2) - 40, right: (canvasWidth / 2) + 40,
-                top: (canvasHeight / 2) - 75, bottom: (canvasHeight / 2) + 75
-            };
-            const padding = 10; // 테이블과 좌석 사이 간격
+            const padding = 10; // 좌석과 캔버스 테두리, 좌석 사이의 간격
+            const seatsPerRow = 4; // 한 줄에 배치할 최대 좌석 수
 
-            // 각 면에 균등하게 배치될 좌석 수 계산
-            const maxSeatsPerSide = { top: 3, bottom: 3, left: 2, right: 2 };
-            let positions = [];
-            let placedCount = 0;
+            table.seats.forEach((seat, seatIndex) => {
+                const col = seatIndex % seatsPerRow;
+                const row = Math.floor(seatIndex / seatsPerRow);
 
-            // 상단 -> 하단 -> 왼쪽 -> 오른쪽 순으로 좌석 배치
-            ['top', 'bottom', 'left', 'right'].forEach(side => {
-                let count = 0;
-                if (side === 'top' || side === 'bottom') {
-                    count = Math.min(maxSeatsPerSide[side], Math.ceil((seatsCount - placedCount) / (4 - ['top', 'bottom', 'left', 'right'].indexOf(side))));
-                } else {
-                    count = Math.min(maxSeatsPerSide[side], Math.ceil((seatsCount - placedCount) / (2 - ['left', 'right'].indexOf(side))));
-                }
+                const x = padding + col * (seatSize + padding);
+                const y = padding + row * (seatSize + padding);
 
-                for (let i = 0; i < count; i++) {
-                    if (placedCount >= seatsCount) break;
-                    let x, y;
-                    const spacing = (side === 'top' || side === 'bottom') ? tableRect.width / (count + 1) : tableRect.height / (count + 1);
-
-                    if (side === 'top') {
-                        x = tableRect.left + spacing * (i + 1) - (seatSize / 2);
-                        y = tableRect.top - seatSize - padding;
-                    } else if (side === 'bottom') {
-                        x = tableRect.left + spacing * (i + 1) - (seatSize / 2);
-                        y = tableRect.bottom + padding;
-                    } else if (side === 'left') {
-                        x = tableRect.left - seatSize - padding;
-                        y = tableRect.top + spacing * (i + 1) - (seatSize / 2);
-                    } else if (side === 'right') {
-                        x = tableRect.right + padding;
-                        y = tableRect.top + spacing * (i + 1) - (seatSize / 2);
-                    }
-                    positions.push({ x, y });
-                    placedCount++;
-                }
+                positions.push({ x, y });
             });
 
             table.seats.forEach((seat, seatIndex) => {
