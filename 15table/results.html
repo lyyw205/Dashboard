@@ -58,7 +58,7 @@
                     // 저장된 x, y 좌표를 transform 속성에 적용
                     seatsHtml += `<div class="seat" style="transform: translate(${seat.x}px, ${seat.y}px);">?</div>`;
                 });
-                wrapper.innerHTML += `<div class="table-container"><div class="table-canvas"><div class="table-center-drag">${table.name}</div>${seatsHtml}</div></div>`;
+                wrapper.innerHTML += `<div class="table-canvas"><div class="table-center-drag">${table.name}</div>${seatsHtml}</div></div>`;
             });
             
             const allSeatElements = document.querySelectorAll('.seat');
