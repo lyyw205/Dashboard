@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>자리 배치 결과</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="content-wrapper">
+      <h2 id="result-title" style="text-align:center; margin-bottom: 30px;">자리를 섞는 중...</h2>
+      <div id="result-wrapper" class="result-wrapper"></div>
+    </div>
+    <script>
+        let animationIntervalHandler = null;
+        function runAnimation() {
+            const tablesData = JSON.parse(localStorage.getItem('seatingData'));
+            const wrapper = document.getElementById('result-wrapper');
+            const title = document.getElementById('result-title');
+            wrapper.innerHTML = '';
+            title.textContent = '자리를 섞는 중...';
+            if (animationIntervalHandler) clearInterval(animationIntervalHandler);
+            if (!tablesData) { wrapper.innerHTML = "<h2>데이터 없음</h2>"; return; }
+
+            // --- 최종 자리 배치 계산 (고정석 반영) 로직은 이전과 동일 ---
+            function shuffleArray(array) { for(let i = array.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [array[i], array[j]] = [array[j], array[i]]; } }
+            let totalMen = 0, totalWomen = 0;
+            tablesData.forEach(t => { totalMen += t.men; totalWomen += t.women; });
+            const menNumbers = Array.from({ length: totalMen }, (_, i) => (i + 1) * 2);
+            const womenNumbers = Array.from({ length: totalWomen }, (_, i) => i * 2 + 1);
+            shuffleArray(menNumbers); shuffleArray(womenNumbers);
+            const finalAssignments = [];
+            let seatCounter = 0;
+            tablesData.forEach(table => {
+                const fixedMaleSeats = [], fixedFemaleSeats = [], randomSeats = [];
+                table.seats.forEach((seat, seatIndex) => {
+                    const globalSeatIndex = seatCounter + seatIndex;
+                    if (seat.fixed === 'male') fixedMaleSeats.push(globalSeatIndex);
+                    else if (seat.fixed === 'female') fixedFemaleSeats.push(globalSeatIndex);
+                    else randomSeats.push(globalSeatIndex);
+                });
+                fixedMaleSeats.forEach(index => finalAssignments[index] = menNumbers.pop());
+                fixedFemaleSeats.forEach(index => finalAssignments[index] = womenNumbers.pop());
+                
+                // [수정됨] 남은 남자, 여자를 구분하여 섞고 배정 (번갈아 앉기 미적용)
+                const remainingMen = menNumbers.splice(0, table.men - fixedMaleSeats.length);
+                const remainingWomen = womenNumbers.splice(0, table.women - fixedFemaleSeats.length);
+                const remainingPeople = [...remainingMen, ...remainingWomen];
+                shuffleArray(remainingPeople);
+                randomSeats.forEach(index => finalAssignments[index] = remainingPeople.pop());
+                
+                seatCounter += table.seats.length;
+            });
+            
+            // --- [수정됨] 화면 그리기 (좌표 기반) ---
+            tablesData.forEach(table => {
+                let seatsHtml = '';
+                table.seats.forEach(seat => {
+                    // 저장된 x, y 좌표를 transform 속성에 적용
+                    seatsHtml += `<div class="seat" style="transform: translate(${seat.x}px, ${seat.y}px);">?</div>`;
+                });
+                wrapper.innerHTML += `<div class="table-container"><div class="table-canvas"><div class="table-center-drag">${table.name}</div>${seatsHtml}</div></div>`;
+            });
+            
+            const allSeatElements = document.querySelectorAll('.seat');
+            
+            function startRoulette() { /* ... 이전과 동일 ... */ }
+            function stopRoulette() { /* ... 이전과 동일 ... */ }
+            // ... (애니메이션 실행 로직은 이전과 동일하게 유지) ...
+            function startRoulette() {
+                animationIntervalHandler = setInterval(() => {
+                    allSeatElements.forEach(seat => {
+                        const randomNumber = Math.floor(Math.random() * (totalMen + totalWomen)) + 1;
+                        seat.textContent = randomNumber; seat.className = 'seat';
+                    });
+                }, 80);
+            }
+            function stopRoulette() {
+                clearInterval(animationIntervalHandler);
+                title.textContent = "학창시절 느낌 그대로";
+                allSeatElements.forEach((seat, index) => {
+                    const person = finalAssignments[index];
+                    if (person !== undefined) {
+                        seat.textContent = person;
+                        seat.className = person % 2 === 0 ? 'seat male' : 'seat female';
+                    } else { seat.textContent = '공석'; seat.className = 'seat'; }
+                });
+            }
+            startRoulette();
+            setTimeout(stopRoulette, 3000);
+        }
+        window.onload = runAnimation;
+        // --- [추가됨] 독립적인 확대/축소 기능 ---
+        let zoomLevel = 1.0; // 현재 확대 비율 (1.0 = 100%)
+        const zoomStep = 0.1;  // 한 번에 10%씩 조절
+        const maxZoom = 2.0;   // 최대 200%
+        const minZoom = 0.5;   // 최소 50%
+
+        // body 전체에 마우스 휠 이벤트 리스너 추가
+        document.body.addEventListener('wheel', function(event) {
+            // Ctrl 키가 눌렸을 때만 작동
+            if (event.ctrlKey) {
+                // 브라우저의 기본 확대/축소 동작을 막음
+                event.preventDefault();
+
+                // 휠을 위로 올리면(event.deltaY < 0) 확대, 아래로 내리면 축소
+                if (event.deltaY < 0) {
+                    zoomLevel += zoomStep;
+                } else {
+                    zoomLevel -= zoomStep;
+                }
+
+                // 최대/최소 배율을 넘지 않도록 제한
+                zoomLevel = Math.max(minZoom, Math.min(maxZoom, zoomLevel));
+
+                // body의 transform: scale 속성을 변경하여 내용물 크기 조절
+                document.body.style.transform = `scale(${zoomLevel})`;
+            }
+        }, { passive: false }); // preventDefault를 사용하기 위한 옵션
+    </script>
+</body>
+</html>

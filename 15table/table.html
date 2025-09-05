@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>랜덤 자리 배치 (입력)</title>
+    <link rel="stylesheet" href="../common/sidebar.css"/>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
+</head>
+<body>
+<div class="container main-content">
+    <h2>1단계: 인원 정보 입력</h2>
+    <!-- [수정됨] 테이블 구조 변경 -->
+    <table class="input-table">
+        <thead>
+            <tr>
+                <!-- [삭제됨] '활성화' th -->
+                <th style="width:60%;">테이블 이름</th>
+                <th style="width:20%;">남자</th>
+                <th style="width:20%;">여자</th>
+            </tr>
+        </thead>
+        <tbody id="table-input-rows">
+             <tr class="input-row">
+                <!-- [삭제됨] 활성화 td -->
+                <td><input type="text" class="table-name" placeholder="예: 1번 테이블"></td>
+                <td><input type="number" class="men-count" value="0" min="0"></td>
+                <td><input type="number" class="women-count" value="0" min="0"></td>
+             </tr>
+             <tr class="input-row">
+                <td><input type="text" class="table-name" placeholder="예: 2번 테이블"></td>
+                <td><input type="number" class="men-count" value="0" min="0"></td>
+                <td><input type="number" class="women-count" value="0" min="0"></td>
+             </tr>
+             <tr class="input-row">
+                <td><input type="text" class="table-name" placeholder="예: 3번 테이블"></td>
+                <td><input type="number" class="men-count" value="0" min="0"></td>
+                <td><input type="number" class="women-count" value="0" min="0"></td>
+             </tr>
+             <tr class="input-row">
+                <td><input type="text" class="table-name" placeholder="예: 4번 테이블"></td>
+                <td><input type="number" class="men-count" value="0" min="0"></td>
+                <td><input type="number" class="women-count" value="0" min="0"></td>
+             </tr>
+             <tr class="input-row">
+                <td><input type="text" class="table-name" placeholder="예: 5번 테이블"></td>
+                <td><input type="number" class="men-count" value="0" min="0"></td>
+                <td><input type="number" class="women-count" value="0" min="0"></td>
+             </tr>
+             <tr class="input-row">
+                <td><input type="text" class="table-name" placeholder="예: 6번 테이블"></td>
+                <td><input type="number" class="men-count" value="0" min="0"></td>
+                <td><input type="number" class="women-count" value="0" min="0"></td>
+             </tr>
+             <tr class="input-row">
+                <td><input type="text" class="table-name" placeholder="예: 7번 테이블"></td>
+                <td><input type="number" class="men-count" value="0" min="0"></td>
+                <td><input type="number" class="women-count" value="0" min="0"></td>
+             </tr>
+             <tr class="input-row">
+                <td><input type="text" class="table-name" placeholder="예: 8번 테이블"></td>
+                <td><input type="number" class="men-count" value="0" min="0"></td>
+                <td><input type="number" class="women-count" value="0" min="0"></td>
+             </tr>
+        </tbody>
+    </table>
+    <button id="preview-btn" class="btn-main">테이블 미리보기 생성</button>
+
+    <div id="preview-section" style="display: none;">
+        <hr style="margin: 30px 0;">
+        <div class="preview-header">
+             <h2>2단계: 좌석 배치 (드래그) 및 고정석 지정 (클릭)</h2>
+        </div>
+        <div id="preview-wrapper" class="preview-wrapper"></div>
+        <button id="shuffle-btn" class="btn-main btn-shuffle" style="margin-top: 20px;">최종 자리 배치 보기</button>
+    </div>
+</div>
+
+<script>
+    let currentTables = [];
+    let resultWindow = null;
+    let isDragging = false;
+    let isSnapEnabled = true;
+
+    document.getElementById('preview-btn').addEventListener('click', () => {
+        const tablesData = [];
+        const rows = document.querySelectorAll('#table-input-rows .input-row');
+        rows.forEach((row, index) => {
+            const name = row.querySelector('.table-name').value.trim();
+            
+            // [수정됨] 테이블 이름이 없으면 해당 행은 무시하고 건너뜀
+            if (!name) {
+                return;
+            }
+
+            const men = parseInt(row.querySelector('.men-count').value) || 0;
+            const women = parseInt(row.querySelector('.women-count').value) || 0;
+            const seatsCount = men + women;
+
+            // 이름은 있는데 인원이 0명이면 경고 (선택사항, 0명 테이블도 생성 가능하게 하려면 이 부분을 주석처리)
+            if (seatsCount < 1) { 
+                alert(`'${name}' 테이블에 인원을 1명 이상 입력해주세요.`);
+                // 여기서 유효성 검사를 중단하고 싶다면 isValid 플래그를 사용할 수 있습니다.
+                // 지금은 그냥 인원이 없는 테이블은 생성되지 않도록 넘어갑니다.
+                return;
+            }
+
+            const seats = Array(seatsCount).fill(null).map(() => ({ x: 0, y: 0, fixed: null }));
+            for (let i = 0; i < men; i++) { if (seats[i]) seats[i].fixed = 'male'; }
+            for (let i = 0; i < women; i++) { if (seats[men + i]) seats[men + i].fixed = 'female'; }
+            tablesData.push({ name, men, women, seats });
+        });
+
+        if (tablesData.length === 0) {
+            alert("이름이 입력된 테이블이 하나도 없습니다.");
+            return;
+        }
+        currentTables = tablesData;
+        generatePreview(currentTables);
+    });
+
+    // --- [수정됨] generatePreview 함수 ---
+    function generatePreview(tables) {
+        const wrapper = document.getElementById('preview-wrapper');
+        wrapper.innerHTML = '';
+        tables.forEach((table, tableIndex) => {
+            const canvas = document.createElement('div');
+            canvas.className = 'table-canvas';
+            // CSS에서 테이블 번호를 가운데 정렬했으므로 JS에서 텍스트만 넘겨줌
+            canvas.innerHTML = `<div class="table-center-drag">${table.name}</div>`;
+            
+            const seatsCount = table.seats.length;
+            // CSS 파일에 정의된 값들을 JS 변수로 가져옴
+            const canvasWidth = 300;
+            const canvasHeight = 330;
+            const seatSize = 50;
+            const tableRect = {
+                width: 80, height: 150,
+                left: (canvasWidth / 2) - 40, right: (canvasWidth / 2) + 40,
+                top: (canvasHeight / 2) - 75, bottom: (canvasHeight / 2) + 75
+            };
+            const padding = 10; // 테이블과 좌석 사이 간격
+
+            // 각 면에 균등하게 배치될 좌석 수 계산
+            const maxSeatsPerSide = { top: 3, bottom: 3, left: 2, right: 2 };
+            let positions = [];
+            let placedCount = 0;
+
+            // 상단 -> 하단 -> 왼쪽 -> 오른쪽 순으로 좌석 배치
+            ['top', 'bottom', 'left', 'right'].forEach(side => {
+                let count = 0;
+                if (side === 'top' || side === 'bottom') {
+                    count = Math.min(maxSeatsPerSide[side], Math.ceil((seatsCount - placedCount) / (4 - ['top', 'bottom', 'left', 'right'].indexOf(side))));
+                } else {
+                    count = Math.min(maxSeatsPerSide[side], Math.ceil((seatsCount - placedCount) / (2 - ['left', 'right'].indexOf(side))));
+                }
+
+                for (let i = 0; i < count; i++) {
+                    if (placedCount >= seatsCount) break;
+                    let x, y;
+                    const spacing = (side === 'top' || side === 'bottom') ? tableRect.width / (count + 1) : tableRect.height / (count + 1);
+
+                    if (side === 'top') {
+                        x = tableRect.left + spacing * (i + 1) - (seatSize / 2);
+                        y = tableRect.top - seatSize - padding;
+                    } else if (side === 'bottom') {
+                        x = tableRect.left + spacing * (i + 1) - (seatSize / 2);
+                        y = tableRect.bottom + padding;
+                    } else if (side === 'left') {
+                        x = tableRect.left - seatSize - padding;
+                        y = tableRect.top + spacing * (i + 1) - (seatSize / 2);
+                    } else if (side === 'right') {
+                        x = tableRect.right + padding;
+                        y = tableRect.top + spacing * (i + 1) - (seatSize / 2);
+                    }
+                    positions.push({ x, y });
+                    placedCount++;
+                }
+            });
+
+            table.seats.forEach((seat, seatIndex) => {
+                const seatEl = document.createElement('div');
+                seatEl.className = 'seat';
+                seatEl.dataset.tableIndex = tableIndex;
+                seatEl.dataset.seatIndex = seatIndex;
+                
+                const pos = positions[seatIndex];
+                if (pos) {
+                    seatEl.style.transform = `translate(${pos.x}px, ${pos.y}px)`;
+                    seat.x = pos.x; seat.y = pos.y;
+                }
+
+                if (seat.fixed === 'male') { seatEl.classList.add('fixed-male'); seatEl.textContent = '男'; }
+                else if (seat.fixed === 'female') { seatEl.classList.add('fixed-female'); seatEl.textContent = '女'; }
+                canvas.appendChild(seatEl);
+            });
+            wrapper.appendChild(canvas);
+        });
+        document.getElementById('preview-section').style.display = 'block';
+    }
+    // --- Interact.js 드래그 기능 (이전과 동일) ---
+    interact('.seat').draggable({
+        modifiers: [interact.modifiers.restrictRect({ restriction: 'parent' })],
+        listeners: {
+            start (event) {
+                isDragging = true;
+                // [추가됨] 드래그 시작 시 body에 'dragging' 클래스 추가
+                document.body.classList.add('dragging');
+            },
+            move (event) {
+                const target = event.target;
+                const canvas = target.parentElement;
+                const tableIndex = parseInt(target.dataset.tableIndex);
+                const seatIndex = parseInt(target.dataset.seatIndex);
+                const table = currentTables[tableIndex];
+                const seat = table.seats[seatIndex];
+
+                let newX = seat.x + event.dx;
+                let newY = seat.y + event.dy;
+
+                const snapThreshold = 10;
+                let snapX = null;
+                let snapY = null;
+                
+                table.seats.forEach((otherSeat, otherSeatIndex) => {
+                    if (seatIndex === otherSeatIndex) return;
+                    if (Math.abs(newX - otherSeat.x) < snapThreshold) snapX = otherSeat.x;
+                    if (Math.abs(newY - otherSeat.y) < snapThreshold) snapY = otherSeat.y;
+                });
+
+                canvas.querySelectorAll('.snap-guideline').forEach(el => el.remove());
+
+                // [수정됨] 스냅이 활성화되었을 때만 마우스 움직임을 보정
+                const pullStrength = 0.2; // 자석 세기를 더 약하게 조정
+                if (snapX !== null) {
+                    newX = seat.x + (snapX - seat.x) * pullStrength + event.dx * (1 - pullStrength);
+                    const guideline = document.createElement('div');
+                    guideline.className = 'snap-guideline vertical';
+                    guideline.style.left = `${snapX + 25}px`;
+                    canvas.appendChild(guideline);
+                }
+                if (snapY !== null) {
+                    newY = seat.y + (snapY - seat.y) * pullStrength + event.dy * (1 - pullStrength);
+                    const guideline = document.createElement('div');
+                    guideline.className = 'snap-guideline horizontal';
+                    guideline.style.top = `${snapY + 25}px`;
+                    canvas.appendChild(guideline);
+                }
+
+                seat.x = newX;
+                seat.y = newY;
+                target.style.transform = `translate(${seat.x}px, ${seat.y}px)`;
+            },
+            end (event) {
+                setTimeout(() => { isDragging = false; }, 100);
+                const canvas = event.target.parentElement;
+                canvas.querySelectorAll('.snap-guideline').forEach(el => el.remove());
+                // [추가됨] 드래그 종료 시 body에서 'dragging' 클래스 제거
+                document.body.classList.remove('dragging');
+            }
+        }
+    });
+
+    // --- (좌석 클릭 및 최종 셔플 버튼 이벤트는 이전과 동일) ---
+    document.getElementById('preview-wrapper').addEventListener('click', (e) => {
+        if (isDragging || !e.target.classList.contains('seat')) { return; }
+
+        const seatEl = e.target;
+        const tableIndex = parseInt(seatEl.dataset.tableIndex);
+        const seatIndex = parseInt(seatEl.dataset.seatIndex);
+        const table = currentTables[tableIndex];
+        const seat = table.seats[seatIndex];
+        const currentStatus = seat.fixed;
+        let nextStatus = null;
+
+        // 1. 현재 고정된 남자/여자 수 계산
+        const fixedMen = table.seats.filter(s => s.fixed === 'male').length;
+        const fixedWomen = table.seats.filter(s => s.fixed === 'female').length;
+
+        // 2. 다음 상태 결정
+        if (currentStatus === null) {
+            // 현재 빈자리 -> 남자 or 여자?
+            const menFull = fixedMen >= table.men;
+            const womenFull = fixedWomen >= table.women;
+
+            if (!menFull && womenFull) { // 남자만 가능할 때
+                nextStatus = 'male';
+            } else if (menFull && !womenFull) { // 여자만 가능할 때
+                nextStatus = 'female';
+            } else { // 둘 다 가능하거나 둘 다 꽉 찼을 땐 기본 순서
+                nextStatus = 'male';
+            }
+        } else if (currentStatus === 'male') {
+            nextStatus = 'female';
+        } else if (currentStatus === 'female') {
+            nextStatus = null; // '선택 안됨'으로
+        }
+
+        // 3. 다음 상태가 유효한지 최종 확인
+        if (nextStatus === 'male') {
+            // 현재 상태가 남자가 아니면서, 남자 자리가 꽉 찼는지 확인
+            if (currentStatus !== 'male' && fixedMen >= table.men) {
+                nextStatus = null; // 꽉 찼으면 '선택 안됨'으로
+            }
+        } else if (nextStatus === 'female') {
+            // 현재 상태가 여자가 아니면서, 여자 자리가 꽉 찼는지 확인
+            if (currentStatus !== 'female' && fixedWomen >= table.women) {
+                nextStatus = null; // 꽉 찼으면 '선택 안됨'으로
+            }
+        }
+        
+        // 4. 최종 상태를 데이터와 UI에 반영
+        seat.fixed = nextStatus;
+        
+        seatEl.className = 'seat';
+        if (seat.fixed === 'male') {
+            seatEl.classList.add('fixed-male');
+            seatEl.textContent = '男';
+        } else if (seat.fixed === 'female') {
+            seatEl.classList.add('fixed-female');
+            seatEl.textContent = '女';
+        } else {
+            seatEl.textContent = '';
+        }
+    });
+    document.getElementById('shuffle-btn').addEventListener('click', () => {
+        localStorage.setItem('seatingData', JSON.stringify(currentTables));
+        if (resultWindow && !resultWindow.closed) {
+            resultWindow.focus(); resultWindow.runAnimation();
+        } else {
+            resultWindow = window.open("results.html", "_blank", "width=1400,height=800,scrollbars=yes,resizable=yes");
+        }
+    });
+</script>
+<script src="/common/sidebar.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q" crossorigin="anonymous"></script>
+</body>
+</html>
