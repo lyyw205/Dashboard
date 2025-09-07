@@ -21,34 +21,84 @@
             if (animationIntervalHandler) clearInterval(animationIntervalHandler);
             if (!tablesData) { wrapper.innerHTML = "<h2>데이터 없음</h2>"; return; }
 
-            // --- 최종 자리 배치 계산 (고정석 반영) 로직은 이전과 동일 ---
-            function shuffleArray(array) { for(let i = array.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [array[i], array[j]] = [array[j], array[i]]; } }
+            function shuffleArray(array) {
+                for(let i = array.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [array[i], array[j]] = [array[j], array[i]]; }
+                return array;
+            }
+
+            // 1. 전체 인원 번호 풀 생성
             let totalMen = 0, totalWomen = 0;
             tablesData.forEach(t => { totalMen += t.men; totalWomen += t.women; });
-            const menNumbers = Array.from({ length: totalMen }, (_, i) => (i + 1) * 2);
-            const womenNumbers = Array.from({ length: totalWomen }, (_, i) => i * 2 + 1);
-            shuffleArray(menNumbers); shuffleArray(womenNumbers);
-            const finalAssignments = [];
-            let seatCounter = 0;
+            const menNumbers = shuffleArray(Array.from({ length: totalMen }, (_, i) => (i + 1) * 2));
+            const womenNumbers = shuffleArray(Array.from({ length: totalWomen }, (_, i) => i * 2 + 1));
+
+            // 2. "사람 번호 -> 이전 테이블 이름" 맵 생성 (핵심)
+            const personToOldTableMap = new Map();
+            const tempMen = [...menNumbers];
+            const tempWomen = [...womenNumbers];
             tablesData.forEach(table => {
-                const fixedMaleSeats = [], fixedFemaleSeats = [], randomSeats = [];
+                for (let i = 0; i < table.men; i++) personToOldTableMap.set(tempMen.shift(), table.name);
+                for (let i = 0; i < table.women; i++) personToOldTableMap.set(tempWomen.shift(), table.name);
+            });
+
+            // 3. 새 테이블 구조 초기화 및 고정석 우선 배정
+            const finalAssignments = new Array(totalMen + totalWomen).fill(null);
+            const newTableLayout = []; // { name, capacity, people: [] }
+            let remainingMen = [...menNumbers];
+            let remainingWomen = [...womenNumbers];
+            let unassignedSlots = []; // { newTableIndex, slotIndex, globalIndex }
+            let seatCounter = 0;
+
+            tablesData.forEach((table, tableIndex) => {
+                newTableLayout.push({ name: table.name, capacity: table.seats.length, people: [] });
                 table.seats.forEach((seat, seatIndex) => {
-                    const globalSeatIndex = seatCounter + seatIndex;
-                    if (seat.fixed === 'male') fixedMaleSeats.push(globalSeatIndex);
-                    else if (seat.fixed === 'female') fixedFemaleSeats.push(globalSeatIndex);
-                    else randomSeats.push(globalSeatIndex);
+                    const globalIndex = seatCounter + seatIndex;
+                    if (seat.fixed === 'male') {
+                        const person = remainingMen.shift();
+                        finalAssignments[globalIndex] = person;
+                        newTableLayout[tableIndex].people.push(person);
+                    } else if (seat.fixed === 'female') {
+                        const person = remainingWomen.shift();
+                        finalAssignments[globalIndex] = person;
+                        newTableLayout[tableIndex].people.push(person);
+                    } else {
+                        unassignedSlots.push({ newTableIndex, slotIndex, globalIndex });
+                    }
                 });
-                fixedMaleSeats.forEach(index => finalAssignments[index] = menNumbers.pop());
-                fixedFemaleSeats.forEach(index => finalAssignments[index] = womenNumbers.pop());
-                
-                // [수정됨] 남은 남자, 여자를 구분하여 섞고 배정 (번갈아 앉기 미적용)
-                const remainingMen = menNumbers.splice(0, table.men - fixedMaleSeats.length);
-                const remainingWomen = womenNumbers.splice(0, table.women - fixedFemaleSeats.length);
-                const remainingPeople = [...remainingMen, ...remainingWomen];
-                shuffleArray(remainingPeople);
-                randomSeats.forEach(index => finalAssignments[index] = remainingPeople.pop());
-                
                 seatCounter += table.seats.length;
+            });
+
+            // 4. 나머지 사람들을 나머지 자리에 배정 (규칙 적용)
+            const remainingPeople = shuffleArray([...remainingMen, ...remainingWomen]);
+            
+            remainingPeople.forEach(person => {
+                const personOldTable = personToOldTableMap.get(person);
+                let placed = false;
+                
+                // 섞인 빈자리 목록을 순회하며 가능한 곳을 찾음
+                for (let i = 0; i < unassignedSlots.length; i++) {
+                    const slot = unassignedSlots[i];
+                    const newTable = newTableLayout[slot.newTableIndex];
+                    
+                    // 현재 새 테이블에 있는 사람들의 이전 테이블 목록을 가져옴
+                    const oldTablesInNewTable = newTable.people.map(p => personToOldTableMap.get(p));
+
+                    // 만약 이 사람의 이전 테이블이 새 테이블에 없다면, 배정 가능!
+                    if (!oldTablesInNewTable.includes(personOldTable)) {
+                        finalAssignments[slot.globalIndex] = person;
+                        newTable.people.push(person);
+                        unassignedSlots.splice(i, 1); // 배정된 자리는 목록에서 제거
+                        placed = true;
+                        break;
+                    }
+                }
+                
+                // 만약 모든 테이블을 확인해도 규칙상 갈 곳이 없다면, 그냥 첫 번째 빈자리에 배정 (예외 처리)
+                if (!placed && unassignedSlots.length > 0) {
+                    const slot = unassignedSlots.shift();
+                    finalAssignments[slot.globalIndex] = person;
+                    newTableLayout[slot.newTableIndex].people.push(person);
+                }
             });
             
             // --- [수정됨] 화면 그리기 (좌표 기반) ---
@@ -63,9 +113,6 @@
             
             const allSeatElements = document.querySelectorAll('.seat');
             
-            function startRoulette() { /* ... 이전과 동일 ... */ }
-            function stopRoulette() { /* ... 이전과 동일 ... */ }
-            // ... (애니메이션 실행 로직은 이전과 동일하게 유지) ...
             function startRoulette() {
                 animationIntervalHandler = setInterval(() => {
                     allSeatElements.forEach(seat => {
