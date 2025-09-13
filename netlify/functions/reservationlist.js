@@ -67,11 +67,38 @@ function renderTabs(dates) {
   });
 }
 
+let currentSort = {
+    column: null,
+    direction: 'asc' // 'asc' 또는 'desc'
+};
 
-function renderTable(data) {
+function renderTable(data, sortColumn = null, sortDirection = null) {
   if (!data || data.length === 0) {
     tableContainer.innerHTML = '<p>예약자가 없습니다.</p>';
     return;
+  }
+
+  // 정렬 로직
+  if (sortColumn) {
+    currentSort.column = sortColumn;
+    currentSort.direction = sortDirection;
+  } else if (currentSort.column) {
+    // 정렬 상태 유지
+    sortColumn = currentSort.column;
+    sortDirection = currentSort.direction;
+  }
+
+  if (sortColumn === 'nickname') {
+    data.sort((a, b) => {
+      const valA = a.nickname || '';
+      const valB = b.nickname || '';
+      
+      if (sortDirection === 'asc') {
+        return valA.localeCompare(valB, undefined, { numeric: true });
+      } else {
+        return valB.localeCompare(valA, undefined, { numeric: true });
+      }
+    });
   }
 
   renderSummary(data);
@@ -82,7 +109,7 @@ function renderTable(data) {
     <thead>
       <tr>
         <th>입장체크</th>
-        <th>번호</th> 
+        <th class="sortable" data-column="nickname">번호</th> 
         <th>이름</th>
         <th>전화번호</th>
         <th>성별</th>
@@ -117,6 +144,28 @@ function renderTable(data) {
   tableContainer.innerHTML = '';
   tableContainer.appendChild(table);
 
+  // 정렬 헤더 UI 업데이트
+  const headers = table.querySelectorAll('th.sortable');
+  headers.forEach(header => {
+    const column = header.dataset.column;
+    if (column === currentSort.column) {
+      header.classList.add(currentSort.direction === 'asc' ? 'sorted-asc' : 'sorted-desc');
+    }
+  });
+
+  // 정렬 클릭 이벤트 리스너 추가
+  table.querySelectorAll('th.sortable').forEach(header => {
+    header.addEventListener('click', () => {
+      const column = header.dataset.column;
+      let direction = 'asc';
+      if (currentSort.column === column && currentSort.direction === 'asc') {
+        direction = 'desc';
+      }
+      // 정렬된 데이터로 테이블을 다시 렌더링
+      renderTable(data, column, direction); 
+    });
+  });
+
   // 자동 저장: 텍스트 입력
   const saveData = async (inputElement) => {
     const id = inputElement.dataset.id;
@@ -135,15 +184,10 @@ function renderTable(data) {
     }
   };
 
-  // 2. 디바운스 함수 생성 (3초 지연)
   const debouncedSave = debounce(saveData, 3000);
 
-  // 자동 저장: 텍스트 입력
   document.querySelectorAll('input[type="text"][data-field]').forEach(input => {
-    // 3. 'input' 이벤트에 디바운스 적용된 함수 연결
     input.addEventListener('input', () => {
-      // 이벤트 리스너는 debouncedSave를 호출하고,
-      // debouncedSave는 3초 후에 saveData를 실행합니다.
       debouncedSave(input);
     });
   });
