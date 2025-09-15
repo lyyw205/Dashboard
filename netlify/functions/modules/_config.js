@@ -194,7 +194,7 @@ const COUPON_CONFIG = [
 // --- 2. 기본 설정 (일치하는 쿠폰이 없을 때 사용) ---
 const DEFAULT_CONFIG = {
   '남자': {
-    template: 'KA01TP250717092857251yAnTUzfxJvp', // 유료 안내 (남자)
+    template: 'KA01TP250821132202052Bqo6oJSoXrN', // 유료 안내 (남자)
     successMessage: '✅입금안내_남',
     variables: (user, formattedDate) => ({
       '#{고객명}': user.name,
@@ -203,7 +203,7 @@ const DEFAULT_CONFIG = {
     }),
   },
   '여자': {
-    template: 'KA01TP250707173844176ndkmNlwondi', // 유료 안내 (여자)
+    template: 'KA01TP250821132429722HL0vtVGdD1U', // 유료 안내 (여자)
     successMessage: '✅입금안내_여',
     variables: (user, formattedDate) => ({
       '#{고객명}': user.name,
