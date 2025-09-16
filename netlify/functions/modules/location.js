@@ -3,9 +3,9 @@ const { formatKoreanDate } = require('./_config.js');
 
 // 이 모듈에서만 사용하는 상수들을 정의합니다.
 const TEMPLATES = {
-  '남자': 'KA01TP250725103215185gMM09ZrdeDh',
-  '여자': 'KA01TP250725103215185gMM09ZrdeDh',
-  'DEFAULT': 'KA01TP250725103215185gMM09ZrdeDh' // 성별이 없거나 일치하지 않을 때 사용할 기본값
+  '남자': 'KA01TP250915111655543dNyrrzwEjp0',
+  '여자': 'KA01TP250915111655543dNyrrzwEjp0',
+  'DEFAULT': 'KA01TP250915111655543dNyrrzwEjp0' // 성별이 없거나 일치하지 않을 때 사용할 기본값
 };
 
 const MEMO_FIELD = 'memo3'; // 상태를 기록할 DB 필드
