@@ -16,6 +16,21 @@
             const tablesData = JSON.parse(localStorage.getItem('seatingData'));
             const wrapper = document.getElementById('result-wrapper');
             const title = document.getElementById('result-title');
+
+            if (!tablesData) { 
+                wrapper.innerHTML = "<h2>데이터 없음</h2>"; 
+                title.textContent = "오류";
+                return; 
+            }
+
+            // 테이블 개수에 따라 동적으로 클래스 제어
+            // 1. 먼저 이전에 추가했을 수 있는 클래스를 제거합니다.
+            wrapper.classList.remove('four-tables-layout');
+            // 2. 테이블 개수가 정확히 4개일 때만 특수 클래스를 추가합니다.
+            if (tablesData.length === 4) {
+                wrapper.classList.add('four-tables-layout');
+            }
+
             wrapper.innerHTML = '';
             title.textContent = '자리를 섞는 중...';
             if (animationIntervalHandler) clearInterval(animationIntervalHandler);
