@@ -134,7 +134,15 @@
         generatePreview(currentTables);
     });
 
-    // --- [수정됨] generatePreview 함수 ---
+    const positionLayouts = {
+        4: [0, 2, 4, 6],          // 4명일 때: 1, 3, 4, 6번 위치 사용
+        5: [0, 1, 2, 4, 6],       // 5명일 때: 1, 3, 4, 5, 6번 위치 사용
+        6: [0, 1, 2, 4, 5, 6],    // 6명일 때: 1, 2, 3, 4, 5, 6번 위치 사용
+        7: [0, 1, 2, 3, 4, 5, 6], // 7명일 때: 1~7번 위치 사용
+        8: [0, 1, 2, 3, 4, 5, 6, 7] // 8명일 때: 1~8번 위치 사용 (전체)
+        // 1, 2, 3명 등 여기에 정의되지 않은 경우는 기존처럼 순서대로 배치됩니다.
+    };
+
     function generatePreview(tables) {
         const wrapper = document.getElementById('preview-wrapper');
 
@@ -174,21 +182,24 @@
             const predefinedPositions = [
                 // 1번째: 왼쪽 위
                 { x: x_left_pos, y: y_center_pos - y_spacing },
-                // 2번째: 왼쪽 중간 (첫번째 사람 밑)
+                // 2번째: 왼쪽 중간
                 { x: x_left_pos, y: y_center_pos },
                 // 3번째: 왼쪽 아래
                 { x: x_left_pos, y: y_center_pos + y_spacing },
-                // 4번째: 오른쪽 위
-                { x: x_right_pos, y: y_center_pos - y_spacing },
-                // 5번째: 오른쪽 중간 (네번째 사람 밑)
-                { x: x_right_pos, y: y_center_pos },
-                // 6번째: 오른쪽 아래
-                { x: x_right_pos, y: y_center_pos + y_spacing },
-                // 7번째: 하단 중앙
+                // 4번째: 하단 중앙
                 { x: x_center_pos, y: y_bottom_pos },
+                // 5번째: 오른쪽 아래
+                { x: x_right_pos, y: y_center_pos + y_spacing },
+                // 6번째: 오른쪽 중간
+                { x: x_right_pos, y: y_center_pos },
+                // 7번째: 오른쪽 위
+                { x: x_right_pos, y: y_center_pos - y_spacing },
                 // 8번째: 상단 중앙
                 { x: x_center_pos, y: y_top_pos }
             ];
+
+            const seatsCount = table.seats.length;
+            const layout = positionLayouts[seatsCount]; // 현재 인원수에 맞는 레이아웃 가져오기
 
             table.seats.forEach((seat, seatIndex) => {
                 const seatEl = document.createElement('div');
@@ -197,16 +208,25 @@
                 seatEl.dataset.seatIndex = seatIndex;
                 
                 let pos;
-                if (seatIndex < predefinedPositions.length) {
-                    // 8명 이내일 경우, 미리 정의된 위치 사용
-                    pos = predefinedPositions[seatIndex];
+
+                if (layout) {
+                    // 1. 정의된 레이아웃이 있는 경우 (4, 5, 6, 7, 8명 등)
+                    const positionIndex = layout[seatIndex]; // 레이아웃 배열에서 이번 좌석이 앉아야 할 위치 인덱스를 가져옴
+                    pos = predefinedPositions[positionIndex];  // 해당 인덱스의 좌표를 할당
+                
                 } else {
-                    // 9명 이상일 경우, 중앙에 추가로 배치 (예시)
-                    const extraIndex = seatIndex - predefinedPositions.length;
-                    pos = {
-                        x: x_center_pos,
-                        y: y_center_pos + (extraIndex * (seatSize + 5))
-                    };
+                    // 2. 정의된 레이아웃이 없는 경우 (1, 2, 3명 또는 9명 이상)
+                    if (seatIndex < predefinedPositions.length) {
+                        // 8명 이내일 경우, 기존처럼 순서대로 배치
+                        pos = predefinedPositions[seatIndex];
+                    } else {
+                        // 9명 이상일 경우, 중앙에 추가로 배치 (기존 로직 유지)
+                        const extraIndex = seatIndex - predefinedPositions.length;
+                        pos = {
+                            x: x_center_pos,
+                            y: y_center_pos + (extraIndex * (seatSize + 5))
+                        };
+                    }
                 }
 
                 if (pos) {
@@ -219,6 +239,8 @@
                 else if (seat.fixed === 'female') { seatEl.classList.add('fixed-female'); seatEl.textContent = '女'; }
                 canvas.appendChild(seatEl);
             });
+            // --- [핵심 수정 로직 끝] ---
+
             wrapper.appendChild(canvas);
         });
         document.getElementById('preview-section').style.display = 'block';
