@@ -85,8 +85,8 @@ const COUPON_CONFIG = [
     code: 'WEINVITEYOU',
     // 템플릿과 성공 메시지를 객체로 만들어 성별에 따라 다른 값을 갖도록 함
     template: {
-      '남자': 'KA01TP250709145734382Qm8j2DgohNp', // 남성용 무료 초대 템플릿
-      '여자': 'KA01TP250709145734382Qm8j2DgohNp',  // 여성용 무료 초대 템플릿 (예시)
+      '남자': 'KA01TP250915111655543dNyrrzwEjp0', // 남성용 무료 초대 템플릿
+      '여자': 'KA01TP250915111655543dNyrrzwEjp0',  // 여성용 무료 초대 템플릿 (예시)
     },
     successMessage: {
       '남자': '✅무료초대_남',
@@ -125,7 +125,7 @@ const COUPON_CONFIG = [
   // --- 시나리오 2: 남/여 공통 쿠폰이고, 템플릿도 완전히 동일한 경우 (가장 간단한 케이스) ---
   {
     code: '민수',
-    template: 'KA01TP250709145734382Qm8j2DgohNp', // 남/여 공통 템플릿을 문자열로 바로 할당
+    template: 'KA01TP250915111655543dNyrrzwEjp0', // 남/여 공통 템플릿을 문자열로 바로 할당
     successMessage: (user) => `✅무료초대_민수`, // 메시지는 동적으로 생성
     variables: (user, formattedDate) => ({
       '#{고객명}': user.name,
@@ -139,7 +139,7 @@ const COUPON_CONFIG = [
   },
   {
     code: '선준',
-    template: 'KA01TP250709145734382Qm8j2DgohNp', // 남/여 공통 템플릿을 문자열로 바로 할당
+    template: 'KA01TP250915111655543dNyrrzwEjp0', // 남/여 공통 템플릿을 문자열로 바로 할당
     successMessage: (user) => `✅무료초대_선준`, // 메시지는 동적으로 생성
     variables: (user, formattedDate) => ({
       '#{고객명}': user.name,
@@ -154,7 +154,7 @@ const COUPON_CONFIG = [
 
   {
     code: '재환',
-    template: 'KA01TP250709145734382Qm8j2DgohNp', // 남/여 공통 템플릿을 문자열로 바로 할당
+    template: 'KA01TP250915111655543dNyrrzwEjp0', // 남/여 공통 템플릿을 문자열로 바로 할당
     successMessage: (user) => `✅무료초대_재환`, // 메시지는 동적으로 생성
     variables: (user, formattedDate) => ({
       '#{고객명}': user.name,
@@ -168,7 +168,7 @@ const COUPON_CONFIG = [
   },
   {
     code: '문토',
-    template: 'KA01TP250709145734382Qm8j2DgohNp', // 남/여 공통 템플릿을 문자열로 바로 할당
+    template: 'KA01TP250915111655543dNyrrzwEjp0', // 남/여 공통 템플릿을 문자열로 바로 할당
     successMessage: (user) => `✅문토예약_${user.gender}`, // 메시지는 동적으로 생성
     variables: (user, formattedDate) => ({
       '#{고객명}': user.name,
