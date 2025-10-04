@@ -4,7 +4,7 @@
 /* --- 공통 스타일 --- */
 body {
     font-family: 'Pretendard Variable', sans-serif;
-    height: 100vh;
+    height: 95vh;
     background-color: #f4f7f6;
 }
 h2, h3 {
@@ -36,13 +36,21 @@ input[type="checkbox"] { width: 18px; height: 18px; }
 
 /* 2. 테이블 캔버스를 담는 그리드 래퍼 크기 고정 */
 .preview-wrapper, .result-wrapper {
-    display: grid;
-    /* [수정] fr 대신 px 단위 사용: 3개의 열을 각각 400px로 고정 */
-    grid-template-columns: 300px 300px 300px;
+    display: flex; /* Grid 대신 Flex 사용 */
+    flex-wrap: wrap; /* 아이템이 공간을 넘어가면 다음 줄로 자동 배치 */
     gap: 20px;
-    /* 그리드 자체의 너비도 고정 (400*3 + 20*2) */
+    justify-content: center; /* 아이템들을 중앙 정렬 */
+
+    /* 기본적으로 3개 아이템을 위한 너비 (300*3 + 20*2) */
     width: 940px;
-    margin: auto 0 auto 60px;
+    margin: 0 auto; /* 전체 래퍼를 페이지 중앙에 배치 */
+}
+
+/* [추가됨] 테이블이 4개일 때 적용될 특수 스타일 */
+.preview-wrapper.four-tables-layout,
+.result-wrapper.four-tables-layout {
+    /* 2개 아이템을 위한 너비 (300*2 + 20*1) */
+    width: 620px;
 }
 
 /* 3. 테이블 캔버스 및 내부 요소 크기 고정 */
@@ -52,8 +60,8 @@ input[type="checkbox"] { width: 18px; height: 18px; }
     border: 1px dashed #ccc;
     border-radius: 8px;
     padding: 10px;
-    height: 330px;
-    width: 300px; /* 고정 너비 */
+    height: 350px;
+    width: 250px; /* 고정 너비 */
     box-sizing: border-box; /* 패딩과 테두리를 너비에 포함 */
     user-select: none; -webkit-user-select: none; -ms-user-select: none;
 }

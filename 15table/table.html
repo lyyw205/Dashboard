@@ -109,9 +109,20 @@
                 return;
             }
 
-            const seats = Array(seatsCount).fill(null).map(() => ({ x: 0, y: 0, fixed: null }));
-            for (let i = 0; i < men; i++) { if (seats[i]) seats[i].fixed = 'male'; }
-            for (let i = 0; i < women; i++) { if (seats[men + i]) seats[men + i].fixed = 'female'; }
+            const seats = [];
+            let menToPlace = men;
+            let womenToPlace = women;
+
+            while (menToPlace > 0 || womenToPlace > 0) {
+                if (menToPlace > 0) {
+                    seats.push({ x: 0, y: 0, fixed: 'male' });
+                    menToPlace--;
+                }
+                if (womenToPlace > 0) {
+                    seats.push({ x: 0, y: 0, fixed: 'female' });
+                    womenToPlace--;
+                }
+            }
             tablesData.push({ name, men, women, seats });
         });
 
@@ -123,30 +134,72 @@
         generatePreview(currentTables);
     });
 
-    // --- [수정됨] generatePreview 함수 ---
+    const positionLayouts = {
+        4: [0, 2, 4, 6],          // 4명일 때: 1, 3, 4, 6번 위치 사용
+        5: [0, 1, 2, 4, 6],       // 5명일 때: 1, 3, 4, 5, 6번 위치 사용
+        6: [0, 1, 2, 4, 5, 6],    // 6명일 때: 1, 2, 3, 4, 5, 6번 위치 사용
+        7: [0, 1, 2, 3, 4, 5, 6], // 7명일 때: 1~7번 위치 사용
+        8: [0, 1, 2, 3, 4, 5, 6, 7] // 8명일 때: 1~8번 위치 사용 (전체)
+        // 1, 2, 3명 등 여기에 정의되지 않은 경우는 기존처럼 순서대로 배치됩니다.
+    };
+
     function generatePreview(tables) {
         const wrapper = document.getElementById('preview-wrapper');
+
+        wrapper.classList.remove('four-tables-layout');
+        // 2. 테이블 개수가 정확히 4개일 때만 특수 클래스를 추가합니다.
+        if (tables.length === 4) {
+            wrapper.classList.add('four-tables-layout');
+        }
+
         wrapper.innerHTML = '';
         tables.forEach((table, tableIndex) => {
             const canvas = document.createElement('div');
             canvas.className = 'table-canvas';
             canvas.innerHTML = `<div class="table-center-drag">${table.name}</div>`;
             
-            // [수정됨] 새로운 초기 배치 로직
-            const positions = [];
+            // 1. 좌석 배치 계산을 위한 기준값 설정
             const seatSize = 50;
-            const padding = 10; // 좌석과 캔버스 테두리, 좌석 사이의 간격
-            const seatsPerRow = 4; // 한 줄에 배치할 최대 좌석 수
+            const canvasWidth = 250;  // 전체 영역 너비 (테이블 + 좌석 포함)
+            const canvasHeight = 350; // 전체 영역 높이
 
-            table.seats.forEach((seat, seatIndex) => {
-                const col = seatIndex % seatsPerRow;
-                const row = Math.floor(seatIndex / seatsPerRow);
+            // 캔버스(테이블)의 크기를 고정하여 좌표 계산이 틀어지지 않게 합니다.
+            canvas.style.width = `${canvasWidth}px`;
+            canvas.style.height = `${canvasHeight}px`;
 
-                const x = padding + col * (seatSize + padding);
-                const y = padding + row * (seatSize + padding);
+            // 2. 이미지처럼 중앙에 밀집시키기 위한 좌표 계산
+            // 이 값들을 수정하여 좌석 간격이나 테이블과의 거리를 조절할 수 있습니다.
+            const x_left_pos = 18;                                    // 왼쪽 줄 좌석들의 x좌표
+            const x_right_pos = 160;  // 오른쪽 줄 좌석들의 x좌표
+            const x_center_pos = 90;  // 위/아래 중앙 좌석의 x좌표
 
-                positions.push({ x, y });
-            });
+            const y_center_pos = (canvasHeight / 2) - (seatSize / 1.35); // 중간 줄 좌석들의 y좌표
+            const y_spacing = 52;                                     // 중간 줄 좌석과의 세로 간격
+            const y_top_pos = 35;                                     // 맨 위 좌석의 y좌표
+            const y_bottom_pos = 245; // 맨 아래 좌석의 y좌표
+
+            // 3. 요청하신 8개의 좌석 위치를 새로 계산하여 정의
+            const predefinedPositions = [
+                // 1번째: 왼쪽 위
+                { x: x_left_pos, y: y_center_pos - y_spacing },
+                // 2번째: 왼쪽 중간
+                { x: x_left_pos, y: y_center_pos },
+                // 3번째: 왼쪽 아래
+                { x: x_left_pos, y: y_center_pos + y_spacing },
+                // 4번째: 하단 중앙
+                { x: x_center_pos, y: y_bottom_pos },
+                // 5번째: 오른쪽 아래
+                { x: x_right_pos, y: y_center_pos + y_spacing },
+                // 6번째: 오른쪽 중간
+                { x: x_right_pos, y: y_center_pos },
+                // 7번째: 오른쪽 위
+                { x: x_right_pos, y: y_center_pos - y_spacing },
+                // 8번째: 상단 중앙
+                { x: x_center_pos, y: y_top_pos }
+            ];
+
+            const seatsCount = table.seats.length;
+            const layout = positionLayouts[seatsCount]; // 현재 인원수에 맞는 레이아웃 가져오기
 
             table.seats.forEach((seat, seatIndex) => {
                 const seatEl = document.createElement('div');
@@ -154,16 +207,40 @@
                 seatEl.dataset.tableIndex = tableIndex;
                 seatEl.dataset.seatIndex = seatIndex;
                 
-                const pos = positions[seatIndex];
+                let pos;
+
+                if (layout) {
+                    // 1. 정의된 레이아웃이 있는 경우 (4, 5, 6, 7, 8명 등)
+                    const positionIndex = layout[seatIndex]; // 레이아웃 배열에서 이번 좌석이 앉아야 할 위치 인덱스를 가져옴
+                    pos = predefinedPositions[positionIndex];  // 해당 인덱스의 좌표를 할당
+                
+                } else {
+                    // 2. 정의된 레이아웃이 없는 경우 (1, 2, 3명 또는 9명 이상)
+                    if (seatIndex < predefinedPositions.length) {
+                        // 8명 이내일 경우, 기존처럼 순서대로 배치
+                        pos = predefinedPositions[seatIndex];
+                    } else {
+                        // 9명 이상일 경우, 중앙에 추가로 배치 (기존 로직 유지)
+                        const extraIndex = seatIndex - predefinedPositions.length;
+                        pos = {
+                            x: x_center_pos,
+                            y: y_center_pos + (extraIndex * (seatSize + 5))
+                        };
+                    }
+                }
+
                 if (pos) {
                     seatEl.style.transform = `translate(${pos.x}px, ${pos.y}px)`;
-                    seat.x = pos.x; seat.y = pos.y;
+                    seat.x = pos.x; 
+                    seat.y = pos.y;
                 }
 
                 if (seat.fixed === 'male') { seatEl.classList.add('fixed-male'); seatEl.textContent = '男'; }
                 else if (seat.fixed === 'female') { seatEl.classList.add('fixed-female'); seatEl.textContent = '女'; }
                 canvas.appendChild(seatEl);
             });
+            // --- [핵심 수정 로직 끝] ---
+
             wrapper.appendChild(canvas);
         });
         document.getElementById('preview-section').style.display = 'block';
@@ -205,7 +282,7 @@
 
                     canvas.querySelectorAll('.snap-guideline').forEach(el => el.remove());
 
-                    const pullStrength = 0.1;
+                    const pullStrength = 0.2;
                     if (snapX !== null) {
                         newX = seat.x + (snapX - seat.x) * pullStrength + event.dx * (1 - pullStrength);
                         const guideline = document.createElement('div');
