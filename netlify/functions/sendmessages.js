@@ -1,4 +1,3 @@
-
 // 1. _config.js에서 필요한 모든 것을 가져옵니다.
 const { supabase, sendAlimtalk, COUPON_CONFIG, DEFAULT_CONFIG, formatKoreanDate, getInitialGuidanceConfig } = require('./modules/_config.js');
 
@@ -21,7 +20,7 @@ async function updateResponse(id, updateData) {
   }
 }
 
-// 3. 메인 핸들러
+// 3. 메인 핸들러 로직은 그대로 유지하되, 함수와 설정을 외부에서 가져와 사용합니다.
 exports.handler = async (event) => {
   console.log('▶️ 알림톡 자동 발송 함수 진입 (HTTP', event.httpMethod, ')');
   if (event.httpMethod !== 'POST') {
@@ -54,58 +53,55 @@ exports.handler = async (event) => {
     console.log('✅ 전체 데이터 조회 성공:', newUser);
 
     const userCouponCode = newUser.coupon ? newUser.coupon.trim().toUpperCase() : null;
-
-    // 이미 처리된 제출이면 스킵
+    // 유효성 검사
+    // memo1 필드 검사는 먼저 수행
     if (newUser.memo1 && newUser.memo1 !== '처리 대기중') {
       console.warn(`⚠️ 이미 처리된 제출이라 건너뜁니다 (id=${newUser.id}, memo1=${newUser.memo1})`);
       return { statusCode: 200, body: 'Already processed, skipped.' };
     }
-
-    // 1) 어떤 메시지를 보낼지 먼저 결정 (여성 기본=템플릿 null 가능)
-    const config = getInitialGuidanceConfig(newUser);
-
-    // 2) 템플릿이 없으면(정책 상 미발송) 바로 스킵 기록 후 종료
-    if (!config.template && userCouponCode !== '문토') {
-      const skipMsg = config.successMessage || '⏭미발송(정책)';
-      console.log(`ℹ️ ${newUser.name}(${newUser.gender}) 템플릿 없음 → 발송 스킵`);
-      await updateResponse(newUser.id, { memo1: skipMsg });
-      return { statusCode: 200, body: 'Skipped: no template (policy).' };
-    }
-
-    // 3) 템플릿이 있는 케이스에만 전화번호 검사(문토는 여전히 예외)
+    
+    // 전화번호 유효성 검사 (단, '문토' 쿠폰은 예외)
     if (userCouponCode !== '문토' && !newUser.phone) {
       console.warn('⚠️ 전화번호가 없어 건너뜁니다.');
       await updateResponse(newUser.id, { memo1: '❌발송실패(번호없음)' }); 
       return { statusCode: 200, body: 'No phone number, skipped.' };
     }
 
+    // 알림톡 발송 분기 처리
+    const config = getInitialGuidanceConfig(newUser);
+    
     const formattedApplyDate = formatKoreanDate(newUser.apply_date);
-    let isSent = false; // 발송 성공 여부
+    
+    let isSent = false; // 발송 성공 여부 변수
 
-    // ★★★ '문토' 특별 처리: 실제 발송 없이 성공 처리
+        // ★★★ '문토' 특별 처리 분기 ★★★
     if (userCouponCode === '문토') {
       console.log("✨ '문토' 예약자 특별 처리: 문자 발송을 건너뛰고 바로 성공으로 간주합니다.");
-      isSent = true;
+      isSent = true; // 실제 발송 없이 성공으로 처리
     } else {
-      // 그 외에는 실제 알림톡 발송
+      // 그 외 모든 경우에만 실제 알림톡 발송
       isSent = await sendAlimtalk(
         newUser,
         config.template,
         config.variables(newUser, formattedApplyDate)
       );
     }
+    
+    
+    const statusMessage = isSent ? config.successMessage : '❌발송실패';
+    // 1. 기본적으로 업데이트할 데이터를 만듭니다 (memo1).
+    let dbUpdatePayload = {
+      memo1: statusMessage
+    };
 
-    const statusMessage = isSent ? (config.successMessage || '✅발송완료') : '❌발송실패';
-
-    // DB 업데이트 페이로드 조립
-    const dbUpdatePayload = { memo1: statusMessage };
-
-    // 발송 성공 + extraUpdate 지시가 있으면 추가 필드 반영
+    // 2. 만약 config에 extraUpdate 지시가 있고, 발송에 성공했다면
     if (isSent && config.extraUpdate) {
       console.log('✨ 추가 DB 업데이트 작업을 수행합니다:', config.extraUpdate);
+      // dbUpdatePayload 객체에 추가 필드와 값을 더해줍니다.
       dbUpdatePayload[config.extraUpdate.field] = config.extraUpdate.value;
     }
-
+    
+    // 3. 최종적으로 조립된 데이터로 DB 업데이트 함수를 호출합니다.
     await updateResponse(newUser.id, dbUpdatePayload);
 
     return {
@@ -117,7 +113,7 @@ exports.handler = async (event) => {
     console.error('❌ 알림톡 자동 발송 함수 전체 실행 중 에러:', error);
     // 에러 발생 시 ID가 존재하면 실패 기록
     if (recordId) {
-      await updateResponse(recordId, { memo1: '❌발송실패(시스템오류)' });
+        await updateResponse(recordId, { memo1: '❌발송실패(시스템오류)' });
     }
     return { statusCode: 500, body: 'Internal Server Error' };
   }
