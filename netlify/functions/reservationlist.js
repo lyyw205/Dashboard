@@ -66,17 +66,6 @@ async function flushAll() {
   }
 }
 
-function debounce(func, delay) {
-  let timeoutId;
-  return function(...args) {
-    clearTimeout(timeoutId);
-    timeoutId = setTimeout(() => {
-      func.apply(this, args);
-    }, delay);
-  };
-}
-
-
 const tabContainer = document.getElementById('date-tabs');
 const tableContainer = document.getElementById('reservation-list');
 
