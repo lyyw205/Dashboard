@@ -4,6 +4,68 @@ const supabaseUrl = 'https://wqxmvqqkbxiykiotbusd.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndxeG12cXFrYnhpeWtpb3RidXNkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg0NDcyOTYsImV4cCI6MjA2NDAyMzI5Nn0.RmB92YtjLPMx4tkQibuRVT_T4DL3_O8Pny3ZA9DU0tk'; // 생략
 const supabase = createClient(supabaseUrl, supabaseKey);
 
+// === 자동저장(텍스트 입력) 헬퍼: 칸별 타이머 / 플러시 ===
+const textInputTimers = new Map();     // key: `${id}:${field}` -> timeout
+const textInputLastValues = new Map(); // 마지막 저장값 캐시(동일 값 중복 저장 방지)
+
+async function saveCellValue(inputEl) {
+  const id = inputEl.dataset.id;
+  const field = inputEl.dataset.field;
+  const value = inputEl.value;
+
+  const { error } = await supabase
+    .from('responses')
+    .update({ [field]: value })
+    .eq('id', id);
+
+  if (error) {
+    console.error(`❌ ${field} 저장 실패:`, error.message);
+  } else {
+    console.log(`✅ ${field} 저장 완료`);
+  }
+}
+
+function scheduleSave(inputEl, delay = 1000) {
+  const key = `${inputEl.dataset.id}:${inputEl.dataset.field}`;
+  // 동일 값이면 저장 예약 안 함(선택)
+  if (textInputLastValues.get(key) === inputEl.value) return;
+
+  if (textInputTimers.has(key)) clearTimeout(textInputTimers.get(key));
+  const t = setTimeout(async () => {
+    await saveCellValue(inputEl);
+    textInputLastValues.set(key, inputEl.value);
+    textInputTimers.delete(key);
+  }, delay);
+  textInputTimers.set(key, t);
+}
+
+async function flushSave(inputEl) {
+  const key = `${inputEl.dataset.id}:${inputEl.dataset.field}`;
+  if (textInputTimers.has(key)) {
+    clearTimeout(textInputTimers.get(key));
+    textInputTimers.delete(key);
+  }
+  await saveCellValue(inputEl);
+  textInputLastValues.set(key, inputEl.value);
+}
+
+async function flushAll() {
+  const pending = [];
+  document.querySelectorAll('input[type="text"][data-field]').forEach((inputEl) => {
+    const key = `${inputEl.dataset.id}:${inputEl.dataset.field}`;
+    if (textInputTimers.has(key)) {
+      clearTimeout(textInputTimers.get(key));
+      textInputTimers.delete(key);
+      pending.push(saveCellValue(inputEl));
+      textInputLastValues.set(key, inputEl.value);
+    }
+  });
+  if (pending.length) {
+    await Promise.all(pending);
+    console.log(`🧮 대기 중이던 텍스트 저장 ${pending.length}건 플러시 완료`);
+  }
+}
+
 function debounce(func, delay) {
   let timeoutId;
   return function(...args) {
@@ -50,7 +112,8 @@ function renderTabs(dates) {
       btn.classList.add('past-date');
     }
 
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', async () => {
+      await flushAll(); // ← 리렌더 전 미저장 내용 커밋
       renderTable(groupedData[dateStr]);
       document.querySelectorAll('#date-tabs button').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
@@ -153,64 +216,34 @@ function renderTable(data, sortColumn = null, sortDirection = null) {
     }
   });
 
-  // 정렬 클릭 이벤트 리스너 추가
+  table.querySelectorAll('input[type="text"][data-field]').forEach(input => {
+    input.addEventListener('input', () => {
+      scheduleSave(input);           // 타이핑 중엔 지연 저장 예약
+    });
+    input.addEventListener('blur', () => {
+      flushSave(input);              // 칸을 벗어나면 즉시 저장
+    });
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        flushSave(input);            // 엔터로 저장 확정
+        input.blur();
+      }
+    });
+  });
+
+  
   table.querySelectorAll('th.sortable').forEach(header => {
-    header.addEventListener('click', () => {
+    header.addEventListener('click', async () => {
+      await flushAll(); // ← 리렌더 전 미저장 내용 커밋
+
       const column = header.dataset.column;
       let direction = 'asc';
       if (currentSort.column === column && currentSort.direction === 'asc') {
         direction = 'desc';
       }
-      // 정렬된 데이터로 테이블을 다시 렌더링
-      renderTable(data, column, direction); 
-    });
-  });
-
-  // 자동 저장: 텍스트 입력
-  const saveData = async (inputElement) => {
-    const id = inputElement.dataset.id;
-    const field = inputElement.dataset.field;
-    const value = inputElement.value;
-
-    const { error } = await supabase
-      .from('responses')
-      .update({ [field]: value })
-      .eq('id', id);
-
-    if (error) {
-      console.error(`❌ ${field} 저장 실패:`, error.message);
-    } else {
-      console.log(`✅ ${field} 저장 완료 (디바운스)`);
-    }
-  };
-
-  const debouncedSave = debounce(saveData, 3000);
-
-  document.querySelectorAll('input[type="text"][data-field]').forEach(input => {
-    input.addEventListener('input', () => {
-      debouncedSave(input);
-    });
-  });
-
-  // 자동 저장: 체크박스 변경
-  document.querySelectorAll('input[type="checkbox"][data-field]').forEach(checkbox => {
-    checkbox.addEventListener('change', async () => {
-      const id = checkbox.dataset.id;
-      const field = checkbox.dataset.field;
-      const checked = checkbox.checked;
-
-      console.log("체크박스 변경 감지:", { id, field, checked });
-
-      const { error } = await supabase
-        .from('responses')
-        .update({ [field]: checked })
-        .eq('id', id);
-
-      if (error) {
-        console.error(`❌ ${field} 저장 실패:`, error.message);
-      } else {
-        console.log(`✅ ${field} 저장 완료`);
-      }
+      // 정렬된 데이터로 테이블 다시 렌더링
+      renderTable(data, column, direction);
     });
   });
 }
